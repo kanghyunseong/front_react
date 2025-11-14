@@ -122,7 +122,13 @@ const SideBar = () => {
             >
               Enviroments Visualization
             </li>
-            <li>User Ranking</li>
+            <li
+              onClick={() =>
+                handleNavigation("/admin/enviroments/enviromentsUserRanking")
+              }
+            >
+              User Ranking
+            </li>
           </S.SubMenu>
         )}
 

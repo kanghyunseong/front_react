@@ -4,9 +4,9 @@ export const StyledHeader = styled.header`
   height: 150px;
   background: linear-gradient(
     90deg,
-    rgb(94, 151, 76),
+    rgba(0, 0, 0, 1),
     rgb(76, 157, 126),
-    rgb(52, 166, 197)
+    rgba(6, 76, 95, 1)
   );
   display: flex;
   align-items: center;

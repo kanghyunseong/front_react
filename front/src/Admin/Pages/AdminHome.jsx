@@ -15,6 +15,8 @@ import CommentDeclaration from "./Community/CommentDeclaration";
 import Layout from "../Components/Layout/Layout";
 import NoticeList from "./Community/NoticeList";
 import NoticeWrite from "./Community/NoticeWrite";
+import Visualization from "./Enviroments/Visualization";
+import UserRanking from "./Enviroments/UserRanking";
 
 const AdminHome = () => {
   return (
@@ -48,8 +50,14 @@ const AdminHome = () => {
           path="community/notice-edit"
           element={<NoticeWrite isEditMode={true} />}
         />
-        <Route path="enviroments/enviromentsVisualization" />
-        <Route path="" />
+        <Route
+          path="enviroments/enviromentsVisualization"
+          element={<Visualization />}
+        />
+        <Route
+          path="enviroments/enviromentsUserRanking"
+          element={<UserRanking />}
+        />
       </Routes>
     </Layout>
   );

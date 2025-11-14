@@ -8,7 +8,7 @@ import {
   ButtonText2,
   IconLogo,
 } from "./Header.styles";
-import logo from "../../../assets/HeaderLogo.png";
+import logo from "../../../assets/adminLogo.png";
 import { useNavigate } from "react-router-dom";
 
 const Header = () => {
