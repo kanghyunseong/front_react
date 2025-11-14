@@ -26,11 +26,11 @@ const Header = () => {
           <NavItem onClick={() => navi("/stations")}>충전소</NavItem>
           <NavItem onClick={() => navi("/boards")}>커뮤니티</NavItem>
           <ButtonWrapper>
-            <ButtonText onClick={() => navi("/members/join")}>
+            <ButtonText onClick={() => navi("/members/login")}>
               로그인
             </ButtonText>
             <ButtonText2>/</ButtonText2>
-            <ButtonText onClick={() => navi("/members/login")}>
+            <ButtonText onClick={() => navi("/members/join")}>
               회원가입
             </ButtonText>
           </ButtonWrapper>

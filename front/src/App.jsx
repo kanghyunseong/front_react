@@ -6,6 +6,8 @@ import Home from "./component/Common/Home/Home";
 import CarsSearchList from "./component/Cars/CarsSearchList";
 import CarsDetail from "./component/Cars/CarsDetail";
 import AdminHome from "./Admin/Pages/AdminHome";
+import Join from "./component/Member/Join/Join";
+
 import CarsReservationConfirm from "./component/Cars/CarsReservationConfirm";
 import CarsReservation from "./component/Cars/CarsReservationForm";
 import CarsUsageHistory from "./component/Cars/CarsUsageHistory";
@@ -13,11 +15,10 @@ import CarsUsageHistory from "./component/Cars/CarsUsageHistory";
 function App() {
   const location = useLocation();
   const isAdminPage = location.pathname.startsWith("/admin");
-
+  const isJoin = location.pathname.startsWith("/members/join");
   return (
     <>
-      {!isAdminPage && <Header />}
-
+      {!isJoin && !isAdminPage && <Header />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/cars/searchList" element={<CarsSearchList />} />
@@ -29,9 +30,9 @@ function App() {
         />
         <Route path="/reserves/detail" element={<CarsUsageHistory />} />
         <Route path="/admin/*" element={<AdminHome />} />
+        <Route path="/members/join" element={<Join />} />
       </Routes>
-
-      {!isAdminPage && <Footer />}
+      {!isJoin && !isAdminPage && <Footer />}
     </>
   );
 }
