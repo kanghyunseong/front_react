@@ -1,5 +1,5 @@
-import Nav from "../../Nav/Nav";
 import HeaderLogo from "../../../assets/HeaderLogo.png";
+import Nav from "../Nav/Nav";
 import {
   FooterContainer,
   FooterContent,

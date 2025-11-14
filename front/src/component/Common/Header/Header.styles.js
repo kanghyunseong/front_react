@@ -18,9 +18,9 @@ export const StyledHeader = styled.header`
 `;
 
 export const IconLogo = styled.div`
-    width: 150px;
-    height: 150px;
-    padding-left: 10%;
+  width: 150px;
+  height: 150px;
+  padding-left: 10%;
 `;
 
 export const Logo = styled.img`
@@ -34,8 +34,8 @@ export const Frame = styled.nav`
   align-items: center;
   gap: 100px;
   flex: 1;
-justify-content: flex-end;
-padding-right: 10%;
+  justify-content: flex-end;
+  padding-right: 10%;
 `;
 
 export const NavItem = styled.a`
