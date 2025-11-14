@@ -26,7 +26,8 @@ import { useNavigate } from "react-router-dom";
 const CarsDetail = () => {
   const carInfo = {
     model: "ELI-X 2024",
-    description: "외관은 단정하고, 실내는 주행 쾌적하며, 배송 중인 자리 및 다양한 용도로 빌려 사람 담당",
+    description:
+      "외관은 단정하고, 실내는 주행 쾌적하며, 배송 중인 자리 및 다양한 용도로 빌려 사람 담당",
     battery: "87%(충전량)",
     distance: "350km",
     location: "중형",
@@ -97,7 +98,9 @@ const CarsDetail = () => {
             ))}
           </ReviewSection>
 
-          <ReservationButton onClick={() => navi("/cars/reserve")}>차량 예약하기</ReservationButton>
+          <ReservationButton onClick={() => navi("/cars/reserve")}>
+            차량 예약하기
+          </ReservationButton>
         </DetailCard>
       </MainContainer>
     </>

@@ -10,7 +10,6 @@ import CarsReservationConfirm from "./component/Cars/CarsReservationConfirm";
 import CarsReservation from "./component/Cars/CarsReservationForm";
 import CarsUsageHistory from "./component/Cars/CarsUsageHistory";
 
-
 function App() {
   const location = useLocation();
   const isAdminPage = location.pathname.startsWith("/admin");
@@ -28,7 +27,7 @@ function App() {
           path="/cars/reserve/confirm"
           element={<CarsReservationConfirm />}
         />
-        <Route path="/reserves/detail" element={<CarsUsageHistory/>} />
+        <Route path="/reserves/detail" element={<CarsUsageHistory />} />
         <Route path="/admin/*" element={<AdminHome />} />
       </Routes>
 
