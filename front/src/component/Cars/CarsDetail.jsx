@@ -97,7 +97,7 @@ const CarsDetail = () => {
             ))}
           </ReviewSection>
 
-          <ReservationButton onClick={() => navi("/cars/reserve/confirm")}>차량 예약하기</ReservationButton>
+          <ReservationButton onClick={() => navi("/cars/reserve")}>차량 예약하기</ReservationButton>
         </DetailCard>
       </MainContainer>
     </>
