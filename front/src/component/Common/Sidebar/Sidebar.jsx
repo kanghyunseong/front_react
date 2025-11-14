@@ -10,7 +10,7 @@ const SideBar = () => {
             <StyledSideHeaderButton>
             <StyledSidebarLogoBox>EV</StyledSidebarLogoBox>
             <span style={{fontWeight: 'bold', color: '#1f2937'}}>Share EV</span>
-            <span style={{fontWeight: 'bold', color: '#1f2937'}}>사용자 이름</span>
+            <span style={{fontWeight: 'bold', color: '#666666ff'}}>사용자 이름</span>
             </StyledSideHeaderButton>
           </StyledSidebarHeader>
           

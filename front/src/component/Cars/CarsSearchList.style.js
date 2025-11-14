@@ -8,6 +8,12 @@ export const MainContainer = styled.div`
   flex-direction: column;
   gap: 20px;
   padding: 20px;
+
+  @media (max-width: 1400px) {
+    margin-left: auto;
+    margin-right: auto;
+    width: 95%;
+  }
 `;
 
 export const TopSection = styled.div`
@@ -43,15 +49,13 @@ export const ProfileSubtitle = styled.p`
 
 export const StatsCard = styled.div`
   flex: 1;
+  flex-direction: column;
+  display: flex;
   background: white;
   border-radius: 16px;
   padding: 30px;
-`;
-
-export const StatsTitle = styled.h3`
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 20px;
+  justify-content: center;
+  gap: 30px;
 `;
 
 export const StatItem = styled.div`
@@ -68,7 +72,7 @@ export const StatItem = styled.div`
 
 export const StatLabel = styled.span`
   font-size: 16px;
-  color: #666;
+  color: #666666ff;
 `;
 
 export const StatValue = styled.span`
@@ -85,7 +89,7 @@ export const BottomSection = styled.div`
 `;
 
 export const SectionTitle = styled.h3`
-  font-size: 24px;
+  font-size: 25px;
   font-weight: 700;
   margin-bottom: 30px;
 `;

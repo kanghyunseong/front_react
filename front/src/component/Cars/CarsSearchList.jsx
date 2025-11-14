@@ -25,8 +25,10 @@ import {
   Pagination,
   PageButton,
 } from "./CarsSearchList.style";
+import { useNavigate } from "react-router-dom";
 
 const CarsSearchList = () => {
+    const navi = useNavigate();
     const [currentPage, setCurrentPage] = useState(1);
 
   const carData = [
@@ -85,7 +87,7 @@ const CarsSearchList = () => {
                 <BatteryLabel>배터리</BatteryLabel>
                 <BatteryValue>{car.battery}</BatteryValue>
               </CarBattery>
-              <DetailButton>상세 보기</DetailButton>
+              <DetailButton onClick={() => navi("/cars/detail")}>상세 보기</DetailButton>
             </CarCard>
           ))}
         </CarGrid>
