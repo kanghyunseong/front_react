@@ -1,5 +1,6 @@
 import { useState, forwardRef } from "react";
 import {
+  Button,
   Container,
   FileInput,
   FileLabel,
@@ -8,11 +9,12 @@ import {
   LogoBox,
   LogoImage,
   SignUpText,
-} from "./Join.style";
+} from "../styles/Styles";
 import logo from "../../../assets/HeaderLogo.png";
 import { useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import defaultImg from "../../../assets/LoginFileImg.png";
 
 const Join = () => {
   const navi = useNavigate();
@@ -25,12 +27,12 @@ const Join = () => {
   // 날짜용
   const [birthday, setBirthday] = useState("");
   const today = new Date();
+  // 파일용
+  const [file, setFile] = useState(null); // 서버 전송용 File 객체
+  const [fileImg, setFileImg] = useState(null); // 미리보기 URL
 
-  const maxDate = new Date(
-    today.getFullYear() - 18,
-    today.getMonth(),
-    today.getDate()
-  );
+  // 날짜용 const
+
   const minDate = new Date(
     today.getFullYear() - 100,
     today.getMonth(),
@@ -45,6 +47,16 @@ const Join = () => {
     return `${yyyy}-${mm}-${dd}`;
   };
 
+  // 파일 이미지용
+
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      setFile(selectedFile); // 실제 서버 전송용
+      setFileImg(URL.createObjectURL(selectedFile)); // Label 배경용 미리보기
+    }
+  };
+
   const CustomInput = forwardRef(({ value, onClick, placeholder }, ref) => (
     <Input
       onClick={onClick}
@@ -55,6 +67,22 @@ const Join = () => {
     />
   ));
 
+  // 서버에 요청
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("userId", userId);
+    formData.append("userPwd", userPwd);
+    formData.append("userName", userName);
+    formData.append("email", email);
+    formData.append("phone", phone);
+    if (file) {
+      formData.append("file", file);
+      console.log(file);
+    }
+  };
+
   return (
     <Container>
       <LogoBox>
@@ -64,17 +92,17 @@ const Join = () => {
         <SignUpText>Sign Up</SignUpText>
       </LogoBox>
 
-      <Form>
+      <Form onSubmit={handleSubmit}>
         <Input
           type="text"
-          placeholder="ID *"
+          placeholder="ID"
           onChange={(e) => setUserId(e.target.value)}
           required
         />
 
         <Input
           type="password"
-          placeholder="Password *"
+          placeholder="Password"
           onChange={(e) => {
             setUserPwd(e.target.value);
           }}
@@ -85,7 +113,7 @@ const Join = () => {
 
         <Input
           type="password"
-          placeholder="Confirm Password *"
+          placeholder="Confirm Password"
           onChange={(e) => {
             setConfirmPwd(e.target.value);
           }}
@@ -96,7 +124,7 @@ const Join = () => {
 
         <Input
           type="text"
-          placeholder="Full Name *"
+          placeholder="Full Name"
           required
           onChange={(e) => {
             setUserName(e.target.value);
@@ -126,15 +154,21 @@ const Join = () => {
           onChange={(date) => setBirthday(date)}
           dateFormat="yyyy-MM-dd"
           placeholderText="Birthday YYYY-MM-DD"
+          maxDate={today}
           minDate={minDate}
-          maxDate={maxDate}
           showYearDropdown
           scrollableYearDropdown
           customInput={<CustomInput />}
         />
 
-        <FileLabel className="inputFileCustom" htmlFor="inputFile" />
-        <FileInput type="file" accept="image/*" id="inputFile" />
+        <FileLabel htmlFor="inputFile" fileImg={fileImg || defaultImg} />
+        <FileInput
+          type="file"
+          accept="image/*"
+          id="inputFile"
+          onChange={handleFileChange}
+        />
+        <Button>Create Account</Button>
       </Form>
     </Container>
   );
