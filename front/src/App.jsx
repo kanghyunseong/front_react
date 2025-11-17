@@ -17,6 +17,7 @@ import Join from "./component/Member/Join/Join";
 
 import CarsReservationConfirm from "./component/Cars/CarsReservationConfirm";
 import CarsReservation from "./component/Cars/CarsReservationForm";
+import CarsReservationChange from "./component/Cars/CarsReservationChange";
 import CarsUsageHistory from "./component/Cars/CarsUsageHistory";
 
 function App() {
@@ -40,6 +41,7 @@ function App() {
           path="/cars/reserve/confirm"
           element={<CarsReservationConfirm />}
         />
+        <Route path="/reserves/searchList" element={<CarsReservationChange />} />
         <Route path="/reserves/detail" element={<CarsUsageHistory />} />
         <Route path="/admin/*" element={<AdminHome />} />
         <Route path="/members/join" element={<Join />} />
