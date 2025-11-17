@@ -1,25 +1,43 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom"; // 1. useLocation 임포트
+import { useLocation } from "react-router-dom";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import * as S from "./CarsRegistration.styles";
 
 const CarsRegistration = ({ isEditMode = false }) => {
   const location = useLocation();
-  const passedData = location.state?.carData; // 2. 넘겨받은 데이터 확인
+  const passedData = location.state?.carData;
 
-  // 3. 입력 필드 상태 관리 (useState)
   const [carName, setCarName] = useState("");
   const [km, setKm] = useState("");
   const [type, setType] = useState("");
+  const [battery, setBattery] = useState(""); // 충전량 (%)
+  const [efficiency, setEfficiency] = useState(""); // 전비 (km/kWh)
+  const [batteryRemaining, setBatteryRemaining] = useState(""); // 배터리 잔량 (kWh)
+  const [range, setRange] = useState("0"); // 주행가능거리 (계산값)
 
-  // 4. 수정 모드이고 데이터가 있다면, 폼에 데이터 채워넣기
+  // 수정 모드일 때 데이터 채우기
   useEffect(() => {
     if (isEditMode && passedData) {
-      setCarName(passedData.name);
-      setKm(passedData.km);
+      setCarName(passedData.name || "");
+      setKm(passedData.km || "");
       setType(passedData.type || "");
+      setBattery(passedData.battery?.replace("%", "") || "");
+      setEfficiency(passedData.efficiency || "");
+      setBatteryRemaining(passedData.batteryRemaining || "");
     }
   }, [isEditMode, passedData]);
+
+  // 주행가능거리 자동 계산
+  useEffect(() => {
+    if (efficiency && batteryRemaining) {
+      const calculatedRange = (
+        parseFloat(efficiency) * parseFloat(batteryRemaining)
+      ).toFixed(1);
+      setRange(calculatedRange);
+    } else {
+      setRange("0");
+    }
+  }, [efficiency, batteryRemaining]);
 
   return (
     <div>
@@ -33,14 +51,13 @@ const CarsRegistration = ({ isEditMode = false }) => {
         </h3>
         <p style={{ color: "#999", marginBottom: "30px", fontSize: "14px" }}>
           {isEditMode
-            ? "Edit Car name, Km, Large, Small Edit page"
+            ? "Edit Car name, Km, Battery, Efficiency information"
             : "Create new car"}
         </p>
 
         <S.FormGroup>
           <div>
             <S.Label>Car Name</S.Label>
-            {/* value와 onChange 연결 */}
             <S.Input
               value={carName}
               onChange={(e) => setCarName(e.target.value)}
@@ -53,17 +70,78 @@ const CarsRegistration = ({ isEditMode = false }) => {
               value={km}
               onChange={(e) => setKm(e.target.value)}
               placeholder="12460"
+              type="number"
             />
           </div>
         </S.FormGroup>
 
+        <S.FormGroup>
+          <div>
+            <S.Label>Large / Small</S.Label>
+            <S.Input
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+              placeholder="Large"
+            />
+          </div>
+          <div>
+            <S.Label>충전량 (%)</S.Label>
+            <S.Input
+              value={battery}
+              onChange={(e) => setBattery(e.target.value)}
+              placeholder="98"
+              type="number"
+              min="0"
+              max="100"
+            />
+          </div>
+        </S.FormGroup>
+
+        <S.FormGroup>
+          <div>
+            <S.Label>전비 (km/kWh)</S.Label>
+            <S.Input
+              value={efficiency}
+              onChange={(e) => setEfficiency(e.target.value)}
+              placeholder="5.2"
+              type="number"
+              step="0.1"
+            />
+          </div>
+          <div>
+            <S.Label>배터리 잔량 (kWh)</S.Label>
+            <S.Input
+              value={batteryRemaining}
+              onChange={(e) => setBatteryRemaining(e.target.value)}
+              placeholder="72"
+              type="number"
+              step="0.1"
+            />
+          </div>
+        </S.FormGroup>
+
+        {/* 주행가능거리 표시 (읽기 전용) */}
         <div style={{ marginBottom: "20px" }}>
-          <S.Label>Large / Small</S.Label>
+          <S.Label>주행가능거리 (자동 계산)</S.Label>
           <S.Input
-            value={type}
-            onChange={(e) => setType(e.target.value)}
-            placeholder="Large"
+            value={`${range} Km`}
+            readOnly
+            style={{
+              backgroundColor: "#f5f5f5",
+              cursor: "not-allowed",
+              fontWeight: "bold",
+              color: "#6B4CE6",
+            }}
           />
+          <p
+            style={{
+              fontSize: "12px",
+              color: "#999",
+              marginTop: "5px",
+            }}
+          >
+            * 주행가능거리 = 전비 × 배터리 잔량
+          </p>
         </div>
 
         {/* 등록 모드일 때만 날짜/이미지 업로드 표시 */}

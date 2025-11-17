@@ -34,7 +34,7 @@ const Footer = () => {
         <Nav />
       </FooterContent>
 
-      <Copyright>© 2024 EV Community. All rights reserved.</Copyright>
+      <Copyright>© 2025 EV Community. All rights reserved.</Copyright>
     </FooterContainer>
   );
 };
