@@ -18,6 +18,7 @@ import Join from "./component/Member/Join/Join";
 import CarsReservationConfirm from "./component/Cars/CarsReservationConfirm";
 import CarsReservation from "./component/Cars/CarsReservationForm";
 import CarsUsageHistory from "./component/Cars/CarsUsageHistory";
+import Station from "./component/Stations/Station";
 
 function App() {
   const location = useLocation();
@@ -27,11 +28,11 @@ function App() {
     <>
       {!isJoin && !isAdminPage && <Header />}
       <Routes>
-        <Route path="/" element={<Home />}/>
+        <Route path="/" element={<Home />} />
         <Route path="/boards" element={<Board />} />
         <Route path="/boards/write" element={<BoardForm />} />
         <Route path="/boards/:id" element={<BoardDetail />} />
-        <Route path="/boards/imgBoard" element={<ImgBoard  />} />
+        <Route path="/boards/imgBoard" element={<ImgBoard />} />
         <Route path="/boards/imgBoard/write" element={<ImgBoardForm />} />
         <Route path="/cars/searchList" element={<CarsSearchList />} />
         <Route path="/cars/detail" element={<CarsDetail />} />
@@ -43,6 +44,7 @@ function App() {
         <Route path="/reserves/detail" element={<CarsUsageHistory />} />
         <Route path="/admin/*" element={<AdminHome />} />
         <Route path="/members/join" element={<Join />} />
+        <Route path="/stations" element={<Station />} />
       </Routes>
       {!isJoin && !isAdminPage && <Footer />}
     </>
