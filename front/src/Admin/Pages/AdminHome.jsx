@@ -17,6 +17,7 @@ import NoticeList from "./Community/NoticeList";
 import NoticeWrite from "./Community/NoticeWrite";
 import Visualization from "./Enviroments/Visualization";
 import UserRanking from "./Enviroments/UserRanking";
+import UserOverview from "./User/UserOverview";
 
 const AdminHome = () => {
   return (
@@ -58,6 +59,7 @@ const AdminHome = () => {
           path="enviroments/enviromentsUserRanking"
           element={<UserRanking />}
         />
+        <Route path="user/userOverview" element={<UserOverview />} />
       </Routes>
     </Layout>
   );
