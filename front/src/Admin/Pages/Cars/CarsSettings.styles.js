@@ -88,3 +88,42 @@ export const DeleteButton = styled.button`
   cursor: pointer;
   color: #333;
 `;
+export const AddButton = styled.button`
+  background-color: #6b4ce6;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  transition: background 0.3s;
+
+  &:hover {
+    background-color: #5a3dc9;
+  }
+`;
+
+export const CarImageContainer = styled.div`
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-right: 10px;
+  background-color: #eee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .no-image {
+    font-size: 10px;
+    color: #aaa;
+  }
+`;
