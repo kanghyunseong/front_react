@@ -41,7 +41,7 @@ const BoardDetail = () => {
         navi("/boards/boards");
       });
   };
-
+ 
   if (!board) return <div>잘못된 접근입니다. 관리자에게 문의하세요.</div>;
 
   return (
