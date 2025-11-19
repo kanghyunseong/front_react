@@ -31,12 +31,13 @@ const Login = () => {
   };
 
   const naverLogin = () => {
-    axios.get("http://localhost:8081/members/naver").then((result) => {
-      console.log(result);
-      navi(
-        "https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=Kki4fyVYcYf_zkU2HAq8&redirect_uri=http%3A%2F%2Flocalhost%3A8081%2Flogin%2Fnaver&state=state_1763523715182_47728"
-      );
-    });
+    axios
+      .get("http://localhost:8081/members/naver")
+      .then((result) => {
+        const naverLoginUrl = result.data;
+        window.location.href = naverLoginUrl;
+      })
+      .catch((err) => console.error(err));
   };
   // 서버에 요청
   const handleLogin = (e) => {
