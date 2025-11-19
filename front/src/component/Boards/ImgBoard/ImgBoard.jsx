@@ -35,7 +35,7 @@ const ImgBoard = () => {
       .get(`http://localhost:8081/boards/imgBoards?page=${page}`)
       .then((response) => {
         console.log(response);
-        setImgBoards(response.data);   // 서버에서 content 형태로 받는 경우에 맞춤
+        setImgBoards(response.data);   
         setTotalPages(response.data.totalPages);
       })
       .catch((err) => {
