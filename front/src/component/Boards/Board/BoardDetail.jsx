@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-//import { AuthContext } from "../../../context/AuthContext";
+import { AuthContext } from "../../../context/AuthContext.jsx";
 
 import {
   Container,
@@ -19,7 +19,7 @@ const BoardDetail = () => {
   const navi = useNavigate();
 
   const [board, setBoard] = useState(null);
-  //const { auth } = useContext(AuthContext);
+  const { auth } = useContext(AuthContext);
 
   useEffect(() => {
     axios
@@ -42,7 +42,7 @@ const BoardDetail = () => {
       });
   };
 
-  if (!board) return <div>로딩중...</div>;
+  if (!board) return <div>잘못된 접근입니다. 관리자에게 문의하세요.</div>;
 
   return (
     <Container>

@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useState } from "react";
-//import { AuthContext } from "../../../context/AuthContext";
+import { AuthContext } from "../../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
@@ -16,16 +16,16 @@ const BoardForm = () => {
   const [boardTitle, setBoardTitle] = useState("");
   const [boardContent, setBoardContent] = useState("");
 
-  //const { auth } = useContext(AuthContext);
+  const { auth } = useContext(AuthContext);
   const navi = useNavigate();
 
    // 로그인 체크
-//   useEffect(() => {
-//     if (!auth.isAuthenticated) {
-//       alert("로그인이 필요합니다!");
-//       navi("/login");
-//     }
-//   }, [auth.isAuthenticated]);
+  useEffect(() => {
+    if (!auth.isAuthenticated) {
+      alert("로그인이 필요합니다!");
+      navi("/login");
+    }
+  }, [auth.isAuthenticated]);
 
    const handleSubmit = (e) => {
      e.preventDefault();
@@ -77,7 +77,7 @@ const BoardForm = () => {
         <Label>작성자</Label>
         <Input
           type="text"
-        //   value={auth.memberName}
+           value={auth.memberName}
           readOnly
           style={{ background: "#eee" }}
         />

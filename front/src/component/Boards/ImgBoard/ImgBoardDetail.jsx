@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-//import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../../../context/AuthContext.jsx";
 import {
   Container,
   Header,
@@ -20,7 +20,7 @@ const ImgBoardDetail = () => {
   const navi = useNavigate();
 
   const [board, setBoard] = useState(null);
-  //const { auth } = useContext(AuthContext);
+  const { auth } = useContext(AuthContext);
 
   useEffect(() => {
     axios

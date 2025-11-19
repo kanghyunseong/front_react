@@ -142,7 +142,7 @@ const Join = () => {
 
         <Input
           type="text"
-          placeholder="Phone Number"
+          placeholder="Phone Number 01012345678"
           required
           onChange={(e) => {
             setUserName(e.target.value);

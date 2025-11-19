@@ -34,7 +34,8 @@ const ImgBoard = () => {
     axios
       .get(`http://localhost:8081/boards/imgBoards?page=${page}`)
       .then((response) => {
-        setImgBoards(response.data.content);   // 서버에서 content 형태로 받는 경우에 맞춤
+        console.log(response);
+        setImgBoards(response.data);   // 서버에서 content 형태로 받는 경우에 맞춤
         setTotalPages(response.data.totalPages);
       })
       .catch((err) => {
@@ -107,7 +108,7 @@ const ImgBoard = () => {
 
               <Td>{imgBoard.imgBoardWriter}</Td>
               <Td>{imgBoard.imgBoardDate}</Td>
-              <Td>{imgBoard.imgBoardCount}</Td>
+              <Td>{imgBoard.imgCount}</Td>
             </Tr>
           ))}
         </tbody>

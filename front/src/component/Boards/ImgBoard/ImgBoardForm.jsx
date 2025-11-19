@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useState } from "react";
-//import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../../../context/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
@@ -18,16 +18,16 @@ const ImgBoardForm = () => {
   const [imgBoardContent, setImgBoardContent] = useState("");
   const [file, setFile] = useState(null);
 
-  //const { auth } = useContext(AuthContext);
+  const { auth } = useContext(AuthContext);
   const navi = useNavigate();
 
   // 로그인 체크
-  // useEffect(() => {
-  //   if (!auth.isAuthenticated) {
-  //     alert("로그인이 필요합니다!");
-  //     navi("/login");
-  //   }
-  // }, [auth.isAuthenticated]);
+  useEffect(() => {
+    if (!auth.isAuthenticated) {
+      alert("로그인이 필요합니다!");
+      navi("/login");
+    }
+  }, [auth.isAuthenticated]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -43,7 +43,7 @@ const ImgBoardForm = () => {
 
     const handelFileChange = (e) => {
     const selectedFile = e.target.files[0];
-    //console.log(selectedFile);
+    console.log(selectedFile);
     const allowTypes = ["image/jpg", "image/jpeg", "image/png", "image/gif"];
     const maxSize = 1024 * 1024 * 10;
     if (selectedFile && !allowTypes.includes(selectedFile.type)) {
@@ -97,7 +97,7 @@ const ImgBoardForm = () => {
         <Label>작성자</Label>
         <Input
           type="text"
-          // value={auth.memberName}
+           value={auth.memberName}
           readOnly
           style={{ background: "#eee" }}
         />
