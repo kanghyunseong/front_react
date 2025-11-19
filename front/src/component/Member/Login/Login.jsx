@@ -29,12 +29,13 @@ const Login = () => {
       console.log(result);
     });
   };
-
   const naverLogin = () => {
     axios
       .get("http://localhost:8081/members/naver")
       .then((result) => {
         const naverLoginUrl = result.data;
+
+        // 네이버 로그인 페이지로 이동 (axios가 아니라 window.location 사용)
         window.location.href = naverLoginUrl;
       })
       .catch((err) => console.error(err));
