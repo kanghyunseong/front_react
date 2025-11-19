@@ -174,27 +174,26 @@ export const DetailButton = styled.button`
     background: #357ab8;
   }
 `;
-
-export const Pagination = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  margin-top: 30px;
-`;
-
-export const PageButton = styled.button`
-  width: 32px;
-  height: 32px;
+export const LoadMoreButton = styled.button`
+  width: 150px;
+  padding: 12px 0;
+  background: #4092cd;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
   border: none;
-  border-radius: 6px;
-  background: ${(props) => (props.$active ? "#4092cd" : "#f0f0f0")};
-  color: ${(props) => (props.$active ? "white" : "#666")};
-  font-size: 14px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s;
+  margin: 0 auto; 
+  display: block;
+  transition: background 0.2s;
 
   &:hover {
-    background: ${(props) => (props.$active ? "#357ab8" : "#e0e0e0")};
+    background: #357ab8;
+  }
+
+  &:disabled {
+    background: #ccc;
+    cursor: not-allowed;
   }
 `;
