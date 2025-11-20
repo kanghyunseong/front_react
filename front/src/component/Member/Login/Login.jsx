@@ -29,16 +29,26 @@ const Login = () => {
       console.log(result);
     });
   };
+  const naverLogin = async () => {
+    location.href =
+      "https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=Kki4fyVYcYf_zkU2HAq8&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2Fmembers%2Fnaver%2Fcallback&state=state_1763619065972_14825";
 
-  const naverLogin = () => {
-    axios
-      .get("http://localhost:8081/members/naver")
+    //const barabam = await axios.get("http://localhost:8081/members/naver");
+    /*
       .then((result) => {
         const naverLoginUrl = result.data;
-        window.location.href = naverLoginUrl;
+
+        var abc = window.open(naverLoginUrl, "_blank", "width=500,height=600");
+        console.log(abc);
+
       })
       .catch((err) => console.error(err));
+      */
+    //const naverLoginUrl = barabam.data;
+
+    //window.open(naverLoginUrl, "_blank", "width=500,height=600");
   };
+
   // 서버에 요청
   const handleLogin = (e) => {
     e.preventDefault();

@@ -196,7 +196,8 @@ const Station = () => {
         <SearchWrapper>
           <SearchInput
             placeholder="궁금하신 내용을 입력하세요."
-            onChange={(e) => setSearchStation(e.target.value)}
+            maxLength={50}
+            onChange={(e) => searchStation(e.target.value)}
           />
           <SearchButton onClick={handleSearch}>🔍</SearchButton>
         </SearchWrapper>

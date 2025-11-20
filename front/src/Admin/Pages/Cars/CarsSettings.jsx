@@ -39,14 +39,12 @@ const CarsSettings = () => {
     }
   };
 
-  // 3. useEffect (페이지 변경 시 조회)
   useEffect(() => {
     if (auth.accessToken) {
       fetchCars(currentPage);
     }
   }, [currentPage, auth.accessToken]);
 
-  // 4. [DELETE] 차량 삭제 함수
   const handleDelete = async (carId) => {
     if (window.confirm("정말로 이 차량을 삭제하시겠습니까?")) {
       try {
@@ -70,32 +68,26 @@ const CarsSettings = () => {
     }
   };
 
-  // 수정 페이지 이동
   const handleEditClick = (car) => {
-    navigate("/admin/cars/edit", { state: { carData: car } });
+    navigate(`/admin/cars/edit/${car.carId}`, { state: { carData: car } });
   };
 
-  // 등록 페이지 이동
   const handleAddClick = () => {
     navigate("/admin/cars/registration");
   };
 
-  // 페이지네이션 버튼 배열 생성
   const pageNumbers = [];
   if (pageInfo) {
     for (let i = pageInfo.startPage; i <= pageInfo.endPage; i++) {
       pageNumbers.push(i);
     }
   }
-
   if (loading && !cars.length) return <div>Loading...</div>;
-
   return (
     <div>
       <h2 style={{ marginBottom: "10px", color: "#6B4CE6" }}>
         Cars / Cars Settings
       </h2>
-
       <div
         style={{
           display: "flex",
@@ -106,7 +98,8 @@ const CarsSettings = () => {
       >
         <h3 style={{ margin: 0 }}>Enumeration</h3>
         <S.AddButton onClick={handleAddClick}>
-          <FaPlus style={{ marginRight: "5px" }} /> 차량 추가
+          <FaPlus style={{ marginRight: "5px" }} />
+          차량 추가
         </S.AddButton>
       </div>
 

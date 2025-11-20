@@ -29,6 +29,7 @@ import UserDetail from "./component/Member/detail/UserDetail";
 import UserChangePwd from "./component/Member/detail/UserChangePwd";
 import UserDelete from "./component/Member/detail/UserDelete";
 import UserUpdate from "./component/Member/detail/UserUpdate";
+import NaverLoginCallback from "./component/Member/Login/NaverCallback";
 
 function App() {
   const location = useLocation();
@@ -48,8 +49,8 @@ function App() {
         <Route path="/boards/imgBoards/write" element={<ImgBoardForm />} />
         <Route path="/boards/imgBoards/:id" element={<ImgBoardDetail />} />
         <Route path="/cars/searchList" element={<CarsSearchList />} />
-        <Route path="/cars/detail" element={<CarsDetail />} />
-        <Route path="/cars/reserve" element={<CarsReservation />} />
+        <Route path="/cars/:carId" element={<CarsDetail />} />
+        <Route path="/cars/:carId/reserve" element={<CarsReservation />} />
         <Route
           path="/cars/reserve/confirm"
           element={<CarsReservationConfirm />}
