@@ -1,10 +1,10 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export const Container = styled.div`
   max-width: 1000px;
   margin: 50px auto;
   padding: 20px;
-  font-family: 'Pretendard', sans-serif;
+  font-family: "Pretendard", sans-serif;
 `;
 
 export const Header = styled.div`
@@ -131,7 +131,7 @@ export const Button = styled.button`
 
 export const Form = styled.form`
   display: flex;
-  flex-direction: column; 
+  flex-direction: column;
 `;
 
 export const Input = styled.input`
@@ -168,6 +168,6 @@ export const BoardWriter = styled.span`
 
 export const Title = styled.h2`
   font-size: 33px;
-  color: #33333;
+  color: #333333;
   margin-bottom: 70px;
 `;
