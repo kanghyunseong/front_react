@@ -1,10 +1,11 @@
-import { useState, createContext, useEffect } from "react";
-
+import { useState, useInsertionEffect, createContext, useEffect } from "react";
 export const AuthContext = createContext();
+// 요 컨텍스트를 통해 인증관련 데이터를 하위 컴포넌트에 전달함
 
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({
     userNo: null,
+    userId: null,
     userName: null,
     userId: null,
     phone: null,
@@ -16,11 +17,10 @@ export const AuthProvider = ({ children }) => {
     provider: null,
     isAuthenticated: false,
   });
-
   useEffect(() => {
     const userNo = localStorage.getItem("userNo");
-    const userName = localStorage.getItem("userName");
     const userId = localStorage.getItem("userId");
+    const userName = localStorage.getItem("userName");
     const role = localStorage.getItem("role");
     const phone = localStorage.getItem("phone");
     const email = localStorage.getItem("email");
@@ -41,6 +41,7 @@ export const AuthProvider = ({ children }) => {
     ) {
       setAuth({
         userNo,
+        userId,
         userName,
         userId,
         role,

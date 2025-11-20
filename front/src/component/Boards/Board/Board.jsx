@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
@@ -18,11 +18,13 @@ import {
   SelectBox,
 } from "./Board.styles";
 import gasipan from "../../../assets/gasipan.png";
+import { AuthContext } from "../../../context/AuthContext.jsx";
 
 const Board = () => {
   const [boards, setBoards] = useState([]);
   const [page, setPage] = useState(0); // 0부터 시작
   const [totalPages, setTotalPages] = useState(1);
+
   const [searchType, setSearchType] = useState("title");
   const [keyword, setKeyword] = useState("");
 
@@ -31,58 +33,48 @@ const Board = () => {
   const [searchParams, setSearchParams] = useState(null); // { type, keyword }
 
   const navi = useNavigate();
+  const { auth } = useContext(AuthContext);
 
   // 공통 목록 로딩 (일반 / 검색 둘 다 여기서 처리)
   useEffect(() => {
-    const fetchBoards = async () => {
-      try {
-        if (isSearchMode && searchParams) {
-          // 검색 모드 : 검색 API
-          const res = await axios.get(
-            "http://localhost:8081/boards/boards/search",
-            {
-              params: {
-                type: searchParams.type,
-                keyword: searchParams.keyword,
-                page,
-              },
-            }
-          );
-          setBoards(res.data.content || []);
-          setTotalPages(res.data.totalPages || 1);
-        } else {
-          // 일반 모드 : 전체 목록 API
-          const res = await axios.get(
-            "http://localhost:8081/boards/boards",
-            {
-              params: { page },
-            }
-          );
-          const data = res.data;
-          setBoards(data.content || data || []);
-          setTotalPages(data.totalPages || 1);
-        }
-      } catch (err) {
-        console.error("게시판 페이지 로딩 실패:", err);
-      }
-    };
+    // 검색 모드인데 아직 검색 파라미터가 없으면 호출 X
+    if (isSearchMode && !searchParams) return;
 
-    fetchBoards();
+    const isSearch = isSearchMode && searchParams;
+
+    const url = isSearch
+      ? "http://localhost:8081/boards/boards/search"
+      : "http://localhost:8081/boards/boards";
+
+    const params = isSearch
+      ? {
+          type: searchParams.type,
+          keyword: searchParams.keyword,
+          page,
+        }
+      : { page };
+
+    axios
+      .get(url, { params })
+      .then((res) => {
+        const data = res.data;
+        setBoards(data.content || []);
+        setTotalPages(data.totalPages || 1);
+      })
+      .catch((err) => {
+        console.error("게시판 페이지 로딩 실패:", err);
+      });
   }, [page, isSearchMode, searchParams]);
 
   // 조회수 증가 + 상세 페이지 이동
   const handleView = (id) => {
-    axios
-      .post(`http://localhost:8081/boards/boards/${id}/view`)
-      .then(() => navi(`/boards/boards/${id}`))
-      .catch(() => navi(`/boards/boards/${id}`));
+    navi(`/boards/boards/${id}`);
   };
 
   // 검색 버튼 클릭
   const handleSearch = () => {
     if (!keyword.trim()) return alert("검색어를 입력하세요!");
 
-    // 검색 파라미터 저장 + 검색 모드 ON + page 0으로 이동
     setSearchParams({ type: searchType, keyword: keyword.trim() });
     setIsSearchMode(true);
     setPage(0);
@@ -113,7 +105,9 @@ const Board = () => {
 
       <TabMenu>
         <Tab onClick={() => navi("/boards/notices")}>공지사항</Tab>
-        <Tab $active onClick={() => navi("/boards/boards")}>일반</Tab>
+        <Tab $active onClick={() => navi("/boards/boards")}>
+          일반
+        </Tab>
         <Tab onClick={() => navi("/boards/imgBoards")}>갤러리</Tab>
       </TabMenu>
 
@@ -149,7 +143,7 @@ const Board = () => {
         </tbody>
       </Table>
 
-      
+      {/* 페이징 */}
       <Pagination>
         {/* 처음 */}
         <button
@@ -240,10 +234,18 @@ const Board = () => {
           마지막
         </button>
       </Pagination>
-      
 
       <ButtonWrapper>
-        <WriteButton onClick={() => navi("/boards/boards/write")}>
+        <WriteButton
+          onClick={() => {
+            if (!auth?.accessToken) {
+              alert("로그인이 필요합니다.");
+              navi("/members/login");
+              return;
+            }
+            navi("/boards/boards/write");
+          }}
+        >
           글쓰기
         </WriteButton>
       </ButtonWrapper>

@@ -34,7 +34,7 @@ const CarsDetail = () => {
  
   useEffect(() => {
     axios
-      .get(`http://localhost:8081/cars/detail/${carId}`)
+      .get(`http://localhost:8081/cars/${carId}`)
       .then((result) => {
         console.log(result);
         setCar(result.data[0]);
@@ -55,30 +55,30 @@ const CarsDetail = () => {
           <CardTitle>차량 상세보기</CardTitle>
 
           <CarImageArea>
-            <CarModel>{car.carImage}</CarModel>
+            <CarModel>{car?.carImage}</CarModel>
           </CarImageArea>
 
           <InfoSection>
             <SectionTitle>차량 소개</SectionTitle>
-            <InfoText>{car.carContent}</InfoText>
+            <InfoText>{car?.carContent}</InfoText>
           </InfoSection>
 
           <SpecGrid>
             <SpecItem>
               <SpecLabel>배터리</SpecLabel>
-              <SpecValue>{car.battery}%</SpecValue>
+              <SpecValue>{car?.battery}%</SpecValue>
             </SpecItem>
             <SpecItem>
               <SpecLabel>주행가능 거리</SpecLabel>
-              <SpecValue>{car.carDriving}km</SpecValue>
+              <SpecValue>{car?.carDriving}km</SpecValue>
             </SpecItem>
             <SpecItem>
               <SpecLabel>차종</SpecLabel>
-              <SpecValue>{car.carSize}</SpecValue>
+              <SpecValue>{car?.carSize}</SpecValue>
             </SpecItem>
             <SpecItem>
               <SpecLabel>좌석</SpecLabel>
-              <SpecValue>{car.carSeet}</SpecValue>
+              <SpecValue>{car?.carSeet}</SpecValue>
             </SpecItem>
           </SpecGrid>
 
@@ -95,7 +95,7 @@ const CarsDetail = () => {
             ))}
           </ReviewSection>
 
-          <ReservationButton onClick={() => navi("/cars/reserve")}>
+          <ReservationButton onClick={() => navi(`/cars/${carId}/reserve`)}>
             차량 예약하기
           </ReservationButton>
         </DetailCard>

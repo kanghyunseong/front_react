@@ -92,7 +92,7 @@ const CarsSearchList = () => {
                   <BatteryLabel>배터리</BatteryLabel>
                   <BatteryValue>{car.battery}%</BatteryValue>
                 </CarBattery>
-                <DetailButton onClick={() => navi(`/cars/detail/${car.carId}`)}>
+                <DetailButton onClick={() => navi(`/cars/${car.carId}`)}>
                   상세 보기
                 </DetailButton>
               </CarCard>

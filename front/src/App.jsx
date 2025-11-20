@@ -49,8 +49,8 @@ function App() {
         <Route path="/boards/imgBoards/write" element={<ImgBoardForm />} />
         <Route path="/boards/imgBoards/:id" element={<ImgBoardDetail />} />
         <Route path="/cars/searchList" element={<CarsSearchList />} />
-        <Route path="/cars/detail/:carId" element={<CarsDetail />} />
-        <Route path="/cars/reserve" element={<CarsReservation />} />
+        <Route path="/cars/:carId" element={<CarsDetail />} />
+        <Route path="/cars/:carId/reserve" element={<CarsReservation />} />
         <Route
           path="/cars/reserve/confirm"
           element={<CarsReservationConfirm />}
@@ -60,10 +60,6 @@ function App() {
           element={<CarsReservationChange />}
         />
         <Route path="/reserves/detail" element={<CarsUsageHistory />} />
-        <Route
-          path="/members/naver/callback"
-          element={<NaverLoginCallback />}
-        />
         <Route path="/admin/*" element={<AdminHome />} />
         <Route path="/members/join" element={<Join />} />
         <Route path="/stations" element={<Station />} />
