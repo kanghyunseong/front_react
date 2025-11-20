@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useState } from "react";
-//import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../../../context/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
@@ -14,36 +14,36 @@ import {
 import gasipan from "../../../assets/gasipan.png";
 
 const ImgBoardForm = () => {
-  const [boardTitle, setBoardTitle] = useState("");
-  const [boardContent, setBoardContent] = useState("");
+  const [imgBoardTitle, setImgBoardTitle] = useState("");
+  const [imgBoardContent, setImgBoardContent] = useState("");
   const [file, setFile] = useState(null);
 
-  //const { auth } = useContext(AuthContext);
+  const { auth } = useContext(AuthContext);
   const navi = useNavigate();
 
   // 로그인 체크
-  // useEffect(() => {
-  //   if (!auth.isAuthenticated) {
-  //     alert("로그인이 필요합니다!");
-  //     navi("/login");
-  //   }
-  // }, [auth.isAuthenticated]);
+  useEffect(() => {
+    if (!auth.isAuthenticated) {
+      alert("로그인이 필요합니다!");
+      navi("/login");
+    }
+  }, [auth.isAuthenticated]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!boardTitle.trim() || !boardContent.trim()) {
+    if (!imgBoardTitle.trim() || !imgBoardContent.trim()) {
       return alert("제목/내용은 필수입니다!");
     }
 
     const formData = new FormData();
-    formData.append("boardTitle", boardTitle);
-    formData.append("boardContent", boardContent);
+    formData.append("imgBoardTitle", imgBoardTitle);
+    formData.append("imgBoardContent", imgBoardContent);
     if (file) formData.append("file", file);
 
     const handelFileChange = (e) => {
     const selectedFile = e.target.files[0];
-    //console.log(selectedFile);
+    console.log(selectedFile);
     const allowTypes = ["image/jpg", "image/jpeg", "image/png", "image/gif"];
     const maxSize = 1024 * 1024 * 10;
     if (selectedFile && !allowTypes.includes(selectedFile.type)) {
@@ -58,20 +58,20 @@ const ImgBoardForm = () => {
     setFile(selectedFile);
   };
 
-    // axios
-    //   .post("http://localhost:8081/boards", formData, {
-    //     headers: {
-    //       Authorization: `Bearer ${auth.accessToken}`,
-    //       "Content-Type": "multipart/form-data",
-    //     },
-    //   })
-    //   .then((res) => {
-    //     if (res.status === 201) {
-    //       alert("게시글이 등록되었습니다!");
-    //       navi("/boards");
-    //     }
-    //   })
-    //   .catch((err) => console.log(err));
+     axios
+       .post("http://localhost:8081/boards/imgBoards", formData, {
+         headers: {
+           Authorization: `Bearer ${auth.accessToken}`,
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => {
+        if (res.status === 201) {
+          alert("게시글이 등록되었습니다!");
+          navi("/boards/imgBoards");
+        }
+      })
+      .catch((err) => console.log(err));
   };
 
   return (
@@ -85,19 +85,19 @@ const ImgBoardForm = () => {
         <Label>제목</Label>
         <Input
           type="text"
-          onChange={(e) => setBoardTitle(e.target.value)}
+          onChange={(e) => setImgBoardTitle(e.target.value)}
         />
 
         <Label>내용</Label>
         <Input
           type="text"
-          onChange={(e) => setBoardContent(e.target.value)}
+          onChange={(e) => setImgBoardContent(e.target.value)}
         />
 
         <Label>작성자</Label>
         <Input
           type="text"
-          // value={auth.memberName}
+           value={auth.memberName}
           readOnly
           style={{ background: "#eee" }}
         />
