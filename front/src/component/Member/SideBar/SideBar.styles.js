@@ -51,6 +51,7 @@ export const StyledSidebarNav = styled.nav`
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  
 `;
 
 export const StyledSidebarButton = styled.button`

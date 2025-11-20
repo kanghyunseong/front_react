@@ -138,3 +138,9 @@ export const UserDetailContainer = styled.div`
   flex-direction: column;
   align-items: center;
 `;
+
+export const Title = styled.h2`
+  font-size: 33px;
+  color: #33333;
+  margin-bottom: 70px;
+`;

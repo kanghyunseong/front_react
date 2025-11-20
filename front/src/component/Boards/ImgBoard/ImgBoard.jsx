@@ -34,7 +34,8 @@ const ImgBoard = () => {
     axios
       .get(`http://localhost:8081/boards/imgBoards?page=${page}`)
       .then((response) => {
-        setImgBoards(response.data.content);   // 서버에서 content 형태로 받는 경우에 맞춤
+        console.log(response);
+        setImgBoards(response.data);   
         setTotalPages(response.data.totalPages);
       })
       .catch((err) => {
@@ -45,7 +46,7 @@ const ImgBoard = () => {
   // 상세보기 + 조회수 증가
   const handleView = (id) => {
     axios
-      .post(`/boards/imgBoards/${id}/view`)
+      .post(`http://localhost:8081/boards/imgBoards/${id}/view`)
       .then(() => navi(`/boards/imgBoards/${id}`))
       .catch(() => navi(`/boards/imgBoards/${id}`));
   };
@@ -56,11 +57,7 @@ const ImgBoard = () => {
 
     axios
       .get("http://localhost:8081/boards/imgBoards/search", {
-        params: {
-          type: searchType,
-          keyword: keyword,
-          page: page,
-        },
+        params: { type: searchType, keyword, page },
       })
       .then((res) => {
         setImgBoards(res.data.content);
@@ -81,8 +78,8 @@ const ImgBoard = () => {
       {/* 탭 메뉴 */}
       <TabMenu>
         <Tab onClick={() => navi("/boards/notices")}>공지사항</Tab>
-        <Tab onClick={() => navi("/boards")}>일반</Tab>
-        <Tab active onClick={() => navi("/boards/imgBoards")}>갤러리</Tab>
+        <Tab onClick={() => navi("/boards/boards")}>일반</Tab>
+        <Tab $active onClick={() => navi("/boards/imgBoards")}>갤러리</Tab>
       </TabMenu>
 
       {/* 테이블 */}
@@ -98,7 +95,7 @@ const ImgBoard = () => {
         </Thead>
 
         <tbody>
-          {imgBoards.map((imgBoard) => (
+          {Array.isArray(imgBoards) && imgBoards.map((imgBoard) => (
             <Tr key={imgBoard.imgBoardNo}>
               <Td>{imgBoard.imgBoardNo}</Td>
 
@@ -111,7 +108,7 @@ const ImgBoard = () => {
 
               <Td>{imgBoard.imgBoardWriter}</Td>
               <Td>{imgBoard.imgBoardDate}</Td>
-              <Td>{imgBoard.imgBoardCount}</Td>
+              <Td>{imgBoard.imgCount}</Td>
             </Tr>
           ))}
         </tbody>

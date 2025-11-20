@@ -29,6 +29,7 @@ import UserDetail from "./component/Member/detail/UserDetail";
 import UserChangePwd from "./component/Member/detail/UserChangePwd";
 import UserDelete from "./component/Member/detail/UserDelete";
 import UserUpdate from "./component/Member/detail/UserUpdate";
+import { AuthProvider } from "./context/AuthContext";
 
 function App() {
   const location = useLocation();
@@ -37,16 +38,15 @@ function App() {
   const isLogin = location.pathname.startsWith("/members/login");
   return (
     <>
+    <AuthProvider>
       {!isJoin && !isAdminPage && !isLogin && <Header />}
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/boards" element={<Board />} />
+        <Route path="/boards/boards" element={<Board />} />
         <Route path="/boards/notices" element={<Notice />} />
-        <Route path="/boards/write" element={<BoardForm />} />
-        <Route path="/boards/:id" element={<BoardDetail />} />
-        <Route path="/boards/imgBoard" element={<ImgBoard />} />
-        <Route path="/boards/imgBoard/write" element={<ImgBoardForm />} />
-        <Route path="/boards/imgBoards" element={<ImgBoard />} />
+        <Route path="/boards/boards/write" element={<BoardForm />} />
+        <Route path="/boards/boards/:id" element={<BoardDetail />} />
+        <Route path="/boards/imgBoards" element={<ImgBoard  />} />
         <Route path="/boards/imgBoards/write" element={<ImgBoardForm />} />
         <Route path="/boards/imgBoards/:id" element={<ImgBoardDetail />} />
         <Route path="/cars/searchList" element={<CarsSearchList />} />
@@ -67,10 +67,11 @@ function App() {
         <Route path="/members/login" element={<Login />} />
         <Route path="/members/detail" element={<UserDetail />} />
         <Route path="/members/detail/changePwd" element={<UserChangePwd />} />
-        <Route path="/members/detail/delete" element={<UserDelete />} />
-        <Route path="/members/detail/update" element={<UserUpdate />} />
-      </Routes>
-      {!isJoin && !isAdminPage && !isLogin && <Footer />}
+          <Route path="/members/detail/delete" element={<UserDelete />} />
+          <Route path="/members/detail/update" element={<UserUpdate />} />
+        </Routes>
+        {!isJoin && !isAdminPage && !isLogin && <Footer />}
+
     </>
   );
 }
