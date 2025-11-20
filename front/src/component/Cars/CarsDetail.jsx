@@ -34,7 +34,7 @@ const CarsDetail = () => {
  
   useEffect(() => {
     axios
-      .get(`http://localhost:8081/cars/detail/${carId}`)
+      .get(`http://localhost:8081/cars/${carId}`)
       .then((result) => {
         console.log(result);
         setCar(result.data[0]);
@@ -95,7 +95,7 @@ const CarsDetail = () => {
             ))}
           </ReviewSection>
 
-          <ReservationButton onClick={() => navi("/cars/reserve")}>
+          <ReservationButton onClick={() => navi(`/cars/${carId}/reserve`)}>
             차량 예약하기
           </ReservationButton>
         </DetailCard>
