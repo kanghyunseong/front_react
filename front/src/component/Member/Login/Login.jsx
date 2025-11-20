@@ -24,6 +24,21 @@ const Login = () => {
   const [msg, setMsg] = useState("");
   const { login } = useContext(AuthContext);
 
+  const kakaoLogin = () => {
+    axios.get("http://localhost:8081/members/kakao").then((result) => {
+      console.log(result);
+    });
+  };
+
+  const naverLogin = () => {
+    axios
+      .get("http://localhost:8081/members/naver")
+      .then((result) => {
+        const naverLoginUrl = result.data;
+        window.location.href = naverLoginUrl;
+      })
+      .catch((err) => console.error(err));
+  };
   // 서버에 요청
   const handleLogin = (e) => {
     e.preventDefault();
@@ -31,10 +46,10 @@ const Login = () => {
     const regexpPwd = /^[a-zA-Z0-9]*$/;
 
     if (!regexpPwd.test(memberId)) {
-      setMsg("아이디나 비밀번호가 틀립니다.");
+      setMsg("아이디나 비밀번호는 영문이거나 숫자만 사용가능합니다.");
       return;
     } else if (!regexpPwd.test(memberPwd)) {
-      setMsg("아이디나 비밀번호가 틀립니다.");
+      setMsg("아이디나 비밀번호는 영문이거나 숫자만 사용가능합니다.");
       return;
     } else {
       setMsg("");
@@ -71,7 +86,7 @@ const Login = () => {
           birthDay
         );
         alert("로그인에 성공하셨습니다.");
-        window.location.href = "/";
+        navi("/");
       })
       .catch((error) => {
         console.error(error);
@@ -94,7 +109,9 @@ const Login = () => {
           onChange={(e) => setUserId(e.target.value)}
           required
         />
-
+        <label style={{ fontSize: "13px", color: "red", padding: "4px" }}>
+          {msg}
+        </label>
         <Input
           type="password"
           placeholder="Password"
@@ -107,8 +124,8 @@ const Login = () => {
         />
 
         <Button type="submit">Login</Button>
-        <KakaoButton></KakaoButton>
-        <NaverButton></NaverButton>
+        <KakaoButton onClick={kakaoLogin} type="button"></KakaoButton>
+        <NaverButton onClick={naverLogin} type="button"></NaverButton>
       </Form>
     </Container>
   );

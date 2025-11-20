@@ -20,12 +20,12 @@ export const Header = styled.div`
 
   .title-overlay {
     position: absolute;
-    top: 50%; // 이미지 위에서 수직 중앙
+    top: 50%;  
     left: 50%;
     transform: translate(-50%, -50%);
     font-size: 32px;
     font-weight: bold;
-    color: black; // 이미지에 따라 white나 shadow 추가 가능
+    color: black; /* 이미지에 따라 white나 shadow 추가 가능 */
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
   }
 `;
@@ -41,8 +41,8 @@ export const Tab = styled.button`
   border: none;
   background: transparent;
   font-weight: bold;
-  border-bottom: ${(props) => (props.active ? "2px solid black" : "none")};
-  color: ${(props) => (props.active ? "black" : "#888")};
+  border-bottom: ${(props) => (props.$active ? '2px solid black' : 'none')};
+  color: ${(props) => (props.$active ? 'black' : '#888')};
   cursor: pointer;
 `;
 
@@ -72,6 +72,7 @@ export const Td = styled.td`
 
 export const TitleTd = styled(Td)`
   text-align: left;
+  cursor: pointer;
 `;
 
 export const ButtonWrapper = styled.div`

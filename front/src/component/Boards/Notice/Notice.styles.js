@@ -41,8 +41,8 @@ export const Tab = styled.button`
   border: none;
   background: transparent;
   font-weight: bold;
-  border-bottom: ${(props) => (props.active ? "2px solid black" : "none")};
-  color: ${(props) => (props.active ? "black" : "#888")};
+  border-bottom: ${(props) => (props.$active ? '2px solid black' : 'none')};
+  color: ${(props) => (props.$active ? 'black' : '#888')};
   cursor: pointer;
 `;
 

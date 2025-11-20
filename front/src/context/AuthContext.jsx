@@ -98,14 +98,15 @@ export const AuthProvider = ({ children }) => {
       isAuthenticated: false,
     });
     localStorage.removeItem("userNo");
-    localStorage.removeItemItem("userName");
+    localStorage.removeItem("userName");
     localStorage.removeItem("userId");
-    localStorage.removeItemItem("role");
-    localStorage.removeItemItem("phone");
-    localStorage.removeItemItem("email");
-    localStorage.removeItemItem("birthDay");
-    localStorage.removeItemItem("refreshToken");
-    localStorage.removeItemItem("accessToken");
+    localStorage.removeItem("role");
+    localStorage.removeItem("phone");
+    localStorage.removeItem("email");
+    localStorage.removeItem("birthDay");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("accessToken");
+    alert("로그아웃 되었습니다.");
     window.localStorage.href = "/";
   };
   return (
