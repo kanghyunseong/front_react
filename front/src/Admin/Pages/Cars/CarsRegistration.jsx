@@ -15,6 +15,7 @@ const CarsRegistration = () => {
   const [battery, setBattery] = useState("");
   const [efficiency, setEfficiency] = useState("");
   const [range, setRange] = useState("0");
+  const [seats, setSeats] = useState("");
 
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null); // [자동 계산 로직] (등록 시 입력에 따라 실시간 계산)
@@ -50,6 +51,7 @@ const CarsRegistration = () => {
     formData.append("carSize", type || "Small");
     formData.append("battery", battery || "0");
     formData.append("carEfficiency", efficiency || "0"); // 등록 전용 URL 사용: POST /admin/api/settings
+    formData.append("carSeet", seats || "0");
 
     const url = "http://localhost:8081/admin/api/settings";
 
@@ -166,6 +168,15 @@ const CarsRegistration = () => {
             onChange={handleFileChange}
             accept="image/*"
           />
+          <div>
+            <S.Label>Seats (인승)</S.Label>
+            <S.Input
+              type="number"
+              value={seats}
+              onChange={(e) => setSeats(e.target.value)}
+              placeholder="5"
+            />
+          </div>
           <S.UploadBox
             onClick={() => document.getElementById("carImgInput").click()}
           >
