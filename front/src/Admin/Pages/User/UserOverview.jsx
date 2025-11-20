@@ -131,6 +131,7 @@ const UserOverview = () => {
               <th>Enroll Date</th>
               <th>Update</th>
               <th>Action</th>
+              <th>State</th>
             </tr>
           </thead>
           <tbody>
@@ -165,6 +166,7 @@ const UserOverview = () => {
                     삭제하기
                   </S.DeleteButton>
                 </td>
+                <td>{user.licenseStatus}</td>
               </tr>
             ))}
           </tbody>

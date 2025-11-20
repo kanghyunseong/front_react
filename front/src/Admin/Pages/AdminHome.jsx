@@ -19,6 +19,7 @@ import Visualization from "./Enviroments/Visualization";
 import UserRanking from "./Enviroments/UserRanking";
 import UserOverview from "./User/UserOverview";
 import UserEdit from "./User/UserEdit";
+import CarsEdit from "./Cars/CarsEdit";
 
 const AdminHome = () => {
   return (
@@ -26,17 +27,11 @@ const AdminHome = () => {
       <Routes>
         {/* 대시보드 (기본 경로) */}
         <Route path="/" element={<DashBoard />} />
-
-        {/* Cars */}
         <Route path="cars/overview" element={<CarsOverview />} />
         <Route path="cars/reservation" element={<CarsReservation />} />
         <Route path="cars/registration" element={<CarsRegistration />} />
-        <Route
-          path="cars/edit"
-          element={<CarsRegistration isEditMode={true} />}
-        />
+        <Route path="cars/edit/:carId" element={<CarsEdit />} />
         <Route path="cars/settings" element={<CarsSettings />} />
-
         {/* Community */}
         <Route
           path="community/declaration"
