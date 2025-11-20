@@ -141,7 +141,9 @@ const SideBar = () => {
         </S.MenuItem>
         {activeMenu.users && (
           <S.SubMenu>
-            <li>Users Overviews</li>
+            <li onClick={() => handleNavigation("/admin/user/userOverview")}>
+              Users Overviews
+            </li>
           </S.SubMenu>
         )}
       </S.Menu>
