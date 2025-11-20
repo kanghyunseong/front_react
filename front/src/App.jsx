@@ -29,7 +29,6 @@ import UserDetail from "./component/Member/detail/UserDetail";
 import UserChangePwd from "./component/Member/detail/UserChangePwd";
 import UserDelete from "./component/Member/detail/UserDelete";
 import UserUpdate from "./component/Member/detail/UserUpdate";
-import { AuthProvider } from "./context/AuthContext";
 
 function App() {
   const location = useLocation();
