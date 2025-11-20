@@ -22,6 +22,7 @@ const Station = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isRecomend, setIsRecomend] = useState(null);
+  const [searchStation, setSearchStation] = useState(null);
   //페이징
   const [currentPage, setCurrentPage] = useState(1);
   const reviewsPerPage = 5;
@@ -29,6 +30,7 @@ const Station = () => {
   const indexOfLast = currentPage * reviewsPerPage;
   const indexOfFirst = indexOfLast - reviewsPerPage;
   useEffect(() => {
+    const searchStation = setSearchStation(() => {});
     //if (!location) return;
     console.log(location);
     setLoading(false);
@@ -68,16 +70,14 @@ const Station = () => {
               },
             }
           );
-          //console.log(abcd.data);
 
           const mmm = abcd.data.map((e) => {
             return {
-              title: e.stationId,
+              title: e.stationName,
               latlng: new kakao.maps.LatLng(e.lat, e.lng),
             };
           });
-          //console.log(mmm);
-          //console.log(mmm);
+
           setPositions([...mmm]);
 
           //console.log(positions);
@@ -143,83 +143,8 @@ const Station = () => {
 
           setLoading(false);
         };
-        /*
-        axios
-          .get("http://localhost:8081/station/EvCharge", {
-            params: {
-              lat: location.latitude,
-              lng: location.longitude,
-            },
-          })
-          .then((result) => {
-            // console.log(result);
-            //console.log(result.data.data[0]);
-            const arr = result.data;
-            const mmm = arr.map((e) => {
-              return {
-                title: e.stationId,
-                latlng: new kakao.maps.LatLng(e.lng, e.lat),
-              };
-            });
-            console.log(mmm);
-            setPositions([...mmm]);
-          });
-        */
+
         fn1();
-        /*
-        // 4. 지도 생성 (위치 정보 받은 후)
-        const container = document.getElementById("map");
-        const options = {
-          center: new window.kakao.maps.LatLng(lat, lng), // 현재 위치로 설정
-          level: 30,
-        };
-
-        const map = new window.kakao.maps.Map(container, options);
-
-        var imageSrc =
-          "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png";
-
-        for (var i = 0; i < positions.length; i++) {
-          // 마커 이미지의 이미지 크기 입니다
-          var imageSize = new kakao.maps.Size(24, 35);
-
-          // 마커 이미지를 생성합니다
-          var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
-
-          // 마커를 생성합니다
-          var marker = new kakao.maps.Marker({
-            map: map, // 마커를 표시할 지도
-            position: positions[i].latlng, // 마커를 표시할 위치
-            title: positions[i].title, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
-            image: markerImage, // 마커 이미지
-          });
-        }
-
-        // 6. 지도 컨트롤 추가
-        const mapTypeControl = new window.kakao.maps.MapTypeControl();
-        map.addControl(
-          mapTypeControl,
-          window.kakao.maps.ControlPosition.TOPRIGHT
-        );
-
-        const zoomControl = new window.kakao.maps.ZoomControl();
-        map.addControl(zoomControl, window.kakao.maps.ControlPosition.RIGHT);
-
-        // 7. 원 그리기 (현재 위치 기준)
-        const circle = new window.kakao.maps.Circle({
-          center: new window.kakao.maps.LatLng(lat, lng),
-          radius: 5000,
-          strokeWeight: 5,
-          strokeColor: "#75B8FA",
-          strokeOpacity: 1,
-          strokeStyle: "solid",
-          fillColor: "#CFE7FF",
-          fillOpacity: 0.7,
-        });
-        circle.setMap(map);
-
-        setLoading(false);
-        */
       },
       (error) => {
         setError(error.message);
@@ -263,6 +188,7 @@ const Station = () => {
           <SearchInput
             placeholder="궁금하신 내용을 입력하세요."
             maxLength={50}
+            onChabge={(e) => searchStation(e.target.value)}
           />
           <SearchButton>🔍</SearchButton>
         </SearchWrapper>
