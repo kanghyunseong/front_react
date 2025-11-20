@@ -77,7 +77,7 @@ const BoardForm = () => {
         <Label>작성자</Label>
         <Input
           type="text"
-           value={auth.memberName}
+           value={auth.userId}
           readOnly
           style={{ background: "#eee" }}
         />

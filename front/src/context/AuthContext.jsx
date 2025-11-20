@@ -4,6 +4,7 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({
     userNo: null,
+    userId: null,
     userName: null,
     phone: null,
     email: null,
@@ -15,6 +16,7 @@ export const AuthProvider = ({ children }) => {
   });
   useEffect(() => {
     const userNo = localStorage.getItem("userNo");
+    const userId = localStorage.getItem("userId");
     const userName = localStorage.getItem("userName");
     const role = localStorage.getItem("role");
     const phone = localStorage.getItem("phone");
@@ -34,6 +36,7 @@ export const AuthProvider = ({ children }) => {
     ) {
       setAuth({
         userNo,
+        userId,
         userName,
         role,
         phone,
