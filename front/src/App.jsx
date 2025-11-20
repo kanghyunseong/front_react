@@ -48,7 +48,7 @@ function App() {
         <Route path="/boards/imgBoards/write" element={<ImgBoardForm />} />
         <Route path="/boards/imgBoards/:id" element={<ImgBoardDetail />} />
         <Route path="/cars/searchList" element={<CarsSearchList />} />
-        <Route path="/cars/detail" element={<CarsDetail />} />
+        <Route path="/cars/detail/:carId" element={<CarsDetail />} />
         <Route path="/cars/reserve" element={<CarsReservation />} />
         <Route
           path="/cars/reserve/confirm"
