@@ -10,7 +10,6 @@ import {
 } from "./Header.styles";
 import logo from "../../../assets/adminLogo.png";
 import { useNavigate } from "react-router-dom";
-import Board from "../../Boards/Board/Board";
 import { useContext } from "react";
 import { AuthContext } from "../../../context/AuthContext";
 
