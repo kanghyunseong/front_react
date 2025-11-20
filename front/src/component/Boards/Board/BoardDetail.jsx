@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-//import { AuthContext } from "../../../context/AuthContext";
+import { AuthContext } from "../../../context/AuthContext.jsx";
 
 import {
   Container,
@@ -19,11 +19,11 @@ const BoardDetail = () => {
   const navi = useNavigate();
 
   const [board, setBoard] = useState(null);
-  //const { auth } = useContext(AuthContext);
+  const { auth } = useContext(AuthContext);
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8081/boards/${id}`)
+      .get(`http://localhost:8081/boards/boards/${id}`)
       .then((res) => setBoard(res.data))
       .catch((err) => console.log(err));
   }, [id]);
@@ -33,16 +33,16 @@ const BoardDetail = () => {
     if (!window.confirm("정말 삭제할까요?")) return;
 
     axios
-      .delete(`http://localhost:8081/boards/${id}`, {
+      .delete(`http://localhost:8081/boards/boards/${id}`, {
         headers: { Authorization: `Bearer ${auth.accessToken}` },
       })
       .then(() => {
         alert("삭제되었습니다!");
-        navi("/boards");
+        navi("/boards/boards");
       });
   };
-
-  if (!board) return <div>로딩중...</div>;
+ 
+  if (!board) return <div>잘못된 접근입니다. 관리자에게 문의하세요.</div>;
 
   return (
     <Container>
@@ -58,7 +58,7 @@ const BoardDetail = () => {
       {/* 작성자만 수정/삭제 가능 */}
       {board.boardWriter === auth.memberId && (
         <div style={{ marginTop: "10px" }}>
-          <Button onClick={() => navi(`/boards/edit/${id}`)}>
+          <Button onClick={() => navi(`/boards/boards/edit/${id}`)}>
             수정하기
           </Button>
 

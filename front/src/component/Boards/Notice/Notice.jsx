@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
-  ButtonWrapper,
   Container,
   Header,
   Pagination,
@@ -21,7 +20,7 @@ import gasipan from "../../../assets/gasipan.png";
 const Notice = () => {
 
   const [notices, setNotices] = useState([]);
-  const [page, setPage] = useState(0);     // page=0부터 시작
+  const [page, setPage] = useState(0);     
   const [totalPages, setTotalPages] = useState(1);
 
   const [searchType, setSearchType] = useState("title");
@@ -54,20 +53,17 @@ const Notice = () => {
   const handleSearch = () => {
     if (!keyword.trim()) return alert("검색어를 입력하세요!");
 
-    axios
-      .get("http://localhost:8081/boards/notices/search", {
-        params: {
-          type: searchType,
-          keyword: keyword,
-          page: page,
-        },
-      })
-      .then((res) => {
-        setNotices(res.data.content);
-        setTotalPages(res.data.totalPages);
-      })
-      .catch((err) => console.error("검색 실패:", err));
-  };
+    useEffect(() => {
+      axios
+        .get(`http://localhost:8081/boards/notices?page=${page}`)
+        .then((response) => {
+          setBoards(response.data.content);   
+          setTotalPages(response.data.totalPages);
+        })
+        .catch((err) => {
+          console.error("게시판 페이지 로딩 실패:", err);
+        });
+    }, [page]);
 
   return (
     <Container>
@@ -80,8 +76,8 @@ const Notice = () => {
 
       {/* 탭 메뉴 */}
       <TabMenu>
-        <Tab active onClick={() => navi("/boards/notices")}>공지사항</Tab>
-        <Tab onClick={() => navi("/boards")}>일반</Tab>
+        <Tab $active onClick={() => navi("/boards/notices")}>공지사항</Tab>
+        <Tab onClick={() => navi("/boards/boards")}>일반</Tab>
         <Tab onClick={() => navi("/boards/imgBoards")}>갤러리</Tab>
       </TabMenu>
 
@@ -98,7 +94,7 @@ const Notice = () => {
         </Thead>
 
         <tbody>
-          {notices.map((notice) => (
+          {Array.isArray(notices) && notices.map((notice) => (
             <Tr key={notice.noticeNo}>
               <Td>{notice.noticeNo}</Td>
 
@@ -141,9 +137,9 @@ const Notice = () => {
         style={{
           display: "flex",
           justifyContent: "flex-end",
-          alignItems: "center",   // 핵심!
+          alignItems: "center",   
           marginTop: 20,
-          gap: "10px",            // 간격 안정적
+          gap: "10px",            
         }}>
 
         {/* SelectBox */}
@@ -193,5 +189,5 @@ const Notice = () => {
     </Container>
   );
 };
-
+}
 export default Notice;
