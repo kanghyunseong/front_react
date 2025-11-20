@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SideBar from "../Common/Sidebar/Sidebar";
 import {
   MainContainer,
@@ -21,35 +21,32 @@ import {
   ReviewText,
   ReservationButton,
 } from "../Cars/CarsDetail.style";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
 
 const CarsDetail = () => {
-  const carInfo = {
-    model: "ELI-X 2024",
-    description:
-      "외관은 단정하고, 실내는 주행 쾌적하며, 배송 중인 자리 및 다양한 용도로 빌려 사람 담당",
-    battery: "87%(충전량)",
-    distance: "350km",
-    location: "중형",
-    capacity: "5인승",
-  };
 
-  const reviews = [
-    {
-      id: 1,
-      name: "김수현",
-      date: "2025-10-02",
-      text: "조작이 쉽고 충전속도도 빠르게 시작됩니다. 추가 공간도 넓었어요.",
-    },
-    {
-      id: 2,
-      name: "정현성",
-      date: "2025-10-02",
-      text: "조작이 쉽고 충전속도도 빠르게 시작됩니다. 추가 공간도 넓었어요.",
-    },
-  ];
-
+  const { carId } = useParams();
   const navi = useNavigate();
+  const [car, setCar] = useState(null);
+  const [load, isLoad] = useState(false);
+  const reviews = null;
+ 
+  useEffect(() => {
+    axios
+      .get(`http://localhost:8081/cars/${carId}`)
+      .then((result) => {
+        console.log(result);
+        setCar(result.data[0]);
+        isLoad(true);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  },[carId]);
+
+
+  if(car == null) return <div>빠이</div>;
   return (
     <>
       <SideBar />
@@ -58,36 +55,36 @@ const CarsDetail = () => {
           <CardTitle>차량 상세보기</CardTitle>
 
           <CarImageArea>
-            <CarModel>ELI-X 국민 전기</CarModel>
+            <CarModel>{car?.carImage}</CarModel>
           </CarImageArea>
 
           <InfoSection>
             <SectionTitle>차량 소개</SectionTitle>
-            <InfoText>{carInfo.description}</InfoText>
+            <InfoText>{car?.carContent}</InfoText>
           </InfoSection>
 
           <SpecGrid>
             <SpecItem>
               <SpecLabel>배터리</SpecLabel>
-              <SpecValue>{carInfo.battery}</SpecValue>
+              <SpecValue>{car?.battery}%</SpecValue>
             </SpecItem>
             <SpecItem>
               <SpecLabel>주행가능 거리</SpecLabel>
-              <SpecValue>{carInfo.distance}</SpecValue>
+              <SpecValue>{car?.carDriving}km</SpecValue>
             </SpecItem>
             <SpecItem>
               <SpecLabel>차종</SpecLabel>
-              <SpecValue>{carInfo.location}</SpecValue>
+              <SpecValue>{car?.carSize}</SpecValue>
             </SpecItem>
             <SpecItem>
               <SpecLabel>좌석</SpecLabel>
-              <SpecValue>{carInfo.capacity}</SpecValue>
+              <SpecValue>{car?.carSeet}</SpecValue>
             </SpecItem>
           </SpecGrid>
 
           <ReviewSection>
             <SectionTitle>이용자 후기</SectionTitle>
-            {reviews.map((review) => (
+            {reviews && reviews.map((review) => (
               <ReviewItem key={review.id}>
                 <ReviewHeader>
                   <ReviewerName>{review.name}</ReviewerName>
@@ -98,7 +95,7 @@ const CarsDetail = () => {
             ))}
           </ReviewSection>
 
-          <ReservationButton onClick={() => navi("/cars/reserve")}>
+          <ReservationButton onClick={() => navi(`/cars/${carId}/reserve`)}>
             차량 예약하기
           </ReservationButton>
         </DetailCard>

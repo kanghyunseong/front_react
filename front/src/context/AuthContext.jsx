@@ -1,8 +1,6 @@
 import { useState, useInsertionEffect, createContext, useEffect } from "react";
-
 export const AuthContext = createContext();
 // 요 컨텍스트를 통해 인증관련 데이터를 하위 컴포넌트에 전달함
-
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({
     userNo: null,
@@ -16,7 +14,6 @@ export const AuthProvider = ({ children }) => {
     role: null,
     isAuthenticated: false,
   });
-
   useEffect(() => {
     const userNo = localStorage.getItem("userNo");
     const userId = localStorage.getItem("userId");
@@ -27,7 +24,6 @@ export const AuthProvider = ({ children }) => {
     const birthDay = localStorage.getItem("birthDay");
     const refreshToken = localStorage.getItem("refreshToken");
     const accessToken = localStorage.getItem("accessToken");
-
     if (
       accessToken &&
       refreshToken &&
@@ -52,7 +48,6 @@ export const AuthProvider = ({ children }) => {
       });
     }
   }, []);
-
   // 로그인에 성공했을 때 수행할 함수
   const login = (
     accessToken,

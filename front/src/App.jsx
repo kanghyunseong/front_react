@@ -37,38 +37,39 @@ function App() {
   const isLogin = location.pathname.startsWith("/members/login");
   return (
     <>
-      {!isJoin && !isAdminPage && !isLogin && <Header />}
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/boards/boards" element={<Board />} />
-        <Route path="/boards/notices" element={<Notice />} />
-        <Route path="/boards/boards/write" element={<BoardForm />} />
-        <Route path="/boards/boards/:id" element={<BoardDetail />} />
-        <Route path="/boards/imgBoards" element={<ImgBoard />} />
-        <Route path="/boards/imgBoards/write" element={<ImgBoardForm />} />
-        <Route path="/boards/imgBoards/:id" element={<ImgBoardDetail />} />
-        <Route path="/cars/searchList" element={<CarsSearchList />} />
-        <Route path="/cars/detail/:carId" element={<CarsDetail />} />
-        <Route path="/cars/reserve" element={<CarsReservation />} />
-        <Route
-          path="/cars/reserve/confirm"
-          element={<CarsReservationConfirm />}
-        />
-        <Route
-          path="/reserves/searchList"
-          element={<CarsReservationChange />}
-        />
-        <Route path="/reserves/detail" element={<CarsUsageHistory />} />
-        <Route path="/admin/*" element={<AdminHome />} />
-        <Route path="/members/join" element={<Join />} />
-        <Route path="/stations" element={<Station />} />
-        <Route path="/members/login" element={<Login />} />
-        <Route path="/members/detail" element={<UserDetail />} />
-        <Route path="/members/detail/changePwd" element={<UserChangePwd />} />
-        <Route path="/members/detail/delete" element={<UserDelete />} />
-        <Route path="/members/detail/update" element={<UserUpdate />} />
-      </Routes>
-      {!isJoin && !isAdminPage && !isLogin && <Footer />}
+        {!isJoin && !isAdminPage && !isLogin && <Header />}
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/boards/boards" element={<Board />} />
+          <Route path="/boards/notices" element={<Notice />} />
+          <Route path="/boards/boards/write" element={<BoardForm />} />
+          <Route path="/boards/boards/:id" element={<BoardDetail />} />
+          <Route path="/boards/imgBoards" element={<ImgBoard />} />
+          <Route path="/boards/imgBoards/write" element={<ImgBoardForm />} />
+          <Route path="/boards/imgBoards/:id" element={<ImgBoardDetail />} />
+          <Route path="/cars/searchList" element={<CarsSearchList />} />
+          <Route path="/cars/:carId" element={<CarsDetail />} />
+          <Route path="/cars/:carId/reserve" element={<CarsReservation />} />
+          <Route
+            path="/cars/reserve/confirm"
+            element={<CarsReservationConfirm />}
+          />
+          <Route
+            path="/reserves/searchList"
+            element={<CarsReservationChange />}
+          />
+          <Route path="/reserves/detail" element={<CarsUsageHistory />} />
+          <Route path="/admin/*" element={<AdminHome />} />
+          <Route path="/members/join" element={<Join />} />
+          <Route path="/stations" element={<Station />} />
+          <Route path="/members/login" element={<Login />} />
+          <Route path="/members/detail" element={<UserDetail />} />
+          <Route path="/members/detail/changePwd" element={<UserChangePwd />} />
+          <Route path="/members/detail/delete" element={<UserDelete />} />
+          <Route path="/members/detail/update" element={<UserUpdate />} />
+        </Routes>
+        {!isJoin && !isAdminPage && !isLogin && <Footer />}
+
     </>
   );
 }
