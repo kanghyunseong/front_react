@@ -7,8 +7,11 @@ import {
   StyledSidebarLogoBox,
   StyledSideHeaderButton,
 } from "./Sidebar.style.js";
+import { useContext } from "react";
+import { AuthContext } from "../../../context/AuthContext.jsx";
 
 const SideBar = () => {
+  const {auth} = useContext(AuthContext);
   const navi = useNavigate();
   return (
     <StyledSidebar>
@@ -16,8 +19,8 @@ const SideBar = () => {
         <StyledSideHeaderButton>
           <StyledSidebarLogoBox>EV</StyledSidebarLogoBox>
           <span style={{ fontWeight: "bold", color: "#1f2937" }}>Share EV</span>
-          <span style={{ fontWeight: "bold", color: "#666666ff" }}>
-            사용자 이름
+          <span style={{ fontWeight: "bold", color: "#666666ff"}}>
+            {auth.userName}
           </span>
         </StyledSideHeaderButton>
       </StyledSidebarHeader>

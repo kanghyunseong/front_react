@@ -57,7 +57,7 @@ const CarsReservationChange = () => {
                   <InfoList>
                     <InfoText>이용 시간 : {reservation.startDate} ~ {reservation.endDate}</InfoText>
                     <InfoText>예약번호 : {reservation.reservationNum}</InfoText>
-                    <InfoText>픽업 위치 : {reservation.location}</InfoText>
+                    <InfoText>반납 위치 : {reservation.location}</InfoText>
                   </InfoList>
                   
                   <ButtonGroup>

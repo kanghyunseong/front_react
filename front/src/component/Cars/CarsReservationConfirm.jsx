@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SideBar from "../Common/Sidebar/Sidebar";
 import {
   MainContainer,
@@ -14,16 +14,28 @@ import {
   InfoValue,
   HomeButton,
 } from "../Cars/CarsReservationConfirm.style";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
 
 const CarsReservationConfirm = () => {
-  const reservationInfo = {
-    reservationNumber: "#A20251112",
-    period: "2025-11-12 14:00 ~ 2025-11-19 14:00",
-    location: "서울시 중구 대한문로 110",
-  };
+  const [reservationInfo, setReservationInfo] = useState(null);
+  const { reservationNo  } = useParams();
   const navi = useNavigate();
   
+  useEffect(() => {
+    axios
+      .get(`http://localhost:8081/cars/reserve/${reservationNo}/confirm`)
+      .then((res) => {
+        console.log(res);
+        
+        setReservationInfo(res.data);
+      })
+      .catch((err) => {
+        console.log("실패", err);
+      })
+  }, [reservationNo]);
+
+  if (!reservationInfo) return <div>예약 정보를 불러오는 중...</div>;
   return (
     <>
       <SideBar />
@@ -46,17 +58,17 @@ const CarsReservationConfirm = () => {
             
             <InfoItem>
               <InfoLabel>예약번호</InfoLabel>
-              <InfoValue>{reservationInfo.reservationNumber}</InfoValue>
+              <InfoValue>{reservationInfo[0].reservationNo}</InfoValue>
             </InfoItem>
             
             <InfoItem>
-              <InfoLabel>이용 시간</InfoLabel>
-              <InfoValue>{reservationInfo.period}</InfoValue>
+              <InfoLabel>이용 기간</InfoLabel>
+              <InfoValue>{reservationInfo[0].endTime}~ {reservationInfo[0].startTime}</InfoValue>
             </InfoItem>
             
             <InfoItem>
-              <InfoLabel>픽업 장소</InfoLabel>
-              <InfoValue>{reservationInfo.location}</InfoValue>
+              <InfoLabel>반납 장소</InfoLabel>
+              <InfoValue>{reservationInfo[0].destination}</InfoValue>
             </InfoItem>
           </InfoSection>
 

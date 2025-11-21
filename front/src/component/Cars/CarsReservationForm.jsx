@@ -20,7 +20,6 @@ import {
 } from "../Cars/CarsReservationForm.style";
 import { AuthContext } from "../../context/AuthContext";
 import axios from "axios";
-import { Description } from "../Common/Footer/Footer.styles";
 
 const CarReservationForm = () => {
   const navi = useNavigate();
@@ -41,7 +40,7 @@ const CarReservationForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // 필수 입력 체크 예외처리
+    // 필수 입력 체크
     if (!startTime.trim() || !endTime.trim() || !destination.trim()) {
       alert("모든 항목을 입력해주세요.");
       return;
@@ -50,52 +49,34 @@ const CarReservationForm = () => {
     const start = new Date(startTime);
     const end = new Date(endTime);
 
-    // 시작 시간 < 종료 시간 체크 예외처리
     if (end <= start) {
       alert("종료 시간은 시작 시간 이후여야 합니다.");
       return;
     }
 
-    // 최대 이용 기간 7일 체크 예외처리
-    const diffDays = (end - start) / (1000 * 60 * 60 * 24); // 일 단위
+    const diffDays = (end - start) / (1000 * 60 * 60 * 24);
     if (diffDays > 7) {
       alert("최대 이용 가능 기간은 7일입니다.");
       return;
     }
 
-    // 모든 체크 통과 → 예약 확인 페이지로 이동
-    console.log("예약 확인", { startTime, endTime, destination });
-    navi("/cars/reserve/confirm", {
-      state: { startTime, endTime, destination }
-    });
-
     axios.post(
       "http://localhost:8081/cars/reserve",
-      {
-        carId,
-        startTime,
-        endTime,
-        destination
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${auth.accessToken}`,
-          "Content-Type": "application/json"
-        }
-      }
+      { carId, startTime, endTime, destination },
+      { headers: { Authorization: `Bearer ${auth.accessToken}` } }
     )
-      .then((result) => {
-        console.log(result)
-      }
-    )
+      .then((res) => {
+        console.log("전체 응답:", res.data);
+        const reservationNo = res.data;
+        navi(`/cars/reserve/${reservationNo}/confirm`);
+      })
       .catch((err) => {
-        console.log(err)
-      }
-    );
-
+        console.error(err);
+        alert("예약에 실패했습니다.");
+      });
   };
 
-  if(!auth.accessToken) return <div>빠이</div>;
+  if (!auth.accessToken) return <div>빠이</div>;
   return (
     <>
       <SideBar />
@@ -122,20 +103,20 @@ const CarReservationForm = () => {
           <TimeSection>
             <SectionTitle>이용시간 선택</SectionTitle>
 
-            <TimeLabel>시작 시간</TimeLabel>
+            <TimeLabel>시작 날짜</TimeLabel>
             <TimeInput
-              type="datetime-local"
+              type="date"
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
-              placeholder="년 - 월 - 일  -- : -- : --"
+              placeholder="년-월-일"
             />
 
-            <TimeLabel>종료 시간</TimeLabel>
+            <TimeLabel>종료 날짜</TimeLabel>
             <TimeInput
-              type="datetime-local"
+              type="date"
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
-              placeholder="년 - 월 - 일  -- : -- : --"
+              placeholder="년-월-일"
             />
 
             <TimeNote>※ 최대 이용 가능 기간은 일주일입니다.</TimeNote>
@@ -152,7 +133,7 @@ const CarReservationForm = () => {
           </LocationSection>
 
           <SubmitButton onClick={handleSubmit}>
-            예약 확인 하기
+            예약 하기
           </SubmitButton>
         </FormCard>
       </MainContainer>

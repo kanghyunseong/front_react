@@ -82,7 +82,13 @@ const CarsSearchList = () => {
           <CarGrid>
             {cars.map((car) => (
               <CarCard key={car.carId}>
-                <CarImageArea>{car.carImage}</CarImageArea>
+                <CarImageArea>
+                  {car.carImage ? (
+                    <img src={car.carImage} alt="차량 이미지" style={{ width: '100%', height: '100%', borderRadius: '8px', objectFit: 'cover' }} />
+                  ) : (
+                    "이미지 없음"
+                  )}
+                </CarImageArea>
                 <CarInfo>
                   <CarName>{car.carName}</CarName>
                   <CarDetail></CarDetail>
@@ -98,7 +104,7 @@ const CarsSearchList = () => {
               </CarCard>
             ))}
           </CarGrid>
- 
+
           {hasMore && (
             <LoadMoreButton onClick={increasePage}>
               더보기
