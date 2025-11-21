@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../../../context/AuthContext.jsx";
+import BoardComment from "./BoardComment.jsx";
 
 import {
   Container,
@@ -10,6 +11,8 @@ import {
   BoardWriter,
   BoardContent,
   Button,
+  BottomArea,
+  TopButtonRow,
 } from "./Board.styles";
 import gasipan from "../../../assets/gasipan.png";
 
@@ -17,15 +20,15 @@ const BoardDetail = () => {
   const { id } = useParams();
   const navi = useNavigate();
 
-  const [board, setBoard] = useState(null);
+  const [board, setBoard] = useState("");
   const { auth } = useContext(AuthContext);
 
-  //  수정 모드 관련 상태
+  // 수정 모드 관련 상태
   const [editMode, setEditMode] = useState(false);
   const [editTitle, setEditTitle] = useState("");
   const [editContent, setEditContent] = useState("");
 
-  // 상세 조회
+  // 게시글 상세 조회
   useEffect(() => {
     if (!auth?.accessToken) {
       alert("로그인이 필요합니다.");
@@ -41,7 +44,6 @@ const BoardDetail = () => {
       })
       .then((res) => {
         setBoard(res.data);
-        // 처음 로딩할 때 수정용 값도 같이 세팅
         setEditTitle(res.data.boardTitle);
         setEditContent(res.data.boardContent);
       })
@@ -52,7 +54,7 @@ const BoardDetail = () => {
       });
   }, [id, auth, navi]);
 
-  // 삭제
+  // 게시글 삭제
   const handleDelete = () => {
     if (!window.confirm("정말 삭제할까요?")) return;
 
@@ -70,7 +72,7 @@ const BoardDetail = () => {
       });
   };
 
-  //  수정 저장
+  // 게시글 수정 저장
   const handleUpdate = () => {
     if (!window.confirm("수정 내용을 저장할까요?")) return;
 
@@ -89,8 +91,13 @@ const BoardDetail = () => {
       )
       .then((res) => {
         alert("수정되었습니다!");
-        // 백엔드에서 수정된 객체를 돌려주면 그걸로 교체
-        setBoard(res.data || { ...board, boardTitle: editTitle, boardContent: editContent });
+        setBoard(
+          res.data || {
+            ...board,
+            boardTitle: editTitle,
+            boardContent: editContent,
+          }
+        );
         setEditMode(false);
       })
       .catch((err) => {
@@ -101,10 +108,7 @@ const BoardDetail = () => {
 
   if (!board) return <div>잘못된 접근입니다. 관리자에게 문의하세요.</div>;
 
-  console.log(" board.boardWriter =", board?.boardWriter);
-  console.log(" auth =", auth);
-
-  const isWriter = board.boardWriter === auth.userId; // 작성자 체크
+  const isWriter = board.boardWriter === auth.userId;
 
   return (
     <Container>
@@ -113,10 +117,9 @@ const BoardDetail = () => {
         <div className="title-overlay">게시글 상세보기</div>
       </Header>
 
-      {/*  읽기 모드 / 수정 모드 전환 */}
+      {/* 읽기 / 수정 모드 */}
       {editMode ? (
         <>
-          {/* 제목 수정 */}
           <input
             value={editTitle}
             onChange={(e) => setEditTitle(e.target.value)}
@@ -129,7 +132,6 @@ const BoardDetail = () => {
             }}
           />
           <BoardWriter>작성자 : {board.boardWriter}</BoardWriter>
-          {/* 내용 수정 */}
           <textarea
             value={editContent}
             onChange={(e) => setEditContent(e.target.value)}
@@ -147,45 +149,73 @@ const BoardDetail = () => {
       ) : (
         <>
           <Title>{board.boardTitle}</Title>
-          <BoardWriter>작성자 : {board.boardWriter}</BoardWriter>
+          <BoardWriter>
+          <span>작성자 : {board.boardWriter}</span>
+           <span>작성일 : {board.boardDate}</span>
+           <span>조회 : {board.count}</span>
+          </BoardWriter>
+          <hr />
           <BoardContent>{board.boardContent}</BoardContent>
+          <hr />
         </>
       )}
 
-      {/* 작성자만 수정/삭제 가능 */}
-      {isWriter && (
-        <div style={{ marginTop: "10px" }}>
-          {editMode ? (
-            <>
-              <Button onClick={handleUpdate}>저장</Button>
-              <Button
-                onClick={() => {
-                  setEditMode(false);
-                  setEditTitle(board.boardTitle);
-                  setEditContent(board.boardContent);
-                }}
-                style={{ background: "gray" }}
-              >
-                취소
-              </Button>
-              <Button onClick={handleDelete} style={{ background: "crimson" }}>
-                삭제하기
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button onClick={() => setEditMode(true)}>수정하기</Button>
-              <Button onClick={handleDelete} style={{ background: "crimson" }}>
-                삭제하기
-              </Button>
-            </>
-          )}
-        </div>
-      )}
+      {/* ====== 하단 버튼 + 댓글 컴포넌트 영역 ====== */}
+      <BottomArea>
+        <TopButtonRow>
+          <div>
+            <Button onClick={() => navi("/boards/boards")}>목록보기</Button>
+            <Button
+              style={{ marginLeft: "8px" }}
+              onClick={() =>
+                alert("게시글 신고 기능은 추후 구현 예정입니다.")
+              }
+            >
+              신고하기
+            </Button>
+          </div>
 
-      <Button onClick={() => navi(-1)} style={{ background: "blue", marginTop: "10px" }}>
-        뒤로가기
-      </Button>
+          {isWriter && (
+            <div>
+              {/* 아래쪽에만 수정/삭제 노출 */}
+              {editMode ? (
+                <>
+                  <Button onClick={handleUpdate}>저장</Button>
+                  <Button
+                    onClick={() => {
+                      setEditMode(false);
+                      setEditTitle(board.boardTitle);
+                      setEditContent(board.boardContent);
+                    }}
+                    style={{ background: "gray", marginLeft: "8px" }}
+                  >
+                    취소
+                  </Button>
+                  <Button
+                    onClick={handleDelete}
+                    style={{ background: "crimson", marginLeft: "8px" }}
+                  >
+                    삭제
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button onClick={() => setEditMode(true)}>수정</Button>
+                  <Button
+                    onClick={handleDelete}
+                    style={{ background: "crimson", marginLeft: "8px" }}
+                  >
+                    삭제
+                  </Button>
+                </>
+              )}
+            </div>
+          )}
+        </TopButtonRow>
+
+        {/* 위에 댓글쓰기 박스 + 아래 표 형태 리스트 */}
+        <BoardComment boardNo={board.boardNo || id} />
+      </BottomArea>
     </Container>
   );
 };
