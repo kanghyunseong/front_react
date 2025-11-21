@@ -10,10 +10,14 @@ export const Input = styled.input`
   border: 1px solid rgba(255, 255, 255, 1);
   border-radius: 4px;
   width: 400px;
-  color: gray;
+  color: #000000;
   &:focus {
     outline: none;
     border-color: lightpink;
+  }
+
+  &::placeholder {
+    color: #fafafa;
   }
 `;
 

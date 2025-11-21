@@ -24,10 +24,9 @@ const Login = () => {
   const [msg, setMsg] = useState("");
   const { login } = useContext(AuthContext);
 
-  const kakaoLogin = () => {
-    axios.get("http://localhost:8081/members/kakao").then((result) => {
-      console.log(result);
-    });
+  const kakaoLogin = async () => {
+    location.href =
+      "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=9ab6eed4ca0b2e40761693da623540b9&redirect_uri=http://localhost:5173/members/kakao/callback";
   };
   const naverLogin = async () => {
     location.href =

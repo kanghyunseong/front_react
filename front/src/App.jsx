@@ -30,6 +30,8 @@ import UserChangePwd from "./component/Member/detail/UserChangePwd";
 import UserDelete from "./component/Member/detail/UserDelete";
 import UserUpdate from "./component/Member/detail/UserUpdate";
 import NaverLoginCallback from "./component/Member/Login/NaverCallback";
+import KakaoLoginCallback from "./component/Member/Login/KakaoCallback";
+import KakaoJoin from "./component/Member/Join/KakaoJoin";
 
 function App() {
   const location = useLocation();
@@ -62,7 +64,16 @@ function App() {
         <Route path="/reserves/detail" element={<CarsUsageHistory />} />
         <Route path="/admin/*" element={<AdminHome />} />
         <Route path="/members/join" element={<Join />} />
+        <Route path="/members/kakaoJoin" element={<KakaoJoin />} />
         <Route path="/stations" element={<Station />} />
+        <Route
+          path="/members/naver/callback"
+          element={<NaverLoginCallback />}
+        />
+        <Route
+          path="/members/kakao/callback"
+          element={<KakaoLoginCallback />}
+        />
         <Route path="/members/login" element={<Login />} />
         <Route path="/members/detail" element={<UserDetail />} />
         <Route path="/members/detail/changePwd" element={<UserChangePwd />} />
