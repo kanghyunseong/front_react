@@ -231,7 +231,7 @@ const ImgBoardDetail = () => {
           )}
         </TopButtonRow>
 
-        {/* ✅ 댓글 쪽도 imgBoardNo 기준으로 넘겨주기 */}
+        {/*  댓글 쪽도 imgBoardNo 기준으로 넘겨주기 */}
         <ImgBoardComment boardNo={board.imgBoardNo || id} />
       </BottomArea>
     </Container>
