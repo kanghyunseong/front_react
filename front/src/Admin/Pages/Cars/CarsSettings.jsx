@@ -48,8 +48,6 @@ const CarsSettings = () => {
   const handleDelete = async (carId) => {
     if (window.confirm("정말로 이 차량을 삭제하시겠습니까?")) {
       try {
-        // 백엔드 API 호출 (삭제 API 경로 가정: /admin/api/settings/{carId})
-        // ※ 백엔드 컨트롤러에 @DeleteMapping 추가 필요
         await axios.delete(
           `http://localhost:8081/admin/api/settings/${carId}`,
           {
