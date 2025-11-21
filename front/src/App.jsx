@@ -52,7 +52,7 @@ function App() {
         <Route path="/cars/:carId" element={<CarsDetail />} />
         <Route path="/cars/:carId/reserve" element={<CarsReservation />} />
         <Route
-          path="/cars/reserve/confirm"
+          path="/cars/reserve/:reservationNo/confirm"
           element={<CarsReservationConfirm />}
         />
         <Route
