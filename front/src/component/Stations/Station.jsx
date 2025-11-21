@@ -13,7 +13,11 @@ import {
 } from "./Station.style";
 import { useEffect, useState } from "react"; // 이 줄이 있는지 확인!
 import axios from "axios";
+
 const Station = () => {
+  // ===========================
+  // 1. State 정의
+  // ===========================
   const [positions, setPositions] = useState([]);
   const [location, setLocation] = useState(null);
   const [error, setError] = useState(null);
@@ -22,10 +26,15 @@ const Station = () => {
   const [searchStation, setSearchStation] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [searchResult, setSearchResult] = useState([]);
+  const [stationId, setStationId] = useState(null);
 
   const reviewsPerPage = 5;
   const indexOfLast = currentPage * reviewsPerPage;
   const indexOfFirst = indexOfLast - reviewsPerPage;
+
+  // ===========================
+  // 2. 검색 관련 함수
+  // ===========================
   // handleSearch 함수를 useEffect 밖으로 이동
   const handleSearch = () => {
     const keyword = (searchStation || "").trim();
@@ -33,13 +42,14 @@ const Station = () => {
       alert("검색어를 입력하세요!");
       return;
     }
+
     axios
       .get("http://localhost:8081/station/search", {
         params: { keyword: keyword },
       })
       .then((response) => {
         const result = response.data;
-        //가공
+        // 가공
         const mapped = result.map((e) => {
           return {
             stationName: e.stationName,
@@ -49,13 +59,20 @@ const Station = () => {
           };
         });
 
-        //searchResult에 세팅[]
         setSearchResult(mapped);
       })
       .catch((error) => {
         console.error("검색실패:", error);
       });
   };
+
+  // axios.post("http://localhost:8081/station/insert", {
+  //   params: {},
+  // });
+
+  // ===========================
+  // 3. 위치 정보 + 지도 + 마커 세팅 (useEffect)
+  // ===========================
   useEffect(() => {
     // 이 부분 추가!
     console.log(location);
@@ -82,14 +99,15 @@ const Station = () => {
           latitude: lat,
           longitude: lng,
         });
-        //★ 주영님 바보 똥 멍텅이 메롱 ★
+
         if (!location) return;
 
-        const fn1 = async () => {
+        const fn1 = async (selectedId) => {
           const abcd = await axios.get("http://localhost:8081/station", {
             params: {
               lat: location.latitude,
               lng: location.longitude,
+              stationId: selectedId,
             },
           });
 
@@ -98,6 +116,7 @@ const Station = () => {
               title: e.stationName,
               subtitle: e.address,
               latlng: new kakao.maps.LatLng(e.lat, e.lng),
+              stationId: e.stationId,
             };
           });
 
@@ -121,14 +140,21 @@ const Station = () => {
           var imageSrc =
             "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png";
 
-          for (var i = 0; i < mmm.length; i++) {
-            var imageSize = new kakao.maps.Size(24, 35);
-            var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
-            var marker = new kakao.maps.Marker({
+          for (let i = 0; i < mmm.length; i++) {
+            const item = mmm[i];
+            const imageSize = new kakao.maps.Size(24, 35);
+            const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
+            const marker = new kakao.maps.Marker({
               map: map,
-              position: mmm[i].latlng,
-              title: mmm[i].title,
+              position: item.latlng,
+              title: item.title,
               image: markerImage,
+            });
+            kakao.maps.event.addListener(marker, "click", () => {
+              const selectedId = item.stationId; // 이 마커에 해당하는 stationId
+
+              setStationId(selectedId); // state에 기억해두고
+              fn1(selectedId); // 선택한 ID 들고 fn1 다시 호출
             });
           }
 
@@ -170,6 +196,9 @@ const Station = () => {
     );
   }, [location?.latitude]); // ? 추가
 
+  // ===========================
+  // 4. 로딩 / 에러 화면 처리
+  // ===========================
   if (loading) {
     return (
       <MainContainer>
@@ -190,17 +219,22 @@ const Station = () => {
     );
   }
 
+  // ===========================
+  // 5. 실제 화면 렌더링(JSX)
+  // ===========================
   return (
     <MainContainer>
+      {/* 왼쪽 : 검색 영역 */}
       <LeftSection>
         <SearchWrapper>
           <SearchInput
             placeholder="궁금하신 내용을 입력하세요."
             maxLength={50}
-            onChange={(e) => searchStation(e.target.value)}
+            onChange={(e) => setSearchResult(e.target.value)}
           />
           <SearchButton onClick={handleSearch}>🔍</SearchButton>
         </SearchWrapper>
+
         <SearchResult>
           <ol>
             {searchResult &&
@@ -215,9 +249,12 @@ const Station = () => {
           </ol>
         </SearchResult>
       </LeftSection>
+
+      {/* 오른쪽 : 지도 + 리뷰 + 페이지네이션 */}
       <RightSection>
         <Map id="map"></Map>
         {location && <div></div>}
+
         <Review>
           <Recomend
             onClick={() => setIsRecomend(true)}
@@ -251,4 +288,5 @@ const Station = () => {
     </MainContainer>
   );
 };
+
 export default Station;
