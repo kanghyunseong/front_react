@@ -24,7 +24,7 @@ const CarsReservationConfirm = () => {
   
   useEffect(() => {
     axios
-      .get(`http://localhost:8081/cars/reserve/${reservationNo}/confirm`)
+      .get(`http://localhost:8081/reserve/${reservationNo}`)
       .then((res) => {
         console.log(res);
         

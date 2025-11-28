@@ -40,7 +40,6 @@ const CarsSearchList = () => {
         const newCars = response.data;
 
         setCars([...cars, ...response.data]);
-        console.log(...cars);
 
         if (newCars.length < 4) {
           setHasMore(false);

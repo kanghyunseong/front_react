@@ -1,6 +1,5 @@
 import axios from "axios";
 import {
-  PageContainer,
   MainContainer,
   PageTitle,
   ReservationList,
@@ -8,7 +7,6 @@ import {
   CardContent,
   ImagePlaceholder,
   ReservationInfo,
-  ReservationTitle,
   InfoList,
   InfoText,
   ButtonGroup,
@@ -23,12 +21,64 @@ import { AuthContext } from "../../context/AuthContext";
 
 const CarsReservationChange = () => {
   const [reservation, setReservation] = useState([]);
+  const [refresh, setRefresh] = useState(0);
   const navi = useNavigate();
   const { auth } = useContext(AuthContext);
 
+  const handleReturn = () => {
+    if (!confirm("반납을 취소하시겠습니까?")) return;
+    axios
+      .put("http://localhost:8081/reserve/return",
+        { headers: { Authorization: `Bearer ${auth.accessToken}` } }
+      )
+      .then((result) => {
+        console.log(result);
+        alert("반납 처리가 완료되었습니다.")
+      })
+      .catch((err) => {
+        console.log(err);
+        alert("반납 처리에 실패했습니다.");
+      })
+  }
+
+  const handleCancel = (reservationNo) => {
+    if (!confirm("예약을 취소하시겠습니까?")) return;
+    axios
+      .delete("http://localhost:8081/reserve",
+        {
+          reservationNo:"reservationNo"
+        },
+        { headers: { Authorization: `Bearer ${auth.accessToken}` } }
+      )
+      .then((result) => {
+        console.log(result);
+        alert("예약취소가 완료되었습니다.")
+        setRefresh(prev => prev + 1);
+      })
+      .catch((err) => {
+        console.log(err);
+        alert("예약취소를 실패했습니다.")
+      })
+  }
+
+  const handleChange = () => {
+    axios
+      .put("http://localhost:8081/reserve/change",
+        { headers: { Authorization: `Bearer ${auth.accessToken}` } }
+      )
+      .then((result) => {
+        console.log(result);
+        alert("예약변경을 성공했습니다.")
+      })
+      .catch((err) => {
+        console.log(err);
+        alert("예약변경을 실패했습니다.")
+      })
+  }
+
   useEffect(() => {
     axios
-      .get("http://localhost:8081/cars/reserve/searchList",
+      .get("http://localhost:8081/reserve/searchList",
         { headers: { Authorization: `Bearer ${auth.accessToken}` } }
       )
       .then((result) => {
@@ -38,51 +88,78 @@ const CarsReservationChange = () => {
       .catch((err) => {
         console.log(err);
       });
-  }, [auth.accessToken]);
+  }, [auth.accessToken, refresh]);
 
 
 
   if (!auth.accessToken) return <div>빠이</div>;
   return (
     <>
+
       <SideBar />
       <MainContainer>
         <PageTitle>예약 내역</PageTitle>
 
         <ReservationList>
-          {reservation.map((item) => (
-            <ReservationCard key={item.reservation.reservationNo}>
-            <CardContent>
-              <ImagePlaceholder>
-                {item.car?.carImage ? (
-                  <img src={item.car?.carImage} alt="차량 이미지" style={{ width: '100%', height: '100%', borderRadius: '8px', objectFit: 'cover' }} />
-                ) : (
-                  "이미지 없음"
-                )}
-              </ImagePlaceholder>
+          {reservation.length === 0 ? (
+            <InfoText>예약 내역이 없습니다.</InfoText>
+          ) : (
+            reservation.map((item) => (
+              <ReservationCard key={item.reservation.reservationNo}>
+                <CardContent>
+                  <ImagePlaceholder>
+                    {item.car?.carImage ? (
+                      <img
+                        src={item.car?.carImage}
+                        alt="차량 이미지"
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          borderRadius: '8px',
+                          objectFit: 'cover',
+                        }}
+                      />
+                    ) : (
+                      "이미지 없음"
+                    )}
+                  </ImagePlaceholder>
 
-              <ReservationInfo>
-                <InfoList>
-                  <InfoText>이용 시간 : {item.reservation?.startTime} ~ {item.reservation.endTime}</InfoText>
-                  <InfoText>예약번호 : {item.reservation?.reservationNo}</InfoText>
-                  <InfoText>반납 위치 : {item.reservation?.destination}</InfoText>
-                </InfoList>
+                  <ReservationInfo>
+                    <InfoList>
+                      <InfoText>
+                        이용 시간 : {item.reservation?.startTime} ~ {item.reservation.endTime}
+                      </InfoText>
+                      <InfoText>
+                        예약번호 : {item.reservation?.reservationNo}
+                      </InfoText>
+                      <InfoText>
+                        반납 위치 : {item.reservation?.destination}
+                      </InfoText>
+                    </InfoList>
 
-                <ButtonGroup>
-                  {item.reservation?.returnStatus === 'Y' ? (
-                    <ReturnButton>반납하기</ReturnButton>
-                  ) : (
-                    <>
-                      <ModifyButton>예약 변경 하기</ModifyButton>
-                      <CancelButton>예약 취소 하기</CancelButton>
-                    </>
-                  )}
-                </ButtonGroup>
-              </ReservationInfo>
-            </CardContent>
-          </ReservationCard>
-                  ))}
+                    <ButtonGroup>
+                      {item.reservation?.returnStatus === 'Y' ? (
+                        <ReturnButton>반납하기</ReturnButton>
+                      ) : (
+                        <>
+                          <ModifyButton onClick={() => setModalOpen(true)}>
+                            <ModifyButton>예약 변경 하기</ModifyButton>
+                          </ModifyButton>
+                          <CancelButton
+                            onClick={() => handleCancel(item.reservation?.reservationNo)}
+                          >
+                            예약 취소 하기
+                          </CancelButton>
+                        </>
+                      )}
+                    </ButtonGroup>
+                  </ReservationInfo>
+                </CardContent>
+              </ReservationCard>
+            ))
+          )}
         </ReservationList>
+
       </MainContainer>
     </>
   );
