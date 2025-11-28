@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom"; // 라우터 훅 추가
+import { useNavigate, useLocation } from "react-router-dom"; 
 import * as S from "./SideBar.styles";
 import {
   FaHome,
@@ -12,12 +12,11 @@ import {
 } from "react-icons/fa";
 
 const SideBar = () => {
-  const navigate = useNavigate(); // 이동 함수
-  const location = useLocation(); // 현재 경로 확인용 (선택 사항)
+  const navigate = useNavigate(); 
+  const location = useLocation(); 
 
-  // 드롭다운 상태 관리
   const [activeMenu, setActiveMenu] = useState({
-    cars: true, // 개발 편의를 위해 기본적으로 열어둠 (나중에 false로 변경 가능)
+    cars: false, 
     community: false,
     environments: false,
     users: false,
@@ -27,7 +26,6 @@ const SideBar = () => {
     setActiveMenu({ ...activeMenu, [menu]: !activeMenu[menu] });
   };
 
-  // 페이지 이동 핸들러
   const handleNavigation = (path) => {
     navigate(path);
   };
@@ -39,7 +37,6 @@ const SideBar = () => {
       </S.LogoArea>
 
       <S.Menu>
-        {/* Home -> 대시보드 */}
         <S.MenuItem
           $active={location.pathname === "/admin"}
           onClick={() => handleNavigation("/admin")}
@@ -47,7 +44,6 @@ const SideBar = () => {
           <FaHome /> <span>Home</span>
         </S.MenuItem>
 
-        {/* Cars Dropdown */}
         <S.MenuItem onClick={() => toggleMenu("cars")}>
           <div className="title">
             <FaCar /> <span>Cars</span>
@@ -72,7 +68,6 @@ const SideBar = () => {
           </S.SubMenu>
         )}
 
-        {/* Community Dropdown */}
         <S.MenuItem onClick={() => toggleMenu("community")}>
           <div className="title">
             <FaComments /> <span>Community</span>
@@ -106,7 +101,6 @@ const SideBar = () => {
           </S.SubMenu>
         )}
 
-        {/* Environments Dropdown */}
         <S.MenuItem onClick={() => toggleMenu("environments")}>
           <div className="title">
             <FaLeaf /> <span>Environments</span>
@@ -132,7 +126,6 @@ const SideBar = () => {
           </S.SubMenu>
         )}
 
-        {/* Users Dropdown */}
         <S.MenuItem onClick={() => toggleMenu("users")}>
           <div className="title">
             <FaUsers /> <span>Users</span>

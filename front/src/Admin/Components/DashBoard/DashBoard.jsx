@@ -25,7 +25,7 @@ const DashBoard = () => {
       <S.ChartRow>
         <CarbonChart />
 
-        <CarsStatsBarChart
+        <CarsStatsBarChart  
           title="Cars Inflow"
           color="#8b5cf6"
           dataType="cars"
