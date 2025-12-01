@@ -65,7 +65,7 @@ function App() {
         <Route path="/admin/*" element={<AdminHome />} />
         <Route path="/members/join" element={<Join />} />
         <Route path="/members/kakaoJoin" element={<KakaoJoin />} />
-        {/* <Route path="/stations" element={<Station />} /> */}
+        <Route path="/stations" element={<Station />} />
         <Route
           path="/members/naver/callback"
           element={<NaverLoginCallback />}

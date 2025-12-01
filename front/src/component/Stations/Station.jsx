@@ -58,10 +58,15 @@ const Station = () => {
         // 가공
         const mapped = result.map((e) => {
           return {
+            stationId: e.stationId,
             stationName: e.stationName,
             address: e.address,
             lat: e.latitude,
             lng: e.longitude,
+            detailAddress: e.detailAddress,
+            tel: e.tel,
+            useTime: e.useTime,
+            regDate: e.regDate,
           };
         });
 
@@ -71,6 +76,19 @@ const Station = () => {
         console.error("검색실패:", error);
       });
   };
+
+  const handleResultClick = (stationId) => {
+    console.log(stationId);
+    axios
+      .get(`http://localhost:8081/station/searchDetail/${stationId}`)
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   // setReviewId()
   const register = () => {
     axios
@@ -188,9 +206,9 @@ const Station = () => {
               image: markerImage,
             });
             kakao.maps.event.addListener(marker, "click", () => {
-              const selectedId = item.stationId; // 이 마커에 해당하는 stationId
-
-              setStationId(selectedId); // state에 기억해두고
+              const selectedId = item.stationId; // 이 마커에 해당하는
+              setStationId(selectedId);
+              setStationName(item.title);
               fn1(selectedId); // 선택한 ID 들고 fn1 다시 호출
             });
           }
@@ -273,8 +291,12 @@ const Station = () => {
             {searchResult &&
               searchResult.map((item, index) => {
                 return (
-                  <li key={index}>
-                    <strong>{item.stationName}</strong>
+                  <li
+                    key={index}
+                    onClick={() => handleResultClick(item.stationId)}
+                    style={{ cursor: "pointer", marginBottom: "8px" }}
+                  >
+                    <strong>{item.title}</strong>
                     <div>{item.address}</div>
                   </li>
                 );
@@ -286,7 +308,7 @@ const Station = () => {
       <RightSection>
         <Map id="map"></Map>
         {location && <div></div>}
-
+        <div>선택된 충전소 이름 : {stationId}</div>
         <DetailButton
           onClick={findAll}
           style={{ marginTop: "5%", width: "10%" }}
