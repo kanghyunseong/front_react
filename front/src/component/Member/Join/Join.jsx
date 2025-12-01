@@ -96,12 +96,12 @@ const Join = () => {
     isLoading(true);
     let newErrors = {};
     const regexpId = /^[a-zA-Z][a-zA-Z0-9_]{4,20}$/;
-    const regexpPwd = /^[a-zA-Z0-9]*$/;
+    const regexpPwd = /^[a-zA-Z0-9]{5,20}$/;
     const regexpName = /^[가-힣]{2,5}$/;
     const regexpbirth =
       /^(19[0-9]{2}|20[0-9]{2})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/;
     const regexpEmail = /^[^@\s]+@[^@\s]+$/;
-    const regexpPhone = /^010\d{8}$/;
+    const regexpPhone = /^010-\d{4}-\d{4}$/;
 
     if (!regexpId.test(userId)) {
       newErrors.userId = "아이디 값은 5글자 이상 20자 이하만 가능합니다.";
@@ -225,7 +225,7 @@ const Join = () => {
           </label>
           <Input
             type="text"
-            placeholder="Phone Number 01012345678"
+            placeholder="Phone Number 010-1234-5678"
             required
             onChange={(e) => {
               setPhone(e.target.value);

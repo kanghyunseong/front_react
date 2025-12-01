@@ -43,7 +43,7 @@ const Header = () => {
                   </>
                 )}
 
-                <ButtonText onClick={() => navi("/members/myinfo")}>
+                <ButtonText onClick={() => navi("/members/detail")}>
                   내정보
                 </ButtonText>
                 <ButtonText2>/</ButtonText2>

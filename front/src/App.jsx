@@ -4,6 +4,8 @@ import Footer from "./component/Common/Footer/Footer";
 import Header from "./component/Common/Header/Header";
 import Home from "./component/Common/Home/Home";
 
+import ProtectedRoute from "./component/ProtectedURL";
+
 import Board from "./component/Boards/Board/Board";
 import BoardForm from "./component/Boards/Board/BoardForm";
 import BoardDetail from "./component/Boards/Board/BoardDetail";
@@ -64,7 +66,17 @@ function App() {
           element={<CarsReservationChange />}
         />
         <Route path="/reserves/detail" element={<CarsUsageHistory />} />
-        <Route path="/admin/*" element={<AdminHome />} />
+
+        {/* 🛡️ 관리자 페이지 보호 라우트 적용 🛡️ */}
+        <Route
+          path="/admin/*"
+          element={
+            <ProtectedRoute requiredRole="ROLE_ADMIN">
+              <AdminHome />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="/members/join" element={<Join />} />
         <Route path="/members/kakaoJoin" element={<KakaoJoin />} />
         <Route path="/stations" element={<Station />} />

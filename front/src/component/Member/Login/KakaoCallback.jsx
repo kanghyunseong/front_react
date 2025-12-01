@@ -41,8 +41,9 @@ const KakaoLoginCallback = () => {
               phone,
               email,
               birthDay,
+              licenseImg,
               provider,
-            } = data;
+            } = response.data;
 
             login(
               accessToken,
@@ -54,6 +55,7 @@ const KakaoLoginCallback = () => {
               phone,
               email,
               birthDay,
+              licenseImg,
               provider
             );
 

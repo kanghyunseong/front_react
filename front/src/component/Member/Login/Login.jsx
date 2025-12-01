@@ -79,6 +79,7 @@ const Login = () => {
           phone,
           email,
           birthDay,
+          licenseUrl,
           refreshToken,
           accessToken,
         } = result.data;
@@ -92,7 +93,8 @@ const Login = () => {
           role,
           phone,
           email,
-          birthDay
+          birthDay,
+          licenseUrl
         );
         alert("로그인에 성공하셨습니다.");
         navi("/");

@@ -150,9 +150,9 @@ const BoardDetail = () => {
         <>
           <Title>{board.boardTitle}</Title>
           <BoardWriter>
-          <span>작성자 : {board.boardWriter}</span>
-           <span>작성일 : {board.boardDate}</span>
-           <span>조회 : {board.count}</span>
+            <span>작성자 : {board.boardWriter}</span>
+            <span>작성일 : {board.boardDate}</span>
+            <span>조회 : {board.count}</span>
           </BoardWriter>
           <hr />
           <BoardContent>{board.boardContent}</BoardContent>
@@ -167,9 +167,7 @@ const BoardDetail = () => {
             <Button onClick={() => navi("/boards/boards")}>목록보기</Button>
             <Button
               style={{ marginLeft: "8px" }}
-              onClick={() =>
-                alert("게시글 신고 기능은 추후 구현 예정입니다.")
-              }
+              onClick={() => alert("게시글 신고 기능은 추후 구현 예정입니다.")}
             >
               신고하기
             </Button>

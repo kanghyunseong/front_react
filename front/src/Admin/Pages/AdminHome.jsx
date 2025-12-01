@@ -15,7 +15,6 @@ import CommentDeclaration from "./Community/CommentDeclaration";
 import Layout from "../Components/Layout/Layout";
 import NoticeList from "./Community/NoticeList";
 import NoticeWrite from "./Community/NoticeWrite";
-import Visualization from "./Enviroments/Visualization";
 import UserRanking from "./Enviroments/UserRanking";
 import UserOverview from "./User/UserOverview";
 import UserEdit from "./User/UserEdit";
@@ -46,10 +45,6 @@ const AdminHome = () => {
         <Route
           path="community/notice-edit"
           element={<NoticeWrite isEditMode={true} />}
-        />
-        <Route
-          path="enviroments/enviromentsVisualization"
-          element={<Visualization />}
         />
         <Route
           path="enviroments/enviromentsUserRanking"
