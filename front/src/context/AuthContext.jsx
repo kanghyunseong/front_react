@@ -13,6 +13,7 @@ export const AuthProvider = ({ children }) => {
     refreshToken: null,
     role: null,
     provider: null,
+    licenseImg: null,
     isAuthenticated: false,
   });
   useEffect(() => {
@@ -26,6 +27,7 @@ export const AuthProvider = ({ children }) => {
     const refreshToken = localStorage.getItem("refreshToken");
     const accessToken = localStorage.getItem("accessToken");
     const provider = localStorage.getItem("provider");
+    const licenseImg = localStorage.getItem("licenseImg");
     if (
       accessToken &&
       refreshToken &&
@@ -49,6 +51,7 @@ export const AuthProvider = ({ children }) => {
         accessToken,
         provider: provider || null,
         refreshToken,
+        licenseImg: licenseImg,
         isAuthenticated: true,
       });
     }
@@ -64,6 +67,7 @@ export const AuthProvider = ({ children }) => {
     phone,
     email,
     birthDay,
+    licenseImg,
     provider
   ) => {
     setAuth({
@@ -74,6 +78,7 @@ export const AuthProvider = ({ children }) => {
       phone,
       email,
       birthDay,
+      licenseImg,
       accessToken,
       refreshToken,
       provider: provider || null,
@@ -86,6 +91,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("phone", phone);
     localStorage.setItem("email", email);
     localStorage.setItem("birthDay", birthDay);
+    localStorage.setItem("licenseImg", licenseImg);
     localStorage.setItem("refreshToken", refreshToken);
     localStorage.setItem("accessToken", accessToken);
     if (provider) {
@@ -104,6 +110,7 @@ export const AuthProvider = ({ children }) => {
       accessToken: null,
       refreshToken: null,
       provider: null,
+      licenseImg: null,
       role: null,
       isAuthenticated: false,
     });
@@ -114,6 +121,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("phone");
     localStorage.removeItem("email");
     localStorage.removeItem("birthDay");
+    localStorage.removeItem("licenseImg");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("accessToken");
     localStorage.removeItem("provider");

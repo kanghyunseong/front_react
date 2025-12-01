@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import SideBar from "../SideBar/SideBar";
 import { UserDetailContainer } from "../styles/Styles";
 import {
@@ -9,22 +9,56 @@ import {
   UpdateUserButton,
 } from "./UserDetail.styles";
 
+import { AuthContext } from "../../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import Nophoto from "../../../assets/Nophoto.png";
+
 const UserDetail = () => {
+  const navi = useNavigate();
+  const { auth } = useContext(AuthContext);
+
   const [userId, setUserId] = useState("");
   const [userName, setUserName] = useState("");
   const [birthday, setBirthday] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [licenseImg, setlicenseImg] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  // 로그인 체크 (한 번만)
+  useEffect(() => {
+    if (auth && auth.isAuthenticated !== undefined) {
+      setLoading(false);
+      if (!auth.isAuthenticated) {
+        alert("로그인부터 해주세요");
+        navi("/");
+      }
+    }
+  }, [auth, navi]);
+
+  // auth 값으로 기본 입력값 채우기
+  useEffect(() => {
+    if (auth && auth.isAuthenticated) {
+      setUserId(auth.userId || "");
+      setUserName(auth.userName || "");
+      setBirthday(auth.birthDay || "");
+      setEmail(auth.email || "");
+      setPhone(auth.phone || "");
+      const imgUrl = auth.licenseImg;
+      setlicenseImg(imgUrl !== "null" && imgUrl?.trim() !== "" ? imgUrl : "");
+    }
+  }, [auth]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <>
       <SideBar></SideBar>
       <UserDetailContainer>
         <h2 style={{ marginTop: "100px" }}>PROFILE</h2>
-        <DriverLicenseImg
-          src="https://blog.kakaocdn.net/dna/b48sqJ/btsD0I89OOR/AAAAAAAAAAAAAAAAAAAAALWWxrJBN4MWC72RUyyuGCpa_KFxJvm8rz6zUsmtnLnk/img.png?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1764514799&allow_ip=&allow_referer=&signature=OglTHGm4b%2BrEM%2FhFNHnCu%2BpNg0I%3D"
-          alt=""
-        />
-
+        <DriverLicenseImg src={licenseImg || Nophoto} alt="Driver License" />
         <UserDatailBox>
           <div>
             <Label>Name</Label>
@@ -34,6 +68,7 @@ const UserDetail = () => {
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
               required
+              readOnly
             />
           </div>
 
@@ -44,6 +79,7 @@ const UserDetail = () => {
               value={birthday}
               onChange={(e) => setBirthday(e.target.value)}
               required
+              readOnly
             />
           </div>
 
@@ -55,6 +91,7 @@ const UserDetail = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              readOnly
             />
           </div>
 
@@ -66,6 +103,7 @@ const UserDetail = () => {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               required
+              readOnly
             />
           </div>
         </UserDatailBox>

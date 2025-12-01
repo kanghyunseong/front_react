@@ -32,7 +32,7 @@ const NaverLoginCallback = () => {
             phone,
             email,
             birthDay,
-            provider, // provider 값 추가
+            provider,
           } = response.data;
 
           // 로그인 함수 호출
@@ -46,7 +46,8 @@ const NaverLoginCallback = () => {
             phone,
             email,
             birthDay,
-            provider // provider 값도 전달
+            null,
+            provider
           );
           alert("로그인 성공!");
           navi("/"); // 로그인 후 홈으로 이동
