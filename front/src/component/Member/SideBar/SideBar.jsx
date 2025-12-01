@@ -74,12 +74,6 @@ const SideBar = () => {
         >
           <span>회원 탈퇴</span>
         </StyledSidebarButton>
-
-        <StyledSidebarButton
-          onClick={() => navi("/members/detail/savingCarbon")}
-        >
-          <span>내 탄소 등급</span>
-        </StyledSidebarButton>
       </StyledSidebarNav>
     </StyledSidebar>
   );

@@ -148,3 +148,26 @@ export const Title = styled.h2`
   color: #33333;
   margin-bottom: 70px;
 `;
+
+export const ProfileFileLabel = styled.label`
+  width: 300px;
+  height: 300px;
+  margin: 0 auto;
+  background-image: url(${(props) => props.fileImg});
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+  position: relative;
+  transition: 0.3s ease;
+
+  &:hover {
+    filter: brightness(0.7);
+
+    &::after {
+      content: "";
+
+      inset: 0;
+      background: rgba(255, 255, 255, 0.25);
+    }
+  }
+`;
