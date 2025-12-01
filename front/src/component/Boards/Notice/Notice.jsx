@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
@@ -13,61 +13,85 @@ import {
   Th,
   Thead,
   TitleTd,
-  Tr
+  Tr,
 } from "./Notice.styles";
 import gasipan from "../../../assets/gasipan.png";
 
 const Notice = () => {
-
   const [notices, setNotices] = useState([]);
-  const [page, setPage] = useState(0);     
+  const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
 
   const [searchType, setSearchType] = useState("title");
   const [keyword, setKeyword] = useState("");
+  const [isSearchMode, setIsSearchMode] = useState(false); // 검색 모드 여부
 
   const navi = useNavigate();
 
-  // 페이지별 게시글 로딩
-  useEffect(() => {
+  // 공지사항 목록(전체 조회 or 검색 결과) 로딩
+  const loadNotices = () => {
+    const baseUrl = "http://localhost:8081/boards/notices";
+
+    // 검색 모드일 때는 /search 호출, 아니면 전체 조회
+    const url = isSearchMode ? `${baseUrl}/search` : baseUrl;
+
+    const params = isSearchMode
+      ? { type: searchType, keyword, page }
+      : {}; // 전체 조회는 page 안 보냄 (지금 List로 응답)
+
     axios
-      .get(`http://localhost:8081/boards/notices?page=${page}`)
+      .get(url, { params })
       .then((response) => {
-        setNotices(response.data.content);   // 서버 응답 content 사용
-        setTotalPages(response.data.totalPages);
+        const data = response.data;
+
+        // 전체 조회는 List<NoticeDTO> 그대로 옴 (배열)
+        if (Array.isArray(data)) {
+          setNotices(data);
+          setTotalPages(1); // 페이지 1개만
+        } else {
+          // 검색 결과나 Page 형태일 경우
+          setNotices(data.content || []);
+          setTotalPages(data.totalPages || 1);
+        }
       })
       .catch((err) => {
         console.error("공지사항 페이지 로딩 실패:", err);
+        alert("공지사항 목록을 불러올 수 없습니다.");
       });
-  }, [page]);
+  };
+
+  // 페이지 / 검색 모드 변경 시 목록 다시 로딩
+  useEffect(() => {
+    loadNotices();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, isSearchMode]);
 
   // 상세보기 + 조회수 증가
   const handleView = (id) => {
-    axios
-      .post(`/boards/notices/${id}/view`)
-      .then(() => navi(`/boards/notices/${id}`))
-      .catch(() => navi(`/boards/notices/${id}`));
+    navi(`/boards/notices/${id}`);
   };
+
 
   // 검색 기능
   const handleSearch = () => {
-    if (!keyword.trim()) return alert("검색어를 입력하세요!");
+    if (!keyword.trim()) {
+      alert("검색어를 입력하세요!");
+      return;
+    }
+    setPage(0); // 검색 시 첫 페이지로
+    setIsSearchMode(true);
+    // loadNotices는 useEffect에서 자동 호출
+  };
 
-    useEffect(() => {
-      axios
-        .get(`http://localhost:8081/boards/notices?page=${page}`)
-        .then((response) => {
-          setBoards(response.data.content);   
-          setTotalPages(response.data.totalPages);
-        })
-        .catch((err) => {
-          console.error("게시판 페이지 로딩 실패:", err);
-        });
-    }, [page]);
+  // 검색 초기화 (전체 목록 보기)
+  const handleResetSearch = () => {
+    setKeyword("");
+    setIsSearchMode(false);
+    setPage(0);
+  };
 
   return (
     <Container>
-
       {/* 헤더 */}
       <Header>
         <img src={gasipan} alt="" style={{ width: "100%" }} />
@@ -76,7 +100,9 @@ const Notice = () => {
 
       {/* 탭 메뉴 */}
       <TabMenu>
-        <Tab $active onClick={() => navi("/boards/notices")}>공지사항</Tab>
+        <Tab $active onClick={() => navi("/boards/notices")}>
+          공지사항
+        </Tab>
         <Tab onClick={() => navi("/boards/boards")}>일반</Tab>
         <Tab onClick={() => navi("/boards/imgBoards")}>갤러리</Tab>
       </TabMenu>
@@ -94,22 +120,28 @@ const Notice = () => {
         </Thead>
 
         <tbody>
-          {Array.isArray(notices) && notices.map((notice) => (
-            <Tr key={notice.noticeNo}>
-              <Td>{notice.noticeNo}</Td>
+          {Array.isArray(notices) && notices.length > 0 ? (
+            notices.map((notice) => (
+              <Tr key={notice.noticeNo}>
+                <Td>{notice.noticeNo}</Td>
 
-              <TitleTd
-                style={{ cursor: "pointer" }}
-                onClick={() => handleView(notice.noticeNo)}
-              >
-                {notice.noticeTitle}
-              </TitleTd>
+                <TitleTd
+                  style={{ cursor: "pointer" }}
+                  onClick={() => handleView(notice.noticeNo)}
+                >
+                  {notice.noticeTitle}
+                </TitleTd>
 
-              <Td>{notice.noticeWriter}</Td>
-              <Td>{notice.noticeDate}</Td>
-              <Td>{notice.noticeCount}</Td>
+                <Td>{notice.noticeWriter}</Td>
+                <Td>{notice.noticeDate}</Td>
+                <Td>{notice.noticeCount}</Td>
+              </Tr>
+            ))
+          ) : (
+            <Tr>
+              <Td colSpan={5}>등록된 공지사항이 없습니다.</Td>
             </Tr>
-          ))}
+          )}
         </tbody>
       </Table>
 
@@ -132,35 +164,29 @@ const Notice = () => {
         ))}
       </Pagination>
 
-      {/* 검색 */}
+      {/* 검색 영역 */}
       <div
         style={{
           display: "flex",
           justifyContent: "flex-end",
-          alignItems: "center",   
+          alignItems: "center",
           marginTop: 20,
-          gap: "10px",            
-        }}>
-
-        {/* SelectBox */}
+          gap: "10px",
+        }}
+      >
         <SelectBox
+          value={searchType}
           onChange={(e) => setSearchType(e.target.value)}
-          style={{
-            height: "40px",
-            padding: "0 10px",
-            fontSize: "14px",
-            borderRadius: "6px",
-          }}>
-
+        >
           <option value="title">제목</option>
           <option value="writer">작성자</option>
           <option value="content">내용</option>
         </SelectBox>
 
-        {/* Input */}
         <input
           type="text"
           placeholder="검색어 입력"
+          value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
           style={{
             height: "40px",
@@ -168,9 +194,9 @@ const Notice = () => {
             fontSize: "14px",
             border: "1px solid gray",
             borderRadius: "6px",
-          }} />
+          }}
+        />
 
-        {/* Button */}
         <button
           onClick={handleSearch}
           style={{
@@ -182,12 +208,31 @@ const Notice = () => {
             borderRadius: "6px",
             cursor: "pointer",
             border: "none",
-          }}>검색</button>
+          }}
+        >
+          검색
+        </button>
 
+        {isSearchMode && (
+          <button
+            onClick={handleResetSearch}
+            style={{
+              height: "40px",
+              padding: "0 20px",
+              fontSize: "14px",
+              background: "lightgray",
+              color: "black",
+              borderRadius: "6px",
+              cursor: "pointer",
+              border: "none",
+            }}
+          >
+            전체보기
+          </button>
+        )}
       </div>
-
     </Container>
   );
 };
-}
+
 export default Notice;

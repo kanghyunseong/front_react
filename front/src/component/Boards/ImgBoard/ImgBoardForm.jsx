@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useState } from "react";
+import { useEffect, useContext, useState } from "react";
 import { AuthContext } from "../../../context/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -15,7 +15,7 @@ import gasipan from "../../../assets/gasipan.png";
 const ImgBoardForm = () => {
   const [imgBoardTitle, setImgBoardTitle] = useState("");
   const [imgBoardContent, setImgBoardContent] = useState("");
-  const [files, setFiles] = useState([]);   // ✅ 여러 개
+  const [files, setFiles] = useState([]);   // 여러 개
 
   const { auth } = useContext(AuthContext);
   const navi = useNavigate();
@@ -68,7 +68,7 @@ const ImgBoardForm = () => {
     formData.append("imgBoardTitle", imgBoardTitle);
     formData.append("imgBoardContent", imgBoardContent);
 
-    // ✅ 여러 파일 전송
+    // 여러 파일 전송
     files.forEach((file) => {
       formData.append("files", file); // 컨트롤러 @RequestParam("files")
     });
