@@ -28,11 +28,17 @@ const CarsReservationChange = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState(null);
 
-  const handleReturn = () => {
-    if (!confirm("반납을 취소하시겠습니까?")) return;
+  const handleReturn = (reservationNo) => {
+    if (!confirm("반납하시겠습니까?")) return;
     axios
       .put("http://localhost:8081/reserve/return",
-        { headers: { Authorization: `Bearer ${auth.accessToken}` } }
+        reservationNo,
+        {
+          headers: {
+            Authorization: `Bearer ${auth.accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        }
       )
       .then((result) => {
         console.log(result);
@@ -68,13 +74,13 @@ const CarsReservationChange = () => {
   const handleChange = (updatedData) => {
     axios
       .put("http://localhost:8081/reserve/change",
-        updatedData, 
+        updatedData,
         { headers: { Authorization: `Bearer ${auth.accessToken}` } }
       )
       .then((result) => {
         console.log(result);
         alert("예약변경을 성공했습니다.")
-        setModalOpen(false); 
+        setModalOpen(false);
         setRefresh(prev => prev + 1);
       })
       .catch((err) => {
@@ -143,7 +149,13 @@ const CarsReservationChange = () => {
 
                     <ButtonGroup>
                       {item.reservation?.returnStatus === 'Y' ? (
-                        <ReturnButton>반납하기</ReturnButton>
+                        <InfoText>
+                          ✓ 반납 완료
+                        </InfoText>
+                      ) : new Date() >= new Date(item.reservation?.endTime) ? (
+                        <ReturnButton onClick={() => handleReturn(item.reservation?.reservationNo)}>
+                          반납하기
+                        </ReturnButton>
                       ) : (
                         <>
                           <ModifyButton onClick={() => {

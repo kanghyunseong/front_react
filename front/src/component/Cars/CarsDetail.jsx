@@ -30,8 +30,9 @@ const CarsDetail = () => {
   const navi = useNavigate();
   const [car, setCar] = useState(null);
   const [load, isLoad] = useState(false);
-  const reviews = null;
+  const [reviews, setReviews ] = useState([]);
 
+  // 차량 정보 가져오기
   useEffect(() => {
     axios
       .get(`http://localhost:8081/cars/${carId}`)
@@ -45,6 +46,19 @@ const CarsDetail = () => {
       });
   }, [carId]);
 
+  // 리뷰 가져오기
+  useEffect(() => {
+    axios
+      .get(`http://localhost:8081/cars/${carId}/reviews`)
+      .then((result) => {
+        console.log(result);
+        setReviews(result.data);
+        isLoad(true);
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+  }, [carId]);
 
   if (car == null) return <div>빠이</div>;
   return (
@@ -91,12 +105,12 @@ const CarsDetail = () => {
           <ReviewSection>
             <SectionTitle>이용자 후기</SectionTitle>
             {reviews && reviews.map((review) => (
-              <ReviewItem key={review.id}>
+              <ReviewItem key={review.reviewNo}>
                 <ReviewHeader>
-                  <ReviewerName>{review.name}</ReviewerName>
-                  <ReviewDate>{review.date}</ReviewDate>
+                  <ReviewerName>{review.userName}</ReviewerName>
+                  <ReviewDate>{review.createDate}</ReviewDate>
                 </ReviewHeader>
-                <ReviewText>{review.text}</ReviewText>
+                <ReviewText>{review.reviewContent}</ReviewText>
               </ReviewItem>
             ))}
           </ReviewSection>
