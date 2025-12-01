@@ -62,6 +62,7 @@ export const SearchResult = styled.div`
   background-repeat: no-repeat;
   background-image: url("src/assets/logo.png");
   background-position: center;
+  overflow: scroll;
 `;
 export const RightSection = styled.div`
   display: flex;
@@ -83,7 +84,7 @@ export const Recomend = styled.button`
   width: 10%;
   height: 30px;
   font-size: 15px;
-  margin-top: 20px;
+  margin-top: 30px;
   margin-right: 20px;
   background-color: white;
   cusor: pointer;
@@ -108,7 +109,7 @@ width: 100%;
   height: 30px;
   font-size: 20px;
   outline: none;
-  margin-top: 20px;
+  margin-top: 40px;
 
   transsition: all 0.3s;
   &:focus {
@@ -118,7 +119,21 @@ width: 100%;
     color: #aaa;
     font-size: 14px;
     font-style: italic;
-
-
+     flex-direction: column;
 `;
-export const PageButtton = styled.button``;
+export const Registration = styled.button`
+  width: 10%;
+  height: 30px;
+  font-size: 15px;
+  color: black;
+  margin-top: 30px;
+  margin-left: 20px;
+`;
+export const Elision = styled.button`
+  width: 10%;
+  height: 30px;
+  font-size: 15px;
+  color: black;
+  margin-top: 30px;
+  margin-left: 20px;
+`;

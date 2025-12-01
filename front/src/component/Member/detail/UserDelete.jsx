@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext, useEffect } from "react";
 import SideBar from "../SideBar/SideBar";
 import { UserDetailContainer } from "../styles/Styles";
 import {
@@ -7,10 +7,47 @@ import {
   Input,
   DeleteUserButton,
 } from "./UserDetail.styles";
-
+import axios from "axios";
+import { AuthContext } from "../../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 const UserDelete = () => {
   const [userPwd, setUserPwd] = useState("");
   const [agree, setAgree] = useState("");
+  const { auth, logout } = useContext(AuthContext);
+  const navi = useNavigate();
+  useEffect(() => {
+    if (auth && auth.isAuthenticated !== undefined) {
+      if (!auth.isAuthenticated) {
+        alert("로그인부터 해주세요");
+        navi("/");
+      }
+    }
+  }, [auth, navi]);
+  const handleDelete = () => {
+    if (agree !== "동의합니다") {
+      alert("회원탈퇴를 원하신다면 동의합니다를 정확히 적어주세요.");
+      return;
+    }
+    axios
+      .delete("http://localhost:8081/members", {
+        headers: {
+          Authorization: `Bearer ${auth.accessToken}`,
+        },
+        data: {
+          userPwd,
+        },
+      })
+      .then((result) => {
+        alert("회원탈퇴를 성공했습니다.");
+        logout();
+        navi("/");
+      })
+      .catch((err) => {
+        if (err.response?.status === 401) {
+          alert("비밀번호가 일치하지 않습니다.");
+        }
+      });
+  };
 
   return (
     <>
@@ -40,7 +77,7 @@ const UserDelete = () => {
             />
           </div>
           <br />
-          <DeleteUserButton>회원 탈퇴</DeleteUserButton>
+          <DeleteUserButton onClick={handleDelete}>회원 탈퇴</DeleteUserButton>
         </UserDatailBox>
       </UserDetailContainer>
     </>

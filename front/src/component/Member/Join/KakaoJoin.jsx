@@ -47,6 +47,14 @@ const KakaoJoin = () => {
     phone: "",
   });
 
+  useEffect(() => {
+    if (userId === undefined) {
+      // 비정상 접근 → 홈으로 이동
+      alert("비정상적인 접근입니다.");
+      navi("/");
+    }
+  }, [userId, navi]);
+
   // 날짜용 const
 
   const minDate = new Date(
