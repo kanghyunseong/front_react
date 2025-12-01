@@ -32,7 +32,6 @@ export const MenuItem = styled.li`
   border-radius: 10px;
   margin-bottom: 10px;
 
-  /* props.active -> props.$active 로 변경 */
   background-color: ${(props) => (props.$active ? "#E0E7FF" : "transparent")};
   color: ${(props) => (props.$active ? "#4F46E5" : "#555")};
 
@@ -59,5 +58,51 @@ export const SubMenu = styled.ul`
     &:hover {
       color: #4f46e5;
     }
+  }
+`;
+export const UserInfoArea = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  background-color: #555;
+  border-radius: 5px;
+  margin: 10px 15px 20px 15px;
+  color: white;
+
+  .user-details {
+    display: flex;
+    flex-direction: column;
+    margin-left: 10px;
+  }
+
+  .user-name {
+    font-weight: bold;
+    font-size: 14px;
+  }
+
+  .user-role {
+    font-size: 12px;
+    color: #ccc;
+  }
+`;
+
+export const LogoutButton = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  margin-top: auto;
+  cursor: pointer;
+  color: #fff;
+  background-color: #e64c6b;
+  border-top: 1px solid #777;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #cc405b;
+  }
+
+  span {
+    margin-left: 10px;
+    font-weight: bold;
   }
 `;

@@ -12,12 +12,14 @@ const CarsEdit = () => {
 
   const [carName, setCarName] = useState("");
   const [km, setKm] = useState("");
-  const [type, setType] = useState("Small");
+  const [type, setType] = useState("소형"); // 🚀 초기값을 옵션에 맞게 변경
   const [battery, setBattery] = useState("");
   const [efficiency, setEfficiency] = useState("");
   const [range, setRange] = useState("0");
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [loading, setLoading] = useState(true); // 🚀 로딩 상태 추가
+
   useEffect(() => {
     if (!carId) {
       console.error("❌ 차량 ID가 없습니다. 수정 페이지 진입 오류.");
@@ -28,40 +30,46 @@ const CarsEdit = () => {
       console.log("⏳ 토큰을 기다리는 중...");
       return;
     }
-
+    setLoading(true);
     axios
       .get(`http://localhost:8081/admin/api/settings/${carId}`, {
         headers: { Authorization: `Bearer ${auth.accessToken}` },
       })
       .then((response) => {
-        console.log("✅ 데이터 로드 성공:", response.data);
-        const data = response.data; // 상태 업데이트
+        const data = response.data;
+        setCarName(data.CARNAME || "");
+
         setCarName(data.carName || "");
-        setKm(data.carDriving || "");
-        setType(data.carSize || "Small");
-        setBattery(data.battery ? String(data.battery) : "");
-        setEfficiency(data.carEfficiency ? String(data.carEfficiency) : "");
-
-        // 로드 후 즉시 주행 가능 거리 계산 (자동계산 로직 복원)
-        const bat = parseFloat(data.battery);
-        const eff = parseFloat(data.carEfficiency);
-        if (!isNaN(bat) && !isNaN(eff) && bat > 0 && eff > 0) {
+        setKm(data.carDriving != null ? String(data.carDriving) : "");
+        setType(data.carSize || "소형");
+        setBattery(data.battery != null ? String(data.battery) : "");
+        setEfficiency(
+          data.carEfficiency != null ? String(data.carEfficiency) : ""
+        );
+        const bat = data.battery != null ? parseFloat(data.battery) : 0;
+        const eff =
+          data.carEfficiency != null ? parseFloat(data.carEfficiency) : 0;
+        if (bat > 0 && eff > 0) {
           setRange(String(Math.round(bat * eff)));
+        } else {
+          setRange("0");
         }
-
-        if (data.carImage) {
-          setPreview(data.carImage);
+        if (data.CARIMAGE) {
+          setPreview(data.CARIMAGE);
         }
       })
       .catch((err) => {
         console.error("❌ 상세 정보 로딩 실패:", err);
         alert("차량 정보를 불러올 수 없거나 권한이 없습니다.");
+      })
+      .finally(() => {
+        setLoading(false);
       });
-  }, [carId, auth]); // carId와 auth가 변경될 때만 실행 // ============================================================= // 2. [자동 계산 로직] 배터리 또는 전비 변경 시 주행 가능 거리 계산 // =============================================================
+  }, [carId, auth]);
 
   useEffect(() => {
     const bat = parseFloat(battery);
-    const eff = parseFloat(efficiency);
+    const eff = parseFloat(parseFloat(efficiency).toFixed(1));
 
     if (!isNaN(bat) && !isNaN(eff) && bat > 0 && eff > 0) {
       const calculatedRange = Math.round(bat * eff);
@@ -69,7 +77,7 @@ const CarsEdit = () => {
     } else {
       setRange("0");
     }
-  }, [battery, efficiency]); // 파일 변경 핸들러 (동일)
+  }, [battery, efficiency]);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -77,7 +85,7 @@ const CarsEdit = () => {
       setFile(selectedFile);
       setPreview(URL.createObjectURL(selectedFile));
     }
-  }; // ============================================================= // 3. [저장] 수정 요청 (Update 전용) // =============================================================
+  };
 
   const handleSave = () => {
     if (!carName) {
@@ -88,18 +96,15 @@ const CarsEdit = () => {
     const formData = new FormData();
     formData.append("carName", carName);
     formData.append("carDriving", km || "0");
-    formData.append("carSize", type || "Small");
+    formData.append("carSize", type || "소형");
     formData.append("battery", battery || "0");
     formData.append("carEfficiency", efficiency || "0");
-
-    // 수정 모드이므로 carId는 필수입니다.
     formData.append("carId", carId);
 
     if (file) {
       formData.append("file", file);
     }
 
-    // 수정 전용 경로 사용: POST /admin/api/settings/update
     axios
       .post(`http://localhost:8081/admin/api/settings/update`, formData, {
         headers: {
@@ -120,6 +125,15 @@ const CarsEdit = () => {
   const handleCancel = () => {
     navigate(-1);
   };
+
+  if (loading) {
+    return (
+      <div style={{ padding: "30px", textAlign: "center", color: "#6B4CE6" }}>
+        <p>차량 정보를 불러오는 중입니다...</p>
+      </div>
+    );
+  }
+
   return (
     <div>
       <h2 style={{ marginBottom: "20px", color: "#6B4CE6" }}>
@@ -132,6 +146,9 @@ const CarsEdit = () => {
         <p style={{ color: "#999", marginBottom: "30px", fontSize: "14px" }}>
           Edit Car name, Km, Battery, Efficiency information
         </p>
+
+        {/* ... (폼 그룹 유지) ... */}
+
         <S.FormGroup>
           <div>
             <S.Label>Car Name</S.Label>
@@ -147,7 +164,6 @@ const CarsEdit = () => {
               type="number"
               value={km}
               onChange={(e) => setKm(e.target.value)}
-              placeholder="12345"
             />
           </div>
         </S.FormGroup>
@@ -171,7 +187,6 @@ const CarsEdit = () => {
               type="number"
               value={battery}
               onChange={(e) => setBattery(e.target.value)}
-              placeholder="77.4"
             />
           </div>
         </S.FormGroup>
@@ -183,7 +198,6 @@ const CarsEdit = () => {
               step="0.1"
               value={efficiency}
               onChange={(e) => setEfficiency(e.target.value)}
-              placeholder="5.2"
             />
           </div>
           <div>

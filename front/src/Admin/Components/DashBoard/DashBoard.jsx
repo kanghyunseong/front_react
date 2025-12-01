@@ -1,7 +1,6 @@
 import React from "react";
 import UserChart from "./UserChart";
 
-import CarbonChart from "./CarbonChart";
 import * as S from "./DashBoard.styles";
 import CarsStatsBarChart from "./CarsStatsBarChart";
 import UserStatsBarChart from "./UserStatsBarChart";
@@ -23,9 +22,7 @@ const DashBoard = () => {
       </S.ChartRow>
 
       <S.ChartRow>
-        <CarbonChart />
-
-        <CarsStatsBarChart  
+        <CarsStatsBarChart
           title="Cars Inflow"
           color="#8b5cf6"
           dataType="cars"
