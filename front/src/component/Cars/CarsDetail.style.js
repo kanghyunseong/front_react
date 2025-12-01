@@ -31,7 +31,7 @@ export const CardTitle = styled.h2`
 `;
 
 export const CarImageArea = styled.div`
-  height: 280px;
+  height: 500px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 12px;
   display: flex;

@@ -3,27 +3,21 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import Footer from "./component/Common/Footer/Footer";
 import Header from "./component/Common/Header/Header";
 import Home from "./component/Common/Home/Home";
-
 import ProtectedRoute from "./component/ProtectedURL";
-
 import Board from "./component/Boards/Board/Board";
 import BoardForm from "./component/Boards/Board/BoardForm";
 import BoardDetail from "./component/Boards/Board/BoardDetail";
 import ImgBoard from "./component/Boards/ImgBoard/ImgBoard";
 import ImgBoardForm from "./component/Boards/ImgBoard/ImgBoardForm";
-
 import CarsSearchList from "./component/Cars/CarsSearchList";
 import CarsDetail from "./component/Cars/CarsDetail";
 import AdminHome from "./Admin/Pages/AdminHome";
 import Join from "./component/Member/Join/Join";
-
 import CarsReservationConfirm from "./component/Cars/CarsReservationConfirm";
 import CarsReservation from "./component/Cars/CarsReservationForm";
 import CarsReservationChange from "./component/Cars/CarsReservationChange";
 import CarsUsageHistory from "./component/Cars/CarsUsageHistory";
-
 import Station from "./component/Stations/Station";
-
 import Notice from "./component/Boards/Notice/Notice";
 import ImgBoardDetail from "./component/Boards/ImgBoard/ImgBoardDetail";
 import Login from "./component/Member/Login/Login";
@@ -34,7 +28,6 @@ import UserUpdate from "./component/Member/detail/UserUpdate";
 import NaverLoginCallback from "./component/Member/Login/NaverCallback";
 import KakaoLoginCallback from "./component/Member/Login/KakaoCallback";
 import KakaoJoin from "./component/Member/Join/KakaoJoin";
-
 function App() {
   const location = useLocation();
   const isAdminPage = location.pathname.startsWith("/admin");
@@ -64,8 +57,7 @@ function App() {
           element={<CarsReservationChange />}
         />
         <Route path="/reserves/detail" element={<CarsUsageHistory />} />
-
-        {/* 🛡️ 관리자 페이지 보호 라우트 적용 🛡️ */}
+        {/* :방패: 관리자 페이지 보호 라우트 적용 :방패: */}
         <Route
           path="/admin/*"
           element={
@@ -74,7 +66,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route path="/members/join" element={<Join />} />
         <Route path="/members/kakaoJoin" element={<KakaoJoin />} />
         <Route path="/stations" element={<Station />} />
@@ -96,5 +87,4 @@ function App() {
     </>
   );
 }
-
 export default App;

@@ -29,10 +29,10 @@ const SideBar = () => {
         <StyledSidebarButton onClick={() => navi("/cars/searchList")}>
           <span>차량 목록보기</span>
         </StyledSidebarButton>
-        <StyledSidebarButton onClick={() => navi("/reserves/searchList")}>
+        <StyledSidebarButton onClick={() => navi("/cars/reserves/searchList")}>
           <span>예약 내역 변경 / 취소</span>
         </StyledSidebarButton>
-        <StyledSidebarButton onClick={() => navi("/reserves/detail")}>
+        <StyledSidebarButton onClick={() => navi("/cars/reserves/detail")}>
           <span>이용 기록</span>
         </StyledSidebarButton>
       </StyledSidebarNav>
