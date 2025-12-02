@@ -152,3 +152,96 @@ export const ReservationButton = styled.button`
     transform: translateY(0);
   }
 `;
+export const ReviewActionButtons = styled.div`
+  display: flex;
+  gap: 8px;
+`;
+
+export const EditButton = styled.button`
+  padding: 6px 12px;
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #1976D2;
+  }
+`;
+
+export const DeleteButton = styled.button`
+  padding: 6px 12px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #d32f2f;
+  }
+`;
+
+export const SaveButton = styled.button`
+  padding: 6px 12px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #45a049;
+  }
+`;
+
+export const CancelButton = styled.button`
+  padding: 6px 12px;
+  background-color: #9e9e9e;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #757575;
+  }
+`;
+
+export const ReviewEditTextarea = styled.textarea`
+  width: 100%;
+  min-height: 80px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  margin-top: 10px;
+  resize: vertical;
+  font-family: inherit;
+
+  &:focus {
+    outline: none;
+    border-color: #2196F3;
+  }
+`;
+
+export const EmptyReviewMessage = styled.div`
+  text-align: center;
+  padding: 20px;
+  color: #999;
+`;
+
+export const ReviewHeaderContent = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;

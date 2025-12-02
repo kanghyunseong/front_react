@@ -28,8 +28,11 @@ const CarsReservationChange = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState(null);
 
-  const handleReturn = (reservationNo) => {
+const handleReturn = (reservationNo, carId) => {
     if (!confirm("반납하시겠습니까?")) return;
+    const wantsReview = confirm("리뷰를 작성하시겠습니까?");
+
+    // 차량 반납
     axios
       .put("http://localhost:8081/reserve/return", reservationNo, {
         headers: {
@@ -39,8 +42,13 @@ const CarsReservationChange = () => {
       })
       .then((result) => {
         console.log(result);
-        alert("반납 처리가 완료되었습니다.");
-        setRefresh((prev) => prev + 1);
+        alert("반납 처리가 완료되었습니다.")
+        
+        if (wantsReview) {
+          navi(`/cars/${carId}/review/write?reservationNo=${reservationNo}`);
+        } else {
+          setRefresh(prev => prev + 1);
+        }
       })
       .catch((err) => {
         console.log(err);
@@ -145,11 +153,7 @@ const CarsReservationChange = () => {
                       {item.reservation?.returnStatus === "Y" ? (
                         <InfoText>✓ 반납 완료</InfoText>
                       ) : new Date() >= new Date(item.reservation?.endTime) ? (
-                        <ReturnButton
-                          onClick={() =>
-                            handleReturn(item.reservation?.reservationNo)
-                          }
-                        >
+                        <ReturnButton onClick={() => handleReturn(item.reservation?.reservationNo, item.car?.carId)}>
                           반납하기
                         </ReturnButton>
                       ) : (
