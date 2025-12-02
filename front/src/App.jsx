@@ -60,7 +60,6 @@ function App() {
           element={<CarsReservationChange />}
         />
         <Route path="/cars/reserves/detail" element={<CarsUsageHistory />} />
-
         <Route
           path="/admin/*"
           element={

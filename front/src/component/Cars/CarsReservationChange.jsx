@@ -12,10 +12,10 @@ import {
   ButtonGroup,
   ReturnButton,
   ModifyButton,
-  CancelButton
-} from "../Cars/CarsReservationChange.style"
+  CancelButton,
+} from "../Cars/CarsReservationChange.style";
 import SideBar from "../Common/Sidebar/Sidebar";
-import ReservationChangeModal from './ReservationChangeModal'; // 모달 import 추가
+import ReservationChangeModal from "./ReservationChangeModal"; // 모달 import 추가
 import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
@@ -31,69 +31,62 @@ const CarsReservationChange = () => {
   const handleReturn = (reservationNo) => {
     if (!confirm("반납하시겠습니까?")) return;
     axios
-      .put("http://localhost:8081/reserve/return",
-        reservationNo,
-        {
-          headers: {
-            Authorization: `Bearer ${auth.accessToken}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      )
+      .put("http://localhost:8081/reserve/return", reservationNo, {
+        headers: {
+          Authorization: `Bearer ${auth.accessToken}`,
+          "Content-Type": "application/json",
+        },
+      })
       .then((result) => {
         console.log(result);
-        alert("반납 처리가 완료되었습니다.")
-        setRefresh(prev => prev + 1);
+        alert("반납 처리가 완료되었습니다.");
+        setRefresh((prev) => prev + 1);
       })
       .catch((err) => {
         console.log(err);
         alert("반납 처리에 실패했습니다.");
-      })
-  }
+      });
+  };
 
   const handleCancel = (reservationNo) => {
     if (!confirm("예약을 취소하시겠습니까?")) return;
     axios
-      .delete(
-        `http://localhost:8081/reserve/${reservationNo}`,
-        {
-          headers: { Authorization: `Bearer ${auth.accessToken}` }
-        }
-      )
+      .delete(`http://localhost:8081/reserve/${reservationNo}`, {
+        headers: { Authorization: `Bearer ${auth.accessToken}` },
+      })
       .then((result) => {
         console.log(result);
         alert(result);
-        setRefresh(prev => prev + 1);
+        setRefresh((prev) => prev + 1);
       })
       .catch((err) => {
         console.log(err);
         alert(err);
-      })
-  }
+      });
+  };
 
   const handleChange = (updatedData) => {
     axios
-      .put("http://localhost:8081/reserve/change",
-        updatedData,
-        { headers: { Authorization: `Bearer ${auth.accessToken}` } }
-      )
+      .put("http://localhost:8081/reserve/change", updatedData, {
+        headers: { Authorization: `Bearer ${auth.accessToken}` },
+      })
       .then((result) => {
         console.log(result);
-        alert("예약변경을 성공했습니다.")
+        alert("예약변경을 성공했습니다.");
         setModalOpen(false);
-        setRefresh(prev => prev + 1);
+        setRefresh((prev) => prev + 1);
       })
       .catch((err) => {
         console.log(err);
-        alert("예약변경을 실패했습니다.")
-      })
-  }
+        alert("예약변경을 실패했습니다.");
+      });
+  };
 
   useEffect(() => {
     axios
-      .get("http://localhost:8081/reserve/searchList",
-        { headers: { Authorization: `Bearer ${auth.accessToken}` } }
-      )
+      .get("http://localhost:8081/reserve/searchList", {
+        headers: { Authorization: `Bearer ${auth.accessToken}` },
+      })
       .then((result) => {
         console.log(result.data);
         setReservation(result.data);
@@ -123,10 +116,10 @@ const CarsReservationChange = () => {
                         src={item.car?.carImage}
                         alt="차량 이미지"
                         style={{
-                          width: '100%',
-                          height: '100%',
-                          borderRadius: '8px',
-                          objectFit: 'cover',
+                          width: "100%",
+                          height: "100%",
+                          borderRadius: "8px",
+                          objectFit: "cover",
                         }}
                       />
                     ) : (
@@ -137,7 +130,8 @@ const CarsReservationChange = () => {
                   <ReservationInfo>
                     <InfoList>
                       <InfoText>
-                        이용 시간 : {item.reservation?.startTime} ~ {item.reservation.endTime}
+                        이용 시간 : {item.reservation?.startTime} ~{" "}
+                        {item.reservation.endTime}
                       </InfoText>
                       <InfoText>
                         예약번호 : {item.reservation?.reservationNo}
@@ -148,24 +142,30 @@ const CarsReservationChange = () => {
                     </InfoList>
 
                     <ButtonGroup>
-                      {item.reservation?.returnStatus === 'Y' ? (
-                        <InfoText>
-                          ✓ 반납 완료
-                        </InfoText>
+                      {item.reservation?.returnStatus === "Y" ? (
+                        <InfoText>✓ 반납 완료</InfoText>
                       ) : new Date() >= new Date(item.reservation?.endTime) ? (
-                        <ReturnButton onClick={() => handleReturn(item.reservation?.reservationNo)}>
+                        <ReturnButton
+                          onClick={() =>
+                            handleReturn(item.reservation?.reservationNo)
+                          }
+                        >
                           반납하기
                         </ReturnButton>
                       ) : (
                         <>
-                          <ModifyButton onClick={() => {
-                            setSelectedReservation(item.reservation);
-                            setModalOpen(true);
-                          }}>
+                          <ModifyButton
+                            onClick={() => {
+                              setSelectedReservation(item.reservation);
+                              setModalOpen(true);
+                            }}
+                          >
                             예약 변경 하기
                           </ModifyButton>
                           <CancelButton
-                            onClick={() => handleCancel(item.reservation?.reservationNo)}
+                            onClick={() =>
+                              handleCancel(item.reservation?.reservationNo)
+                            }
                           >
                             예약 취소 하기
                           </CancelButton>
@@ -188,6 +188,6 @@ const CarsReservationChange = () => {
       </MainContainer>
     </>
   );
-}
+};
 
 export default CarsReservationChange;
