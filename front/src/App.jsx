@@ -56,11 +56,11 @@ function App() {
           element={<CarsReservationConfirm />}
         />
         <Route
-          path="/reserves/searchList"
+          path="/cars/reserves/searchList"
           element={<CarsReservationChange />}
         />
-        <Route path="/reserves/detail" element={<CarsUsageHistory />} />
-        {/* :방패: 관리자 페이지 보호 라우트 적용 :방패: */}
+        <Route path="/cars/reserves/detail" element={<CarsUsageHistory />} />
+
         <Route
           path="/admin/*"
           element={
