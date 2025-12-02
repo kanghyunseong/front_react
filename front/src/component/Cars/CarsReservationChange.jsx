@@ -1,5 +1,5 @@
-import { 
-  PageContainer,
+import axios from "axios";
+import {
   MainContainer,
   PageTitle,
   ReservationList,
@@ -7,7 +7,6 @@ import {
   CardContent,
   ImagePlaceholder,
   ReservationInfo,
-  ReservationTitle,
   InfoList,
   InfoText,
   ButtonGroup,
@@ -16,65 +15,176 @@ import {
   CancelButton
 } from "../Cars/CarsReservationChange.style"
 import SideBar from "../Common/Sidebar/Sidebar";
+import ReservationChangeModal from './ReservationChangeModal'; // 모달 import 추가
+import { useEffect, useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext";
 
 const CarsReservationChange = () => {
-  const reservations = [
-    {
-      id: 1,
-      title: '현대 아이오닉 5',
-      startDate: '2025-11-12 14:00',
-      endDate: '2025-11-19 14:00',
-      reservationNum: '#A20251112',
-      location: '서울시 종로구 세종대로 110',
-      status: 'returned'
-    },
-    {
-      id: 2,
-      title: '기아 EV6',
-      startDate: '2025-11-19 14:00',
-      endDate: '2025-11-19 14:00',
-      reservationNum: '#20251113',
-      location: '서울시 종로구 세종대로 110',
-      status: 'active'
-    }
-  ];
+  const [reservation, setReservation] = useState([]);
+  const [refresh, setRefresh] = useState(0);
+  const navi = useNavigate();
+  const { auth } = useContext(AuthContext);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedReservation, setSelectedReservation] = useState(null);
 
+  const handleReturn = (reservationNo) => {
+    if (!confirm("반납하시겠습니까?")) return;
+    axios
+      .put("http://localhost:8081/reserve/return",
+        reservationNo,
+        {
+          headers: {
+            Authorization: `Bearer ${auth.accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      )
+      .then((result) => {
+        console.log(result);
+        alert("반납 처리가 완료되었습니다.")
+        setRefresh(prev => prev + 1);
+      })
+      .catch((err) => {
+        console.log(err);
+        alert("반납 처리에 실패했습니다.");
+      })
+  }
+
+  const handleCancel = (reservationNo) => {
+    if (!confirm("예약을 취소하시겠습니까?")) return;
+    axios
+      .delete(
+        `http://localhost:8081/reserve/${reservationNo}`,
+        {
+          headers: { Authorization: `Bearer ${auth.accessToken}` }
+        }
+      )
+      .then((result) => {
+        console.log(result);
+        alert(result);
+        setRefresh(prev => prev + 1);
+      })
+      .catch((err) => {
+        console.log(err);
+        alert(err);
+      })
+  }
+
+  const handleChange = (updatedData) => {
+    axios
+      .put("http://localhost:8081/reserve/change",
+        updatedData,
+        { headers: { Authorization: `Bearer ${auth.accessToken}` } }
+      )
+      .then((result) => {
+        console.log(result);
+        alert("예약변경을 성공했습니다.")
+        setModalOpen(false);
+        setRefresh(prev => prev + 1);
+      })
+      .catch((err) => {
+        console.log(err);
+        alert("예약변경을 실패했습니다.")
+      })
+  }
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:8081/reserve/searchList",
+        { headers: { Authorization: `Bearer ${auth.accessToken}` } }
+      )
+      .then((result) => {
+        console.log(result.data);
+        setReservation(result.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [auth.accessToken, refresh]);
+
+  if (!auth.accessToken) return <div>빠이</div>;
   return (
     <>
-    <SideBar />    
+      <SideBar />
       <MainContainer>
         <PageTitle>예약 내역</PageTitle>
-        
+
         <ReservationList>
-          {reservations.map((reservation) => (
-            <ReservationCard key={reservation.id}>
-              <CardContent>
-                <ImagePlaceholder>이미지</ImagePlaceholder>
-                
-                <ReservationInfo>
-                  <ReservationTitle>{reservation.title}</ReservationTitle>
-                  
-                  <InfoList>
-                    <InfoText>이용 시간 : {reservation.startDate} ~ {reservation.endDate}</InfoText>
-                    <InfoText>예약번호 : {reservation.reservationNum}</InfoText>
-                    <InfoText>반납 위치 : {reservation.location}</InfoText>
-                  </InfoList>
-                  
-                  <ButtonGroup>
-                    {reservation.status === 'returned' ? (
-                      <ReturnButton>반납하기</ReturnButton>
+          {reservation.length === 0 ? (
+            <InfoText>예약 내역이 없습니다.</InfoText>
+          ) : (
+            reservation.map((item) => (
+              <ReservationCard key={item.reservation.reservationNo}>
+                <CardContent>
+                  <ImagePlaceholder>
+                    {item.car?.carImage ? (
+                      <img
+                        src={item.car?.carImage}
+                        alt="차량 이미지"
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          borderRadius: '8px',
+                          objectFit: 'cover',
+                        }}
+                      />
                     ) : (
-                      <>
-                        <ModifyButton>예약 변경 하기</ModifyButton>
-                        <CancelButton>예약 취소 하기</CancelButton>
-                      </>
+                      "이미지 없음"
                     )}
-                  </ButtonGroup>
-                </ReservationInfo>
-              </CardContent>
-            </ReservationCard>
-          ))}
+                  </ImagePlaceholder>
+
+                  <ReservationInfo>
+                    <InfoList>
+                      <InfoText>
+                        이용 시간 : {item.reservation?.startTime} ~ {item.reservation.endTime}
+                      </InfoText>
+                      <InfoText>
+                        예약번호 : {item.reservation?.reservationNo}
+                      </InfoText>
+                      <InfoText>
+                        반납 위치 : {item.reservation?.destination}
+                      </InfoText>
+                    </InfoList>
+
+                    <ButtonGroup>
+                      {item.reservation?.returnStatus === 'Y' ? (
+                        <InfoText>
+                          ✓ 반납 완료
+                        </InfoText>
+                      ) : new Date() >= new Date(item.reservation?.endTime) ? (
+                        <ReturnButton onClick={() => handleReturn(item.reservation?.reservationNo)}>
+                          반납하기
+                        </ReturnButton>
+                      ) : (
+                        <>
+                          <ModifyButton onClick={() => {
+                            setSelectedReservation(item.reservation);
+                            setModalOpen(true);
+                          }}>
+                            예약 변경 하기
+                          </ModifyButton>
+                          <CancelButton
+                            onClick={() => handleCancel(item.reservation?.reservationNo)}
+                          >
+                            예약 취소 하기
+                          </CancelButton>
+                        </>
+                      )}
+                    </ButtonGroup>
+                  </ReservationInfo>
+                </CardContent>
+              </ReservationCard>
+            ))
+          )}
         </ReservationList>
+
+        <ReservationChangeModal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          reservation={selectedReservation}
+          onConfirm={handleChange}
+        />
       </MainContainer>
     </>
   );

@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useState } from "react";
+import { useEffect, useContext, useState } from "react";
 import { AuthContext } from "../../../context/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -13,9 +13,9 @@ import {
 import gasipan from "../../../assets/gasipan.png";
 
 const ImgBoardForm = () => {
-  const [boardTitle, setBoardTitle] = useState("");
-  const [boardContent, setBoardContent] = useState("");
-  const [file, setFile] = useState(null);
+  const [imgBoardTitle, setImgBoardTitle] = useState("");
+  const [imgBoardContent, setImgBoardContent] = useState("");
+  const [files, setFiles] = useState([]);   // 여러 개
 
   const { auth } = useContext(AuthContext);
   const navi = useNavigate();
@@ -27,21 +27,51 @@ const ImgBoardForm = () => {
     }
   }, [auth.isAuthenticated, navi]);
 
+  const handelFileChange = (e) => {
+    const selectedFiles = Array.from(e.target.files); // FileList → 배열
+    const allowTypes = ["image/jpg", "image/jpeg", "image/png", "image/gif"];
+    const maxSize = 1024 * 1024 * 10;
+
+    const validFiles = [];
+
+    for (const file of selectedFiles) {
+      if (!allowTypes.includes(file.type)) {
+        alert("이미지만 올려주세요 (jpg, jpeg, png, gif)");
+        continue;
+      }
+      if (file.size > maxSize) {
+        alert("너무 용량이 커요 (파일당 최대 10MB)");
+        continue;
+      }
+      validFiles.push(file);
+    }
+
+    if (validFiles.length === 0) {
+      setFiles([]);
+    } else {
+      setFiles(validFiles);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!boardTitle.trim() || !boardContent.trim()) {
+    if (!imgBoardTitle.trim() || !imgBoardContent.trim()) {
       return alert("제목/내용은 필수입니다!");
     }
 
-    if (!file) {
-      return alert("이미지 파일을 선택해주세요!");
+    if (!files || files.length === 0) {
+      return alert("이미지 파일을 하나 이상 선택해주세요!");
     }
 
     const formData = new FormData();
-    formData.append("boardTitle", boardTitle);
-    formData.append("boardContent", boardContent);
-    formData.append("imageFile", file); // 백엔드에서 받는 파라미터명에 맞게 수정
+    formData.append("imgBoardTitle", imgBoardTitle);
+    formData.append("imgBoardContent", imgBoardContent);
+
+    // 여러 파일 전송
+    files.forEach((file) => {
+      formData.append("files", file); // 컨트롤러 @RequestParam("files")
+    });
 
     axios
       .post("http://localhost:8081/boards/imgBoards", formData, {
@@ -73,15 +103,15 @@ const ImgBoardForm = () => {
         <Label>제목</Label>
         <Input
           type="text"
-          value={boardTitle}
-          onChange={(e) => setBoardTitle(e.target.value)}
+          value={imgBoardTitle}
+          onChange={(e) => setImgBoardTitle(e.target.value)}
         />
 
         <Label>내용</Label>
         <Input
           type="text"
-          value={boardContent}
-          onChange={(e) => setBoardContent(e.target.value)}
+          value={imgBoardContent}
+          onChange={(e) => setImgBoardContent(e.target.value)}
         />
 
         <Label>작성자</Label>
@@ -92,11 +122,12 @@ const ImgBoardForm = () => {
           style={{ background: "#eee" }}
         />
 
-        <Label>이미지 파일</Label>
+        <Label>이미지 파일 (여러 개 선택 가능)</Label>
         <Input
           type="file"
           accept="image/*"
-          onChange={(e) => setFile(e.target.files[0])}
+          multiple
+          onChange={handelFileChange}
         />
 
         <Button type="submit">등록하기</Button>
@@ -111,5 +142,6 @@ const ImgBoardForm = () => {
     </Container>
   );
 };
+
 
 export default ImgBoardForm;

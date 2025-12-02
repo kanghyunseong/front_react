@@ -61,7 +61,7 @@ const CarReservationForm = () => {
     }
 
     axios.post(
-      "http://localhost:8081/cars/reserve",
+      "http://localhost:8081/reserve",
       { carId, startTime, endTime, destination },
       { headers: { Authorization: `Bearer ${auth.accessToken}` } }
     )

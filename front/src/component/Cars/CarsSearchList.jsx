@@ -38,6 +38,7 @@ const CarsSearchList = () => {
       .get(`http://localhost:8081/cars?page=${currentPage}`)
       .then((response) => {
         const newCars = response.data;
+
         setCars([...cars, ...response.data]);
 
         if (newCars.length < 4) {

@@ -1,11 +1,5 @@
 import styled from 'styled-components';
 
-export const PageContainer = styled.div`
-  min-height: 100vh;
-  background: #f5f7fb;
-  padding: 24px;
-`;
-
 export const MainContainer = styled.div`
   width: 1062px;
   margin: 20px auto;

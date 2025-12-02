@@ -30,8 +30,9 @@ const CarsDetail = () => {
   const navi = useNavigate();
   const [car, setCar] = useState(null);
   const [load, isLoad] = useState(false);
-  const reviews = null;
- 
+  const [reviews, setReviews ] = useState([]);
+
+  // 차량 정보 가져오기
   useEffect(() => {
     axios
       .get(`http://localhost:8081/cars/${carId}`)
@@ -43,10 +44,23 @@ const CarsDetail = () => {
       .catch((err) => {
         console.log(err);
       });
-  },[carId]);
+  }, [carId]);
 
+  // 리뷰 가져오기
+  useEffect(() => {
+    axios
+      .get(`http://localhost:8081/cars/${carId}/reviews`)
+      .then((result) => {
+        console.log(result);
+        setReviews(result.data);
+        isLoad(true);
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+  }, [carId]);
 
-  if(car == null) return <div>빠이</div>;
+  if (car == null) return <div>빠이</div>;
   return (
     <>
       <SideBar />
@@ -55,7 +69,13 @@ const CarsDetail = () => {
           <CardTitle>차량 상세보기</CardTitle>
 
           <CarImageArea>
-            <CarModel>{car?.carImage}</CarModel>
+
+              {car.carImage ? (
+                <img src={car.carImage} alt="차량 이미지" style={{ width: '100%', height: '100%', borderRadius: '8px', objectFit: 'cover' }} />
+              ) : (
+                "이미지 없음"
+              )}
+
           </CarImageArea>
 
           <InfoSection>
@@ -85,12 +105,12 @@ const CarsDetail = () => {
           <ReviewSection>
             <SectionTitle>이용자 후기</SectionTitle>
             {reviews && reviews.map((review) => (
-              <ReviewItem key={review.id}>
+              <ReviewItem key={review.reviewNo}>
                 <ReviewHeader>
-                  <ReviewerName>{review.name}</ReviewerName>
-                  <ReviewDate>{review.date}</ReviewDate>
+                  <ReviewerName>{review.userName}</ReviewerName>
+                  <ReviewDate>{review.createDate}</ReviewDate>
                 </ReviewHeader>
-                <ReviewText>{review.text}</ReviewText>
+                <ReviewText>{review.reviewContent}</ReviewText>
               </ReviewItem>
             ))}
           </ReviewSection>

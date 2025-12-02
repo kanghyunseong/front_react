@@ -109,7 +109,7 @@ const ImgBoard = () => {
         </Tab>
       </TabMenu>
 
-      {/* ✅ 일반 게시판처럼 테이블 목록 */}
+      {/* 일반 게시판처럼 테이블 목록 */}
       <Table>
         <Thead>
           <Tr>
