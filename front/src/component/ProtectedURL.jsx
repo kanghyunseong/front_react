@@ -1,3 +1,4 @@
+// ProtectedRoute.js
 import React, { useContext } from "react";
 import { Navigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
@@ -14,7 +15,8 @@ const ProtectedRoute = ({ requiredRole, children }) => {
   }
 
   const isAuthenticated = auth?.accessToken;
-  const hasRequiredRole = auth?.role === requiredRole;
+
+  const hasRequiredRole = auth?.role?.includes(requiredRole);
 
   if (!isAuthenticated || !hasRequiredRole) {
     return <Navigate to="/members/login" replace />;
