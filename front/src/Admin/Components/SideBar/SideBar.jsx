@@ -115,13 +115,6 @@ const SideBar = () => {
             >
               Comment Declaration
             </li>
-            <li
-              onClick={() =>
-                handleNavigation("/admin/community/notice/noticeWrite")
-              }
-            >
-              Notice Write
-            </li>
             <li onClick={() => navigate("/admin/community/notice/noticeList")}>
               Notice List
             </li>

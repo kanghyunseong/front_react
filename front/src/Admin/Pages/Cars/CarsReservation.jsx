@@ -48,11 +48,10 @@ const CarsReservation = () => {
 
   const { auth } = useContext(AuthContext);
 
-  // 1. 예약 목록 로딩 (기존 로직 유지)
   useEffect(() => {
     const fetchReservations = async () => {
       if (!auth || !auth.accessToken) {
-        setLoading(false); // 토큰 없을 때 로딩 해제
+        setLoading(false);
         return;
       }
 

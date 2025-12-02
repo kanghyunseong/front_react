@@ -1,31 +1,62 @@
-import React, { useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import * as S from "./NoticeList.styles";
+import { AuthContext } from "../../../context/AuthContext";
+import axios from "axios";
 
 const NoticeList = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [notices, setNotices] = useState([]);
+  const { auth } = useContext(AuthContext);
 
-  // 임시 데이터
-  const [notices, setNotices] = useState([
-    { id: 1, title: "서비스 점검 안내", writer: "Admin", date: "2023-10-01" },
-    { id: 2, title: "신규 기능 업데이트", writer: "Admin", date: "2023-10-05" },
-  ]);
+  useEffect(() => {
+    const fetchNotices = async () => {
+      if (!auth || !auth.accessToken) {
+        setLoading(false);
+        return;
+      }
 
-  // 삭제 핸들러
-  const handleDelete = (id) => {
-    if (window.confirm("정말 삭제하시겠습니까?")) {
-      setNotices(notices.filter((n) => n.id !== id));
+      try {
+        const response = await axios.get(
+          "http://localhost:8081/admin/api/notice/list",
+          { headers: { Authorization: `Bearer ${auth.accessToken}` } }
+        );
+        setNotices(response.data);
+      } catch (error) {
+        console.log("공지사항 목록 로딩 실패: ", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchNotices();
+  }, [auth]);
+
+  const handleDelete = async (noticeNo) => {
+    if (!window.confirm("정말 이 공지사항을 삭제하시겠습니까?")) {
+      return;
+    }
+    try {
+      await axios.delete(
+        `http://localhost:8081/admin/api/notice/delete/${noticeNo}`,
+        { headers: { Authorization: `Bearer ${auth.accessToken}` } }
+      );
+      setNotices((prevNotices) =>
+        prevNotices.filter((notice) => notice.noticeNo !== noticeNo)
+      );
+      alert("삭제되었습니다.");
+    } catch (error) {
+      console.error("삭제 실패:", error);
+      alert("공지사항 삭제 중 오류가 발생했습니다.");
     }
   };
 
-  // 수정 핸들러 (데이터를 들고 이동)
   const handleEdit = (notice) => {
-    navigate("/admin/community/notice-write", {
+    navigate(`/admin/community/notice/edit/${notice.noticeNo}`, {
       state: { noticeData: notice },
     });
   };
 
-  // ★ 글쓰기 핸들러 (데이터 없이 이동 -> 신규 등록 모드)
   const handleWrite = () => {
     navigate("/admin/community/notice/noticeWrite");
   };
@@ -34,7 +65,6 @@ const NoticeList = () => {
     <S.Container>
       <S.Header>
         <h2>Community / Notice List</h2>
-        {/* 글쓰기 버튼 추가 */}
         <S.WriteBtn onClick={handleWrite}>+ New Notice</S.WriteBtn>
       </S.Header>
 
@@ -44,27 +74,25 @@ const NoticeList = () => {
             <th>No</th>
             <th>Title</th>
             <th>Writer</th>
+            <th>Content</th>
             <th>Date</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {notices.map((notice) => (
-            <tr key={notice.id}>
-              <td>{notice.id}</td>
-              <td>{notice.title}</td>
-              <td>{notice.writer}</td>
-              <td>{notice.date}</td>
+            <tr key={notice.noticeNo}>
+              <td>{notice.noticeNo}</td>
+              <td>{notice.noticeTitle}</td>
+              <td>{notice.noticeWriter}</td>
+              <td>{notice.noticeContent}</td>
+              <td>{notice.noticeDate}</td>
               <td>
-                <S.ActionBtn
-                  onClick={() =>
-                    navigate("/admin/community/notice/notice-edit")
-                  }
-                >
+                <S.ActionBtn onClick={() => handleEdit(notice)}>
                   Edit
                 </S.ActionBtn>
                 <S.ActionBtn
-                  onClick={() => handleDelete(notice.id)}
+                  onClick={() => handleDelete(notice.noticeNo)}
                   style={{ color: "red" }}
                 >
                   Del

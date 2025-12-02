@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import axios from "axios";
-import * as S from "./CarsRegistration.styles";
+import * as S from "./CarEdit.styles";
 import { AuthContext } from "../../../context/AuthContext";
 
 const CarsEdit = () => {
@@ -10,34 +10,60 @@ const CarsEdit = () => {
   const { auth } = useContext(AuthContext);
   const { carId } = useParams();
 
+  // 상태 변수들
   const [carName, setCarName] = useState("");
   const [km, setKm] = useState("");
-  const [type, setType] = useState("소형"); // 🚀 초기값을 옵션에 맞게 변경
+  const [type, setType] = useState("소형");
   const [battery, setBattery] = useState("");
   const [efficiency, setEfficiency] = useState("");
   const [range, setRange] = useState("0");
+  const [seats, setSeats] = useState("");
+
+  // 차량 설명 상태
+  const [carContent, setCarContent] = useState("");
+  const [byteCount, setByteCount] = useState(0); // 바이트 수 상태
+
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
-  const [loading, setLoading] = useState(true); // 🚀 로딩 상태 추가
+  const [loading, setLoading] = useState(true);
 
+  // ✅ [Helper] 바이트 수 계산 함수 (한글 3byte, 영문 1byte)
+  const getByteLength = (s) => {
+    let b = 0;
+    if (!s) return 0;
+    for (let i = 0; i < s.length; i++) {
+      const c = s.charCodeAt(i);
+      b += c >> 7 ? 3 : 1; // 오라클 UTF-8 기준 한글 3바이트 계산
+    }
+    return b;
+  };
+
+  // 설명 입력 핸들러 (바이트 계산 포함)
+  const handleContentChange = (e) => {
+    const val = e.target.value;
+    const currentByte = getByteLength(val);
+
+    if (currentByte > 4000) {
+      alert("작성 가능한 최대 글자 수(4000 Byte)를 초과했습니다.");
+      return; // 입력 막기
+    }
+    setCarContent(val);
+    setByteCount(currentByte);
+  };
+
+  // 1. 기존 데이터 불러오기
   useEffect(() => {
-    if (!carId) {
-      console.error("❌ 차량 ID가 없습니다. 수정 페이지 진입 오류.");
-      return;
-    }
+    if (!carId) return;
+    if (!auth || !auth.accessToken) return;
 
-    if (!auth || !auth.accessToken) {
-      console.log("⏳ 토큰을 기다리는 중...");
-      return;
-    }
     setLoading(true);
+
     axios
       .get(`http://localhost:8081/admin/api/settings/${carId}`, {
         headers: { Authorization: `Bearer ${auth.accessToken}` },
       })
       .then((response) => {
         const data = response.data;
-        setCarName(data.CARNAME || "");
 
         setCarName(data.carName || "");
         setKm(data.carDriving != null ? String(data.carDriving) : "");
@@ -46,6 +72,10 @@ const CarsEdit = () => {
         setEfficiency(
           data.carEfficiency != null ? String(data.carEfficiency) : ""
         );
+        setSeats(data.carSeet != null ? String(data.carSeet) : "");
+        const content = data.carContent || "";
+        setCarContent(content);
+        setByteCount(getByteLength(content));
         const bat = data.battery != null ? parseFloat(data.battery) : 0;
         const eff =
           data.carEfficiency != null ? parseFloat(data.carEfficiency) : 0;
@@ -54,8 +84,10 @@ const CarsEdit = () => {
         } else {
           setRange("0");
         }
-        if (data.CARIMAGE) {
-          setPreview(data.CARIMAGE);
+
+        const dbImage = data.carImage || data.CARIMAGE;
+        if (dbImage) {
+          setPreview(`http://localhost:8081/uploads/${dbImage}`);
         }
       })
       .catch((err) => {
@@ -67,18 +99,18 @@ const CarsEdit = () => {
       });
   }, [carId, auth]);
 
+  // 2. 주행거리 자동 계산
   useEffect(() => {
     const bat = parseFloat(battery);
-    const eff = parseFloat(parseFloat(efficiency).toFixed(1));
-
+    const eff = parseFloat(efficiency);
     if (!isNaN(bat) && !isNaN(eff) && bat > 0 && eff > 0) {
-      const calculatedRange = Math.round(bat * eff);
-      setRange(calculatedRange.toString());
+      setRange(Math.round(bat * eff).toString());
     } else {
       setRange("0");
     }
   }, [battery, efficiency]);
 
+  // 3. 파일 선택
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
@@ -87,9 +119,20 @@ const CarsEdit = () => {
     }
   };
 
+  // 4. 저장 (예외처리 강화)
   const handleSave = () => {
     if (!carName) {
-      alert("필수 정보를 입력해주세요.");
+      alert("차량 이름은 필수입니다.");
+      return;
+    }
+
+    if (!carContent) {
+      alert("차량 설명을 입력해주세요.");
+      return;
+    }
+
+    if (getByteLength(carContent) > 4000) {
+      alert("차량 설명이 너무 깁니다. 내용을 줄여주세요.");
       return;
     }
 
@@ -99,7 +142,9 @@ const CarsEdit = () => {
     formData.append("carSize", type || "소형");
     formData.append("battery", battery || "0");
     formData.append("carEfficiency", efficiency || "0");
+    formData.append("carSeet", seats || "0");
     formData.append("carId", carId);
+    formData.append("carContent", carContent);
 
     if (file) {
       formData.append("file", file);
@@ -113,7 +158,7 @@ const CarsEdit = () => {
         },
       })
       .then(() => {
-        alert("차량이 수정되었습니다.");
+        alert("차량 정보가 수정되었습니다.");
         navigate("/admin/cars/settings");
       })
       .catch((err) => {
@@ -142,12 +187,9 @@ const CarsEdit = () => {
 
       <S.Container>
         <h3 style={{ marginBottom: "5px" }}>Edit Page (ID: {carId})</h3>
-
         <p style={{ color: "#999", marginBottom: "30px", fontSize: "14px" }}>
           Edit Car name, Km, Battery, Efficiency information
         </p>
-
-        {/* ... (폼 그룹 유지) ... */}
 
         <S.FormGroup>
           <div>
@@ -167,6 +209,7 @@ const CarsEdit = () => {
             />
           </div>
         </S.FormGroup>
+
         <S.FormGroup>
           <div>
             <S.Label>Type (Large/Small)</S.Label>
@@ -190,6 +233,7 @@ const CarsEdit = () => {
             />
           </div>
         </S.FormGroup>
+
         <S.FormGroup>
           <div>
             <S.Label>Efficiency (km/kWh)</S.Label>
@@ -213,6 +257,48 @@ const CarsEdit = () => {
             />
           </div>
         </S.FormGroup>
+
+        <S.FormGroup>
+          <div style={{ width: "100%" }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: "5px",
+              }}
+            >
+              <S.Label style={{ marginBottom: 0 }}>Car Description</S.Label>
+            </div>
+
+            <S.TextArea
+              value={carContent}
+              onChange={handleContentChange}
+              placeholder="차량에 대한 상세 설명을 입력하세요."
+              $error={byteCount > 4000} // 스타일 파일에 에러 상태 전달
+            />
+
+            <S.ByteInfo $error={byteCount > 4000}>
+              {byteCount} / 4000 Bytes
+            </S.ByteInfo>
+
+            {byteCount > 4000 && (
+              <p style={{ color: "red", fontSize: "12px", marginTop: "5px" }}>
+                작성 가능한 용량을 초과했습니다. 내용을 줄여주세요.
+              </p>
+            )}
+          </div>
+        </S.FormGroup>
+
+        <div style={{ marginBottom: "20px" }}>
+          <S.Label>Seats (인승)</S.Label>
+          <S.Input
+            type="number"
+            value={seats}
+            onChange={(e) => setSeats(e.target.value)}
+            placeholder="5"
+          />
+        </div>
+
         <div style={{ marginBottom: "20px" }}>
           <S.Label>Car Profile Image</S.Label>
           <input
@@ -253,6 +339,7 @@ const CarsEdit = () => {
             )}
           </S.UploadBox>
         </div>
+
         <S.ButtonGroup>
           <S.Button onClick={handleCancel}>Cancel</S.Button>
           <S.Button $primary onClick={handleSave}>
