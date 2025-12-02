@@ -56,10 +56,11 @@ function App() {
           element={<CarsReservationConfirm />}
         />
         <Route
-          path="/reserves/searchList"
+          path="/cars/reserves/searchList"
           element={<CarsReservationChange />}
         />
-        <Route path="/reserves/detail" element={<CarsUsageHistory />} />
+        <Route path="/cars/reserves/detail" element={<CarsUsageHistory />} />
+
         <Route
           path="/admin/*"
           element={
