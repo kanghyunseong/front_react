@@ -42,7 +42,6 @@ const handleReturn = (reservationNo, carId) => {
       })
       .then((result) => {
         console.log(result);
-<<<<<<< HEAD
         alert("반납 처리가 완료되었습니다.")
         
         if (wantsReview) {
@@ -50,10 +49,6 @@ const handleReturn = (reservationNo, carId) => {
         } else {
           setRefresh(prev => prev + 1);
         }
-=======
-        alert("반납 처리가 완료되었습니다.");
-        setRefresh((prev) => prev + 1);
->>>>>>> 1c48b38c17be8d2d5c5b078e03ca3d4a4bdbe5e3
       })
       .catch((err) => {
         console.log(err);
@@ -158,15 +153,7 @@ const handleReturn = (reservationNo, carId) => {
                       {item.reservation?.returnStatus === "Y" ? (
                         <InfoText>✓ 반납 완료</InfoText>
                       ) : new Date() >= new Date(item.reservation?.endTime) ? (
-<<<<<<< HEAD
                         <ReturnButton onClick={() => handleReturn(item.reservation?.reservationNo, item.car?.carId)}>
-=======
-                        <ReturnButton
-                          onClick={() =>
-                            handleReturn(item.reservation?.reservationNo)
-                          }
-                        >
->>>>>>> 1c48b38c17be8d2d5c5b078e03ca3d4a4bdbe5e3
                           반납하기
                         </ReturnButton>
                       ) : (
