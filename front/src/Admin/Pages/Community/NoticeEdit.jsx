@@ -7,7 +7,7 @@ import * as S from "./NoticeEdit.styles";
 const NoticeEdit = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { noticeNo } = useParams(); // URL 파라미터에서 번호 가져오기 (라우터 설정 필요)
+  const { noticeNo } = useParams();
   const { auth } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
