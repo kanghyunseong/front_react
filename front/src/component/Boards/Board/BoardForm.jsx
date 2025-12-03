@@ -2,14 +2,7 @@ import { useEffect, useContext, useState } from "react";
 import { AuthContext } from "../../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import {
-  Container,
-  Header,
-  Form,
-  Input,
-  Label,
-  Button,
-} from "./Board.styles";
+import { Container, Header, Form, Input, Label, Button } from "./Board.styles";
 import gasipan from "../../../assets/gasipan.png";
 
 const BoardForm = () => {
@@ -19,7 +12,7 @@ const BoardForm = () => {
   const { auth } = useContext(AuthContext);
   const navi = useNavigate();
 
-   // 로그인 체크
+  // 로그인 체크
   useEffect(() => {
     if (!auth.isAuthenticated) {
       alert("로그인이 필요합니다!");
@@ -27,32 +20,32 @@ const BoardForm = () => {
     }
   }, [auth.isAuthenticated]);
 
-   const handleSubmit = (e) => {
-     e.preventDefault();
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-     if (!boardTitle.trim() || !boardContent.trim()) {
-       return alert("제목/내용은 필수입니다!");
-     }
+    if (!boardTitle.trim() || !boardContent.trim()) {
+      return alert("제목/내용은 필수입니다!");
+    }
 
-     const formData = new FormData();
-     formData.append("boardTitle", boardTitle);
-     formData.append("boardContent", boardContent);
+    const formData = new FormData();
+    formData.append("boardTitle", boardTitle);
+    formData.append("boardContent", boardContent);
 
-     axios
-       .post("http://localhost:8081/boards/boards", formData, {
-         headers: {
-           Authorization: `Bearer ${auth.accessToken}`,
-           "Content-Type": "multipart/form-data",
-         },
-       })
-       .then((res) => {
-         if (res.status === 201) {
-           alert("게시글이 등록되었습니다!");
-           navi("/boards/boards");
-         }
-       })
-       .catch((err) => console.log(err));
-   };
+    axios
+      .post("http://localhost:8081/boards/boards", formData, {
+        headers: {
+          Authorization: `Bearer ${auth.accessToken}`,
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => {
+        if (res.status === 201) {
+          alert("게시글이 등록되었습니다!");
+          navi("/boards/boards");
+        }
+      })
+      .catch((err) => console.log(err));
+  };
 
   // 뒤로가기 버튼 처리: 작성 중이면 확인창 띄우기
   const handleBack = () => {
@@ -73,28 +66,23 @@ const BoardForm = () => {
 
       <Form onSubmit={handleSubmit}>
         <Label>제목</Label>
-        <Input
-          type="text"
-          onChange={(e) => setBoardTitle(e.target.value)}
-        />
+        <Input type="text" onChange={(e) => setBoardTitle(e.target.value)} />
 
         <Label>내용</Label>
-        <Input
-          type="text"
-          onChange={(e) => setBoardContent(e.target.value)}
-        />
+        <Input type="text" onChange={(e) => setBoardContent(e.target.value)} />
 
         <Label>작성자</Label>
         <Input
           type="text"
-           value={auth.userId}
+          value={auth.userId}
           readOnly
           style={{ background: "#eee" }}
         />
 
-         <Button type="submit">등록하기</Button>
+        <Button type="submit">등록하기</Button>
         <Button type="button" onClick={handleBack} style={{ background: "blue" }} >
         뒤로가기 </Button>
+
       </Form>
     </Container>
   );

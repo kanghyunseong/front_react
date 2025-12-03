@@ -13,19 +13,21 @@ import {
   SearchResult,
   SearchWrapper,
 } from "./Station.style";
-import { useEffect, useState } from "react"; // 이 줄이 있는지 확인!
+import { useEffect, useState, useContext } from "react"; // 이 줄이 있는지 확인!
 import axios from "axios";
+import { AuthContext } from "../../context/AuthContext";
 import { DetailButton } from "../Cars/CarsSearchList.style";
 
 const Station = () => {
   // ===========================
   // 1. State 정의
   // ===========================
+  const { auth } = useContext(AuthContext);
   const [positions, setPositions] = useState([]);
   const [location, setLocation] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isRecomend, setIsRecomend] = useState(null);
+  const [isRecomend, setIsRecomend] = useState("");
   const [searchStation, setSearchStation] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [searchResult, setSearchResult] = useState([]);
@@ -33,11 +35,7 @@ const Station = () => {
   const [comment, setComment] = useState("");
   const [reviewId, setReviewId] = useState(null);
   const [refresh, setRefresh] = useState([]);
-
-  const reviewsPerPage = 5;
-  const indexOfLast = currentPage * reviewsPerPage;
-  const indexOfFirst = indexOfLast - reviewsPerPage;
-
+  const [stationName, setStationName] = useState("");
   // ===========================
   // 2. 검색 관련 함수
   // ===========================
@@ -82,26 +80,74 @@ const Station = () => {
     axios
       .get(`http://localhost:8081/station/searchDetail/${stationId}`)
       .then((res) => {
-        console.log(res);
+        const station = res.data[0]; // 배열 안 첫 번째 객체
+        const {
+          address,
+          detailAddress,
+          regDate,
+          stationId,
+          stationName,
+          tel,
+          useTime,
+        } = station;
+        alert(
+          "주소:" +
+            address +
+            "\n상세주소:" +
+            detailAddress +
+            "\n등록일자:" +
+            regDate +
+            "\n충전소ID:" +
+            stationId +
+            "\n충전소 이름:" +
+            stationName +
+            "\n연락처:" +
+            tel +
+            "\n이용시간:" +
+            useTime
+        );
       })
       .catch((err) => {
         console.log(err);
       });
   };
-
-  // setReviewId()
   const register = () => {
     axios
-      .post("http://localhost:8081/station/insert", {
-        stationId: stationId,
-        commentContent: comment,
-        isRecomend: isRecomend,
-      })
+      .post(
+        "http://localhost:8081/station/insert",
+        {
+          stationId: stationId,
+          commentContent: comment,
+          recommend: isRecomend,
+        },
+        { headers: { Authorization: `Bearer ${auth.accessToken}` } }
+      )
       .then((response) => {
         const result = response.data;
         console.log(result);
         setIsRecomend(null);
         setComment("");
+      })
+      .catch((error) => {
+        if (error.response) {
+          // 서버가 응답을 주었을 때
+          if (error.response.status === 400) {
+            alert("로그인부터 해주세요");
+          } else if (
+            error.response.data &&
+            error.response.data["error-message"]
+          ) {
+            alert(error.response.data["error-message"]);
+          } else {
+            alert("오류가 발생했습니다.");
+          }
+        } else if (error.request) {
+          // 요청은 되었지만 응답이 없을 때
+          alert("서버가 응답하지 않습니다.");
+        } else {
+          // 그 외 오류
+          alert("오류: " + error.message);
+        }
       });
   };
 
@@ -109,14 +155,15 @@ const Station = () => {
     console.log(reviewId);
     axios
       .delete("http://localhost:8081/station", {
+        headers: { Authorization: `Bearer ${auth.accessToken}` },
         data: { reviewId: reviewId }, // data 객체로 감싸기
       })
       .then((response) => {
         alert(response.data);
         findAll();
       })
-      .catch((err) => {
-        alert(err.message);
+      .catch((error) => {
+        alert(error.response.data["error-message"]);
       });
   };
 
@@ -205,10 +252,15 @@ const Station = () => {
               title: item.title,
               image: markerImage,
             });
+
             kakao.maps.event.addListener(marker, "click", () => {
               const selectedId = item.stationId; // 이 마커에 해당하는
+              const selectedName = item.title;
+
               setStationId(selectedId);
-              setStationName(item.title);
+
+              setStationName(selectedName);
+
               fn1(selectedId); // 선택한 ID 들고 fn1 다시 호출
             });
           }
@@ -308,7 +360,9 @@ const Station = () => {
       <RightSection>
         <Map id="map"></Map>
         {location && <div></div>}
-        <div>선택된 충전소 이름 : {stationId}</div>
+        <div style={{ marginTop: "15px" }}>
+          선택된 충전소 이름 : {stationName}
+        </div>
         <DetailButton
           onClick={findAll}
           style={{ marginTop: "5%", width: "10%" }}
@@ -342,21 +396,26 @@ const Station = () => {
               <p> 작성일:{e.createdAt}</p>
             </div>
             <div style={{ flex: "3" }}>
-              <Elision onClick={() => elision(e.reviewId)}>삭제</Elision>
+              <Elision
+                onClick={() => elision(e.reviewId)}
+                style={{ marginTop: "0px" }}
+              >
+                삭제
+              </Elision>
             </div>
           </li>
         ))}
 
         <Review>
           <Recomend
-            onClick={() => setIsRecomend(true)}
-            className={isRecomend === true ? "active" : ""}
+            onClick={() => setIsRecomend("Y")}
+            className={isRecomend === "Y" ? "active" : ""}
           >
             추천
           </Recomend>
           <Recomend
-            onClick={() => setIsRecomend(false)}
-            className={isRecomend === false ? "dislike" : ""}
+            onClick={() => setIsRecomend("N")}
+            className={isRecomend === "N" ? "dislike" : ""}
           >
             비추천
           </Recomend>

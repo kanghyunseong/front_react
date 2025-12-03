@@ -28,8 +28,7 @@ import UserUpdate from "./component/Member/detail/UserUpdate";
 import NaverLoginCallback from "./component/Member/Login/NaverCallback";
 import KakaoLoginCallback from "./component/Member/Login/KakaoCallback";
 import KakaoJoin from "./component/Member/Join/KakaoJoin";
-import NoticeDetail from "./component/Boards/Notice/NoticeDetail";
-
+import CarsReviewForm from "./component/Cars/CarsReviewForm";
 function App() {
   const location = useLocation();
   const isAdminPage = location.pathname.startsWith("/admin");
@@ -42,7 +41,6 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/boards/boards" element={<Board />} />
         <Route path="/boards/notices" element={<Notice />} />
-        <Route path="/boards/notices/:id" element={<NoticeDetail />} />
         <Route path="/boards/boards/write" element={<BoardForm />} />
         <Route path="/boards/boards/:id" element={<BoardDetail />} />
         <Route path="/boards/imgBoards" element={<ImgBoard />} />
@@ -56,10 +54,11 @@ function App() {
           element={<CarsReservationConfirm />}
         />
         <Route
-          path="/reserves/searchList"
+          path="/cars/reserves/searchList"
           element={<CarsReservationChange />}
         />
-        <Route path="/reserves/detail" element={<CarsUsageHistory />} />
+        <Route path="/cars/reserves/detail" element={<CarsUsageHistory />} />
+        <Route path="/cars/:carId/review/write" element={<CarsReviewForm />} />
         {/* :방패: 관리자 페이지 보호 라우트 적용 :방패: */}
         <Route
           path="/admin/*"

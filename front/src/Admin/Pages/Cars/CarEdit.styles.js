@@ -1,5 +1,3 @@
-// CarsEdit.styles.js (CarsRegistration.styles.js와 동일하다고 가정)
-
 import styled from "styled-components";
 
 export const Container = styled.div`
@@ -42,6 +40,35 @@ export const Input = styled.input`
     border-color: #6b4ce6;
     outline: none;
   }
+`;
+
+// ✅ [추가] 설명 입력창용 TextArea (에러 상태 처리 포함)
+export const TextArea = styled.textarea`
+  width: 100%;
+  height: 150px;
+  padding: 12px;
+  border: 1px solid ${(props) => (props.$error ? "red" : "#ccc")}; /* 에러 시 빨간 테두리 */
+  border-radius: 4px;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+
+  &:focus {
+    border-color: ${(props) => (props.$error ? "red" : "#6b4ce6")};
+  }
+`;
+
+// ✅ [추가] 바이트 수 표시용 텍스트
+export const ByteInfo = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  font-size: 12px;
+  color: ${(props) => (props.$error ? "red" : "#888")};
+  margin-top: 5px;
 `;
 
 export const UploadBox = styled.div`

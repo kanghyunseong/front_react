@@ -1,24 +1,23 @@
 import { useState, useInsertionEffect, createContext, useEffect } from "react";
+
 export const AuthContext = createContext();
+// 요 컨텍스트를 통해 인증관련 데이터를 하위 컴포넌트에 전달함
 
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({
     userNo: null,
     userName: null,
-    userId: null,
     phone: null,
     email: null,
     birthDay: null,
     accessToken: null,
     refreshToken: null,
     role: null,
-    provider: null,
-    licenseImg: null,
     isAuthenticated: false,
   });
+
   useEffect(() => {
     const userNo = localStorage.getItem("userNo");
-    const userId = localStorage.getItem("userId");
     const userName = localStorage.getItem("userName");
     const role = localStorage.getItem("role");
     const phone = localStorage.getItem("phone");
@@ -26,14 +25,12 @@ export const AuthProvider = ({ children }) => {
     const birthDay = localStorage.getItem("birthDay");
     const refreshToken = localStorage.getItem("refreshToken");
     const accessToken = localStorage.getItem("accessToken");
-    const provider = localStorage.getItem("provider");
-    const licenseImg = localStorage.getItem("licenseImg");
+
     if (
       accessToken &&
       refreshToken &&
       userNo &&
       userName &&
-      userId &&
       role &&
       phone &&
       email &&
@@ -41,22 +38,19 @@ export const AuthProvider = ({ children }) => {
     ) {
       setAuth({
         userNo,
-        userId,
         userName,
-        userId,
         role,
         phone,
         email,
         birthDay,
         accessToken,
-        provider: provider || null,
         refreshToken,
-        licenseImg: licenseImg,
         isAuthenticated: true,
       });
     }
   }, []);
 
+  // 로그인에 성공했을 때 수행할 함수
   const login = (
     accessToken,
     refreshToken,
@@ -66,9 +60,7 @@ export const AuthProvider = ({ children }) => {
     role,
     phone,
     email,
-    birthDay,
-    licenseImg,
-    provider
+    birthDay
   ) => {
     setAuth({
       userNo,
@@ -78,10 +70,8 @@ export const AuthProvider = ({ children }) => {
       phone,
       email,
       birthDay,
-      licenseImg,
       accessToken,
       refreshToken,
-      provider: provider || null,
       isAuthenticated: true,
     });
     localStorage.setItem("userNo", userNo);
@@ -91,14 +81,9 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("phone", phone);
     localStorage.setItem("email", email);
     localStorage.setItem("birthDay", birthDay);
-    localStorage.setItem("licenseImg", licenseImg);
     localStorage.setItem("refreshToken", refreshToken);
     localStorage.setItem("accessToken", accessToken);
-    if (provider) {
-      localStorage.setItem("provider", provider);
-    }
   };
-
   const logout = () => {
     setAuth({
       userNo: null,
@@ -109,8 +94,6 @@ export const AuthProvider = ({ children }) => {
       birthDay: null,
       accessToken: null,
       refreshToken: null,
-      provider: null,
-      licenseImg: null,
       role: null,
       isAuthenticated: false,
     });
@@ -121,14 +104,11 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("phone");
     localStorage.removeItem("email");
     localStorage.removeItem("birthDay");
-    localStorage.removeItem("licenseImg");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("accessToken");
-    localStorage.removeItem("provider");
     alert("로그아웃 되었습니다.");
-    window.location.href = "/"; //
+    window.localStorage.href = "/";
   };
-
   return (
     <AuthContext.Provider value={{ auth, login, logout }}>
       {children}

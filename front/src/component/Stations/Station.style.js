@@ -84,7 +84,7 @@ export const Recomend = styled.button`
   width: 10%;
   height: 30px;
   font-size: 15px;
-  margin-top: 30px;
+  margin-top: 40px;
   margin-right: 20px;
   background-color: white;
   cusor: pointer;
@@ -126,8 +126,13 @@ export const Registration = styled.button`
   height: 30px;
   font-size: 15px;
   color: black;
-  margin-top: 30px;
+  margin-top: 40px;
   margin-left: 20px;
+  &:hover {
+    background-color: pink;
+    color: white;
+    border: none;
+  }
 `;
 export const Elision = styled.button`
   width: 10%;
