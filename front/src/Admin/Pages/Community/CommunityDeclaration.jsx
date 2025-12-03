@@ -154,7 +154,7 @@ const CommunityDeclaration = () => {
               <S.DeleteBtn onClick={() => handleDelete(item.reportNo)}>
                 삭제하기
               </S.DeleteBtn>
-              <S.CloseIcon onClick={() => handleDelete(item.reportNo)}>
+              <S.CloseIcon onClick={() => handleReject(item.reportNo)}>
                 <FaTimes />
               </S.CloseIcon>
             </S.Col>
