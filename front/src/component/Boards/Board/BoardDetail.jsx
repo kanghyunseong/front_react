@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../../../context/AuthContext.jsx";
 import BoardComment from "./BoardComment.jsx";
-
+import ReportModal from "../ReportModal.jsx";
 import {
   Container,
   Header,
@@ -16,17 +16,24 @@ import {
 } from "./Board.styles";
 import gasipan from "../../../assets/gasipan.png";
 
+
 const BoardDetail = () => {
   const { id } = useParams();
   const navi = useNavigate();
 
   const [board, setBoard] = useState("");
+  const [loading, setLoading] = useState(true);
+
   const { auth } = useContext(AuthContext);
 
   // 수정 모드 관련 상태
   const [editMode, setEditMode] = useState(false);
   const [editTitle, setEditTitle] = useState("");
   const [editContent, setEditContent] = useState("");
+
+  // 신고 기능
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportTarget, setReportTarget] = useState(null);
 
   // 게시글 상세 조회
   useEffect(() => {
@@ -35,7 +42,8 @@ const BoardDetail = () => {
       navi("/members/login");
       return;
     }
-
+    
+    setLoading(true);
     axios
       .get(`http://localhost:8081/boards/boards/${id}`, {
         headers: {
@@ -51,6 +59,9 @@ const BoardDetail = () => {
         console.error("상세보기 로딩 실패:", err);
         alert("게시글을 불러오는 데 실패했습니다.");
         navi("/boards/boards");
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }, [id, auth, navi]);
 
@@ -106,6 +117,36 @@ const BoardDetail = () => {
       });
   };
 
+  // 신고 버튼 클릭 -> 모달 열기
+  const handleOpenReportModal = () => {
+
+    setReportTarget({ id, writer: board.boardWriter }); // 필요 데이터 저장
+    setReportOpen(true);
+  };
+
+  // 모달에서 제출했을 때 처리
+  const handleSubmitReport = (reason) => {
+  if (!reason) {
+    alert("신고 사유를 입력해주세요.");
+    return;
+  }  
+
+  axios
+    .post(
+      `http://localhost:8081/boards/boards/${id}/report`,
+      { reason }, 
+      { headers: { Authorization: `Bearer ${auth.accessToken}` } }
+    )
+    .then(() => {
+      alert("신고가 접수되었습니다. 운영자가 확인 후 처리합니다.");
+      setReportOpen(false);
+    })
+    .catch((err) => {
+      console.error("게시글 신고 실패:", err);
+      alert(err.response?.data?.message || "신고 접수에 실패했습니다.");
+    });
+};
+  if (loading) return <div>로딩 중...</div>;
   if (!board) return <div>잘못된 접근입니다. 관리자에게 문의하세요.</div>;
 
   const isWriter = board.boardWriter === auth.userId;
@@ -165,12 +206,21 @@ const BoardDetail = () => {
         <TopButtonRow>
           <div>
             <Button onClick={() => navi("/boards/boards")}>목록보기</Button>
-            <Button
-              style={{ marginLeft: "8px" }}
-              onClick={() => alert("게시글 신고 기능은 추후 구현 예정입니다.")}
-            >
-              신고하기
-            </Button>
+
+            {/* 자신 글이 아닐 때만 신고 버튼 노출 */}
+            {!isWriter && (
+              <>
+                <Button style={{ marginLeft: "8px" }} onClick={handleOpenReportModal}>
+                  신고하기
+                </Button>
+                <ReportModal
+                  open={reportOpen}
+                  onClose={() => setReportOpen(false)}
+                  onSubmit={handleSubmitReport}
+                  targetLabel="게시글"
+                />
+              </>
+            )}
           </div>
 
           {isWriter && (

@@ -25,6 +25,9 @@ const ImgBoard = () => {
   const [page, setPage] = useState(0); // 0부터 시작
   const [totalPages, setTotalPages] = useState(1);
 
+  const [totalElements, setTotalElements] = useState(0);
+  const [size, setSize] = useState(10);
+
   const [searchType, setSearchType] = useState("title");
   const [keyword, setKeyword] = useState("");
 
@@ -58,6 +61,8 @@ const ImgBoard = () => {
         const data = res.data;
         setImgBoards(data.content || []);
         setTotalPages(data.totalPages || 1);
+        setTotalElements(data.totalElements || 0);
+        setSize(data.size || 10);
       })
       .catch((err) => {
         console.error("갤러리 페이지 로딩 실패:", err);
@@ -122,9 +127,11 @@ const ImgBoard = () => {
         </Thead>
         <tbody>
           {Array.isArray(imgBoards) && imgBoards.length > 0 ? (
-            imgBoards.map((board) => (
+            imgBoards.map((board, index) => {
+              const rowNumber = totalElements - (page * size) - index;
+              return (
               <Tr key={board.imgBoardNo}>
-                <Td>{board.imgBoardNo}</Td>
+                <Td>{rowNumber}</Td>
                 <TitleTd onClick={() => handleView(board.imgBoardNo)}>
                   {board.imgBoardTitle}
                 </TitleTd>
@@ -137,7 +144,7 @@ const ImgBoard = () => {
                 </Td>
                 <Td>{board.imgCount}</Td>
               </Tr>
-            ))
+            )})
           ) : (
             <Tr>
               <Td colSpan={5} style={{ textAlign: "center" }}>

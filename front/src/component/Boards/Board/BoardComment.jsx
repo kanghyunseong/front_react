@@ -1,7 +1,7 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useRef } from "react";
 import axios from "axios";
 import { AuthContext } from "../../../context/AuthContext.jsx";
-
+import ReportModal from "../ReportModal.jsx";
 import {
   CommentArea,
   CommentWriteTitle,
@@ -22,9 +22,16 @@ const BoardComment = ({ boardNo }) => {
   const [comments, setComments] = useState([]);
   const [commentContent, setCommentContent] = useState("");
 
+  // textarea 자동 높이 조절용 ref
+  const textareaRef = useRef(null);
+
   // 수정 중인 댓글 상태
   const [editingId, setEditingId] = useState(null);
   const [editingContent, setEditingContent] = useState("");
+
+  // 신고 기능
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportingCommentId, setReportingCommentId] = useState(null);
 
   // 댓글 목록 불러오기
   const loadComments = () => {
@@ -46,8 +53,15 @@ const BoardComment = ({ boardNo }) => {
 
   useEffect(() => {
     loadComments();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [boardNo]);
+
+  // 🔹 작성 textarea 자동 높이 조절
+  useEffect(() => {
+    if (!textareaRef.current) return;
+    const ta = textareaRef.current;
+    ta.style.height = "auto";                   // 높이 초기화
+    ta.style.height = ta.scrollHeight + "px";   // 내용에 맞춰 다시 설정
+  }, [commentContent]);
 
   // 댓글 등록
   const handleInsertComment = (e) => {
@@ -67,8 +81,6 @@ const BoardComment = ({ boardNo }) => {
       .post(
         "http://localhost:8081/comments",
         {
-          // ✅ 백엔드 DTO 필드명에 맞게 변경 필요
-          // TB_COMMENT 의 REF_BNO 이고, DTO 가 refBno 인 경우
           refBno: boardNo,
           commentContent: commentContent,
         },
@@ -153,26 +165,30 @@ const BoardComment = ({ boardNo }) => {
   };
 
   // 댓글 신고
-  const handleReportComment = (commentNo) => {
-    const reason = window.prompt("신고 사유를 입력하세요.");
-    if (!reason) return;
+  const openReportForComment = (commentNo) => {
+    setReportingCommentId(commentNo);
+    setReportOpen(true);
+  };
+
+  const handleSubmitReport = (reason) => {
+    if (!reason) {
+      alert("신고 사유를 입력해주세요.");
+      return;
+    }
 
     axios
       .post(
-        `http://localhost:8081/comments/${commentNo}/report`,
+        `http://localhost:8081/comments/${reportingCommentId}/report`,
         { reason },
-        {
-          headers: {
-            Authorization: `Bearer ${auth.accessToken}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${auth.accessToken}` } }
       )
       .then(() => {
-        alert("신고가 접수되었습니다.");
+        alert("댓글 신고가 접수되었습니다.");
+        setReportOpen(false);
       })
       .catch((err) => {
         console.error("댓글 신고 실패:", err);
-        alert("댓글 신고에 실패했습니다.");
+        alert("신고에 실패했습니다.");
       });
   };
 
@@ -188,6 +204,14 @@ const BoardComment = ({ boardNo }) => {
       ) : (
         <>
           <CommentInput
+            as="textarea"                // textarea로 사용
+            ref={textareaRef}           // 자동 높이 ref
+            rows={1}                    // 시작은 한 줄
+            style={{
+              minHeight: "40px",
+              resize: "none",
+              overflow: "hidden",
+            }}
             value={commentContent}
             placeholder="댓글을 작성해 주세요."
             onChange={(e) => setCommentContent(e.target.value)}
@@ -218,7 +242,6 @@ const BoardComment = ({ boardNo }) => {
             comments.map((comment, index) => {
               const rowNumber = comments.length - index;
               const isCommentWriter = comment.commentWriter === auth.userId;
-
               const isEditing = editingId === comment.commentNo;
 
               return (
@@ -231,9 +254,7 @@ const BoardComment = ({ boardNo }) => {
                         as="textarea"
                         style={{ minHeight: "50px", marginTop: 0 }}
                         value={editingContent}
-                        onChange={(e) =>
-                          setEditingContent(e.target.value)
-                        }
+                        onChange={(e) => setEditingContent(e.target.value)}
                       />
                     ) : (
                       comment.commentContent
@@ -274,7 +295,7 @@ const BoardComment = ({ boardNo }) => {
                     ) : (
                       <CommentActionButton
                         onClick={() =>
-                          handleReportComment(comment.commentNo)
+                          openReportForComment(comment.commentNo)
                         }
                       >
                         댓글신고
@@ -287,6 +308,12 @@ const BoardComment = ({ boardNo }) => {
           )}
         </tbody>
       </CommentTable>
+      <ReportModal
+        open={reportOpen}
+        onClose={() => setReportOpen(false)}
+        onSubmit={handleSubmitReport}
+        targetLabel="댓글"
+      />
     </CommentArea>
   );
 };

@@ -22,6 +22,9 @@ const Notice = () => {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
 
+  const [totalElements, setTotalElements] = useState(0);
+  const [size, setSize] = useState(10);
+
   const [searchType, setSearchType] = useState("title");
   const [keyword, setKeyword] = useState("");
   const [isSearchMode, setIsSearchMode] = useState(false); // 검색 모드 여부
@@ -37,22 +40,17 @@ const Notice = () => {
 
     const params = isSearchMode
       ? { type: searchType, keyword, page }
-      : {}; // 전체 조회는 page 안 보냄 (지금 List로 응답)
+      : { page }; // 전체 조회는 page 안 보냄 (지금 List로 응답)
 
     axios
       .get(url, { params })
       .then((response) => {
         const data = response.data;
 
-        // 전체 조회는 List<NoticeDTO> 그대로 옴 (배열)
-        if (Array.isArray(data)) {
-          setNotices(data);
-          setTotalPages(1); // 페이지 1개만
-        } else {
-          // 검색 결과나 Page 형태일 경우
-          setNotices(data.content || []);
-          setTotalPages(data.totalPages || 1);
-        }
+        setNotices(data.content || []);
+        setTotalPages(data.totalPages || 1);
+        setTotalElements(data.totalElements || 0);
+        setSize(data.size || 10);
       })
       .catch((err) => {
         console.error("공지사항 페이지 로딩 실패:", err);
@@ -63,7 +61,6 @@ const Notice = () => {
   // 페이지 / 검색 모드 변경 시 목록 다시 로딩
   useEffect(() => {
     loadNotices();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, isSearchMode]);
 
   // 상세보기 + 조회수 증가
@@ -121,9 +118,11 @@ const Notice = () => {
 
         <tbody>
           {Array.isArray(notices) && notices.length > 0 ? (
-            notices.map((notice) => (
+            notices.map((notice, index) => {
+              const rowNumber = totalElements - (page * size) - index;
+              return (
               <Tr key={notice.noticeNo}>
-                <Td>{notice.noticeNo}</Td>
+                <Td>{rowNumber}</Td>
 
                 <TitleTd
                   style={{ cursor: "pointer" }}
@@ -136,7 +135,7 @@ const Notice = () => {
                 <Td>{notice.noticeDate}</Td>
                 <Td>{notice.noticeCount}</Td>
               </Tr>
-            ))
+            )})
           ) : (
             <Tr>
               <Td colSpan={5}>등록된 공지사항이 없습니다.</Td>

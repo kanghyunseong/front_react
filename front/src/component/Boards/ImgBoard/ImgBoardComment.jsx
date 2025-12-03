@@ -1,7 +1,7 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useRef } from "react";
 import axios from "axios";
 import { AuthContext } from "../../../context/AuthContext.jsx";
-
+import ReportModal from "../ReportModal.jsx";
 import {
   CommentArea,
   CommentWriteTitle,
@@ -22,8 +22,14 @@ const ImgBoardComment = ({ imgBoardNo }) => {
   const [imgComments, setImgComments] = useState([]);
   const [imgCommentContent, setImgCommentContent] = useState("");
 
+  const textareaRef = useRef(null); // 🔹 자동 높이 조절용 ref
+
   const [editingId, setEditingId] = useState(null);
   const [editingContent, setEditingContent] = useState("");
+
+  // 신고 기능
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportingCommentId, setReportingCommentId] = useState(null);
 
   const loadImgComments = () => {
     if (!imgBoardNo) return;
@@ -44,8 +50,15 @@ const ImgBoardComment = ({ imgBoardNo }) => {
 
   useEffect(() => {
     loadImgComments();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [imgBoardNo]);
+
+  // 🔹 작성 textarea 자동 높이 조절
+  useEffect(() => {
+    if (!textareaRef.current) return;
+    const ta = textareaRef.current;
+    ta.style.height = "auto";
+    ta.style.height = ta.scrollHeight + "px";
+  }, [imgCommentContent]);
 
   const handleInsertImgComment = (e) => {
     e.preventDefault();
@@ -64,7 +77,7 @@ const ImgBoardComment = ({ imgBoardNo }) => {
       .post(
         "http://localhost:8081/imgComments",
         {
-          refIno: imgBoardNo,             // ★ 백엔드 DTO 필드명
+          refIno: imgBoardNo,
           imgCommentContent: imgCommentContent,
         },
         {
@@ -143,6 +156,40 @@ const ImgBoardComment = ({ imgBoardNo }) => {
       });
   };
 
+  // 댓글 신고
+  const openReportForComment = (imgCommentNo) => {
+    setReportingCommentId(imgCommentNo);
+    setReportOpen(true);
+  };
+
+  const handleSubmitReport = (reason) => {
+    if (!reason) {
+      alert("신고 사유를 입력해주세요.");
+      return;
+    }
+
+    const imgCommentNo = reportingCommentId;
+    axios
+      .post(
+        `http://localhost:8081/imgComments/${imgCommentNo}/report`,
+        {
+          reason,
+          reporter: auth.userId,
+          targetType: "IMGCOMMENT",
+          targetId: imgCommentNo,
+        },
+        { headers: { Authorization: `Bearer ${auth.accessToken}` } }
+      )
+      .then(() => {
+        alert("댓글 신고가 접수되었습니다.");
+        setReportOpen(false);
+      })
+      .catch((err) => {
+        console.error("댓글 신고 실패:", err);
+        alert("신고에 실패했습니다.");
+      });
+  };
+
   return (
     <CommentArea>
       <CommentWriteTitle>댓글쓰기</CommentWriteTitle>
@@ -154,6 +201,14 @@ const ImgBoardComment = ({ imgBoardNo }) => {
       ) : (
         <>
           <CommentInput
+            as="textarea"
+            ref={textareaRef}
+            rows={1}
+            style={{
+              minHeight: "40px",
+              resize: "none",
+              overflow: "hidden",
+            }}
             value={imgCommentContent}
             placeholder="댓글을 작성해 주세요."
             onChange={(e) => setImgCommentContent(e.target.value)}
@@ -237,7 +292,7 @@ const ImgBoardComment = ({ imgBoardNo }) => {
                     ) : (
                       <CommentActionButton
                         onClick={() =>
-                          handleReportComment(imgComment.imgCommentNo)
+                          openReportForComment(imgComment.imgCommentNo)
                         }
                       >
                         댓글신고
@@ -250,10 +305,14 @@ const ImgBoardComment = ({ imgBoardNo }) => {
           )}
         </tbody>
       </CommentTable>
+      <ReportModal
+        open={reportOpen}
+        onClose={() => setReportOpen(false)}
+        onSubmit={handleSubmitReport}
+        targetLabel="댓글"
+      />
     </CommentArea>
   );
 };
-
-
 
 export default ImgBoardComment;

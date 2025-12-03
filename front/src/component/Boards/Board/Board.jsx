@@ -25,6 +25,9 @@ const Board = () => {
   const [page, setPage] = useState(0); // 0부터 시작
   const [totalPages, setTotalPages] = useState(1);
 
+  const [totalElements, setTotalElements] = useState(0);
+  const [size, setSize] = useState(10);
+
   const [searchType, setSearchType] = useState("title");
   const [keyword, setKeyword] = useState("");
 
@@ -60,6 +63,8 @@ const Board = () => {
         const data = res.data;
         setBoards(data.content || []);
         setTotalPages(data.totalPages || 1);
+        setTotalElements(data.totalElements || 0);
+        setSize(data.size || 10);
       })
       .catch((err) => {
         console.error("게시판 페이지 로딩 실패:", err);
@@ -124,9 +129,11 @@ const Board = () => {
 
         <tbody>
           {Array.isArray(boards) && boards.length > 0 ? (
-            boards.map((board) => (
+            boards.map((board, index) => {
+              const rowNumber = totalElements - (page * size) - index;
+              return (
               <Tr key={board.boardNo}>
-                <Td>{board.boardNo}</Td>
+                <Td>{rowNumber}</Td>
                 <TitleTd onClick={() => handleView(board.boardNo)}>
                   {board.boardTitle}
                 </TitleTd>
@@ -134,7 +141,7 @@ const Board = () => {
                 <Td>{board.boardDate}</Td>
                 <Td>{board.count}</Td>
               </Tr>
-            ))
+            )})
           ) : (
             <Tr>
               <Td colSpan={5}>등록된 게시글이 없습니다.</Td>

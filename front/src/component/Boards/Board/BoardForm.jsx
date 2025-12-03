@@ -54,6 +54,16 @@ const BoardForm = () => {
        .catch((err) => console.log(err));
    };
 
+  // 뒤로가기 버튼 처리: 작성 중이면 확인창 띄우기
+  const handleBack = () => {
+    if (boardTitle.trim() || boardContent.trim()) {
+      const ok = window.confirm("작성 중인 내용이 사라집니다. 정말 뒤로가시겠어요?");
+      if (!ok) return;
+    }
+    // history가 없을 수도 있으니 안전하게 경로로 이동
+    navi(-1); 
+  };
+
   return (
     <Container>
       <Header>
@@ -82,10 +92,9 @@ const BoardForm = () => {
           style={{ background: "#eee" }}
         />
 
-        <Button>등록하기</Button>
-        <Button onClick={() => navi(-1)} style={{ background: "blue" }}>
-                뒤로가기
-              </Button>
+         <Button type="submit">등록하기</Button>
+        <Button type="button" onClick={handleBack} style={{ background: "blue" }} >
+        뒤로가기 </Button>
       </Form>
     </Container>
   );
