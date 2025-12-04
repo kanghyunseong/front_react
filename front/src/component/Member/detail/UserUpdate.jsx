@@ -16,6 +16,7 @@ import {
 import { AuthContext } from "../../../context/AuthContext";
 import defaultImg from "../../../assets/LoginFileImg.png";
 import axios from "axios";
+import Nophoto from "../../../assets/Nophoto.png";
 
 const UserUpdate = () => {
   const { auth, login } = useContext(AuthContext);
@@ -28,7 +29,7 @@ const UserUpdate = () => {
   const [phone, setPhone] = useState(() => localStorage.getItem("phone") || "");
   const [file, setFile] = useState(null);
   const [fileImg, setFileImg] = useState(() => {
-    const img = localStorage.getItem("licenseImg");
+    const img = localStorage.getItem("licenseUrl");
     return img && img !== "null" ? img : null;
   });
   const [loading, setLoading] = useState(true);
@@ -48,7 +49,7 @@ const UserUpdate = () => {
       setEmail(auth.email || "");
       setPhone(auth.phone || "");
       setFileImg(
-        auth.licenseImg && auth.licenseImg !== "null" ? auth.licenseImg : null
+        auth.licenseUrl && auth.licenseUrl !== "null" ? auth.licenseUrl : null
       );
     }
   }, [auth, navi]);
@@ -124,10 +125,8 @@ const UserUpdate = () => {
       <UserDetailContainer>
         <h2 style={{ marginTop: "100px" }}>Edit Profile</h2>
         <Form onSubmit={handleUpdateUser}>
-          <ProfileFileLabel
-            htmlFor="inputFile"
-            fileImg={fileImg || defaultImg}
-          />
+          <ProfileFileLabel htmlFor="inputFile" fileImg={fileImg || Nophoto} />
+
           <FileInput
             type="file"
             accept="image/*"

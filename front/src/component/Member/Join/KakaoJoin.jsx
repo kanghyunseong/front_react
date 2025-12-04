@@ -112,7 +112,7 @@ const KakaoJoin = () => {
     const regexpbirth =
       /^(19[0-9]{2}|20[0-9]{2})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/;
     const regexpEmail = /^[^@\s]+@[^@\s]+$/;
-    const regexpPhone = /^010\d{8}$/;
+    const regexpPhone = /^010-\d{4}-\d{4}$/;
 
     if (!regexpName.test(userName)) {
       newErrors.userName = "이름은 한글로 2~5글자여야 합니다.";
@@ -153,6 +153,7 @@ const KakaoJoin = () => {
         }
       })
       .catch((error) => {
+        console.log(error);
         alert(error.response.data["error-message"]);
         isLoading(false);
       });
@@ -164,7 +165,7 @@ const KakaoJoin = () => {
         <a onClick={() => navi("/")}>
           <LogoImage src={logo} alt="logo" />
         </a>
-        <SignUpText>Sign Up</SignUpText>
+        <SignUpText style={{ color: "#FEE500" }}>Kakao Sign Up</SignUpText>
       </LogoBox>
       {loading ? (
         <Title>회원가입 시도중 ... </Title>
@@ -194,7 +195,7 @@ const KakaoJoin = () => {
           </label>
           <Input
             type="text"
-            placeholder="Phone Number 01012345678"
+            placeholder="Phone Number 010-1234-5678"
             required
             onChange={(e) => {
               setPhone(e.target.value);

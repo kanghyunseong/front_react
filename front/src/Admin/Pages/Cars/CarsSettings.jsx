@@ -3,23 +3,24 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaTimes, FaPlus } from "react-icons/fa";
 import * as S from "./CarsSettings.styles";
-import { AuthContext } from "../../../context/AuthContext"; // AuthContext 경로 확인
+import { AuthContext } from "../../../context/AuthContext";
 
 const CarsSettings = () => {
   const navigate = useNavigate();
   const { auth } = useContext(AuthContext);
 
-  // 1. 상태 변수 (백엔드 데이터 연동)
   const [cars, setCars] = useState([]);
   const [pageInfo, setPageInfo] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
 
-  // 2. [GET] 차량 목록 조회 함수
   const fetchCars = async (page) => {
+    if (!auth || !auth.accessToken) {
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
-      // 백엔드 API 호출 (절대 경로 사용)
       const response = await axios.get(
         `http://localhost:8081/admin/api/settings?page=${page}`,
         {
@@ -33,7 +34,19 @@ const CarsSettings = () => {
       setPageInfo(response.data.pageInfo);
     } catch (err) {
       console.error("차량 목록 조회 실패:", err);
-      alert("차량 목록을 불러오는데 실패했습니다.");
+
+      if (
+        (err.response && err.response.status === 401) ||
+        err.response.status === 403
+      ) {
+        alert(
+          "세션이 만료되었거나 접근 권한이 없습니다. 로그인 페이지로 이동합니다."
+        );
+        navigate("/login");
+      } else {
+        alert("차량 목록을 불러오는데 실패했습니다.");
+        setCars([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -46,8 +59,16 @@ const CarsSettings = () => {
   }, [currentPage, auth.accessToken]);
 
   const handleDelete = async (carId) => {
+    const token = auth.accessToken;
+    if (!token) {
+      alert("인증 정보가 없어 삭제할 수 없습니다.");
+      navigate("/login");
+      return;
+    }
+
     if (window.confirm("정말로 이 차량을 삭제하시겠습니까?")) {
       try {
+        setLoading(true);
         await axios.delete(
           `http://localhost:8081/admin/api/settings/${carId}`,
           {
@@ -58,10 +79,33 @@ const CarsSettings = () => {
         );
 
         alert("차량이 삭제되었습니다.");
-        fetchCars(currentPage); // 목록 새로고침
+        fetchCars(currentPage);
       } catch (err) {
         console.error("삭제 실패:", err);
-        alert("삭제에 실패했습니다.");
+        if (err.response) {
+          const status = err.response.status;
+          const serverMsg =
+            err.response.data.message || "서버에서 오류가 발생했습니다.";
+
+          if (status === 404) {
+            alert(
+              `삭제 실패: ${serverMsg} (이미 삭제되었거나 ID를 찾을 수 없습니다.)`
+            );
+          } else if (status === 401 || status === 403) {
+            alert("권한 오류: 로그인 페이지로 이동합니다.");
+            navigate("/login");
+          } else if (status === 409) {
+            alert(
+              `삭제 불가: ${serverMsg} (해당 차량에 예약 내역이 존재합니다.)`
+            );
+          } else {
+            alert(`삭제 실패: ${serverMsg}`);
+          }
+        } else {
+          alert("네트워크 오류로 삭제 요청에 실패했습니다.");
+        }
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -112,7 +156,6 @@ const CarsSettings = () => {
           <div style={{ width: "100px" }}>관리</div>
         </S.ListHeader>
 
-        {/* cars 배열 매핑 (DTO 필드명과 일치시켜야 함) */}
         {cars.map((car) => (
           <S.ListItem key={car.carId}>
             <S.CarInfo>
@@ -120,7 +163,6 @@ const CarsSettings = () => {
 
               <S.CarImageContainer>
                 {car.carImage ? (
-                  // 이미지 경로가 상대경로라면 앞에 서버 주소를 붙여야 할 수도 있음
                   <img src={car.carImage} alt={car.carName} />
                 ) : (
                   <div className="no-image">No Img</div>
@@ -130,7 +172,6 @@ const CarsSettings = () => {
               <span>{car.carName}</span>
             </S.CarInfo>
 
-            {/* DTO 필드명: carDriving, battery, carEfficiency, carStatus, carSize 등 */}
             <S.InfoText>{car.carDriving} Km</S.InfoText>
             <S.InfoText>{car.battery} kWh</S.InfoText>
             <S.InfoText>{car.carEfficiency} km/kWh</S.InfoText>
@@ -149,7 +190,6 @@ const CarsSettings = () => {
         ))}
       </S.ListContainer>
 
-      {/* 페이지네이션 버튼 */}
       {pageInfo && (
         <div
           style={{
@@ -158,7 +198,6 @@ const CarsSettings = () => {
             marginTop: "20px",
           }}
         >
-          {/* (UserOverview와 동일한 스타일의 버튼 사용하시면 됩니다) */}
           {pageNumbers.map((num) => (
             <button
               key={num}

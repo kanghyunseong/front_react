@@ -104,15 +104,13 @@ const UserChart = () => {
         borderColor: "rgb(255, 99, 132)",
         borderWidth: 3,
         borderDash: [8, 4],
-        backgroundColor: "rgba(255, 99, 132, 0.1)",
+        backgroundColor: "rgba(255, 255, 255, 0.1)",
         tension: 0,
         pointRadius: 6,
         pointBackgroundColor: "red",
       },
     ],
   };
-
-  // UserChart.js 내부의 options 객체 정의 부분
 
   const options = {
     responsive: true,
@@ -121,10 +119,10 @@ const UserChart = () => {
     scales: {
       x: {
         ticks: {
-          color: "rgba(255,255,255,0.8)",
+          color: "#333",
           font: {
-            size: 14, // ✨ 변경: X축 폰트 크기 증가
-            weight: "bold", // ✨ 추가: X축 폰트 굵게
+            size: 14,
+            weight: "bold",
           },
         },
         grid: { display: false },
@@ -132,7 +130,7 @@ const UserChart = () => {
       y: {
         ticks: { display: false },
         grid: {
-          color: "rgba(255,255,255,0.1)",
+          color: "rgba(0,0,0,0.1)",
           borderDash: [5, 5],
           drawBorder: false,
         },
@@ -141,19 +139,13 @@ const UserChart = () => {
     },
     backgroundColor: "transparent",
   };
-
-  // 버튼 렌더링 헬퍼 (Styled Component 사용)
   const renderButton = (type, label) => (
-    <FilterButton
-      $active={unit === type} // $active prop으로 활성화 상태 전달
-      onClick={() => setUnit(type)}
-    >
+    <FilterButton $active={unit === type} onClick={() => setUnit(type)}>
       {label}
     </FilterButton>
   );
 
   return (
-    // Styled Components 적용
     <Container>
       <InfoSection>
         <div>
@@ -174,7 +166,6 @@ const UserChart = () => {
       </InfoSection>
 
       <ChartSection>
-        {/* 차트 라이브러리 wrapper */}
         <div style={{ height: "100%", width: "100%" }}>
           <Line data={data} options={options} />
         </div>

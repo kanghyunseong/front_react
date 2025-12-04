@@ -7,10 +7,7 @@ const Layout = ({ children }) => {
   return (
     <S.LayoutContainer>
       <SideBar />
-      <S.MainContent>
-        {/* 라우터 설정에 따라 Outlet 혹은 children 사용 */}
-        {children}
-      </S.MainContent>
+      <S.MainContent>{children}</S.MainContent>
     </S.LayoutContainer>
   );
 };

@@ -44,7 +44,7 @@ const UserDetail = () => {
       setBirthday(auth.birthDay || "");
       setEmail(auth.email || "");
       setPhone(auth.phone || "");
-      const imgUrl = auth.licenseImg;
+      const imgUrl = auth.licenseUrl;
       setlicenseImg(imgUrl !== "null" && imgUrl?.trim() !== "" ? imgUrl : "");
     }
   }, [auth]);

@@ -30,7 +30,6 @@ ChartJS.register(
   Legend
 );
 
-// 컴포넌트 이름을 기능에 맞게 LicenseStatusBarChart로 사용합니다.
 const UserStatsBarChart = ({ unit = "month" }) => {
   const { auth } = useContext(AuthContext);
   const [chartData, setChartData] = useState({

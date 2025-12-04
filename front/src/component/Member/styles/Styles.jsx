@@ -150,12 +150,14 @@ export const Title = styled.h2`
 `;
 
 export const ProfileFileLabel = styled.label`
-  width: 300px;
+  width: 500px;
   height: 300px;
   margin: 0 auto;
   background-image: url(${(props) => props.fileImg});
-  background-size: cover;
+  background-size: contain;
+  background-repeat: no-repeat;
   background-position: center;
+
   cursor: pointer;
   position: relative;
   transition: 0.3s ease;

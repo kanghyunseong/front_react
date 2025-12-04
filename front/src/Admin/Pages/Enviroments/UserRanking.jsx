@@ -12,11 +12,7 @@ const UserRanking = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!auth) {
-      return;
-    }
-
-    if (!auth.accessToken) {
+    if (!auth || !auth.accessToken) {
       setLoading(false);
       setError("로그인이 필요하거나, 인증 토큰이 유효하지 않습니다.");
       console.error("인증 토큰이 없습니다. 로그인 상태를 확인하십시오.");
@@ -58,11 +54,12 @@ const UserRanking = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, [auth]); // 데이터 로딩 및 오류 처리 (생략 없음)
+  }, [auth]);
+
   if (loading) {
     return (
       <div style={{ padding: "30px", textAlign: "center", color: "#6B4CE6" }}>
-                <p>사용자 랭킹 데이터를 불러오는 중입니다...</p>     {" "}
+                <p>사용자 랭킹 데이터를 불러오는 중입니다...</p>      {" "}
       </div>
     );
   }
@@ -94,17 +91,16 @@ const UserRanking = () => {
   return (
     <S.Container>
       <S.TitleArea>
-                <h2>Environments / User Ranking</h2>
+        <h2>Environments / User Ranking</h2>
       </S.TitleArea>
       <S.TableCard>
-                <S.TableTitle>User Ranking</S.TableTitle>
+        <S.TableTitle>User Ranking</S.TableTitle>
         <S.TableDesc>Environments Ranking</S.TableDesc>
         <S.Table>
           <thead>
             <tr>
               <th>순위</th>
-              <th>이름</th>
-              <th>예약 횟수 (회)</th>
+              <th>이름</th>              <th>예약 횟수 (회)</th>
               <th>총 이용 시간 (시간)</th>
               <th>우수 반납률 (%)</th>
             </tr>
@@ -115,11 +111,9 @@ const UserRanking = () => {
                 <td>{idx + 1}</td>
                 <td>{user.name}</td>
                 <td>{user.reservationCount}</td>
-                {/* 💡 총 이용 시간 표시 (totalUsageHours는 백엔드 DTO에 추가되어야 함) */}
                 <td>
-                  {user.totalUsageHours ? user.totalUsageHours.toFixed(1) : 0}
+                  {user.totalUsageHours ? user.totalUsageHours.toFixed(1) : 0} 
                 </td>
-                {/* 💡 우수 반납률 표시 (onTimeReturnRate는 백엔드 DTO에 추가되어야 함) */}
                 <td>
                   {user.onTimeReturnRate ? user.onTimeReturnRate.toFixed(1) : 0}
                   %

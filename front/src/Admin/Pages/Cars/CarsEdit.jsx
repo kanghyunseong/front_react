@@ -10,7 +10,6 @@ const CarsEdit = () => {
   const { auth } = useContext(AuthContext);
   const { carId } = useParams();
 
-  // 상태 변수들
   const [carName, setCarName] = useState("");
   const [km, setKm] = useState("");
   const [type, setType] = useState("소형");
@@ -19,26 +18,23 @@ const CarsEdit = () => {
   const [range, setRange] = useState("0");
   const [seats, setSeats] = useState("");
 
-  // 차량 설명 상태
   const [carContent, setCarContent] = useState("");
-  const [byteCount, setByteCount] = useState(0); // 바이트 수 상태
+  const [byteCount, setByteCount] = useState(0);
 
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ✅ [Helper] 바이트 수 계산 함수 (한글 3byte, 영문 1byte)
   const getByteLength = (s) => {
     let b = 0;
     if (!s) return 0;
     for (let i = 0; i < s.length; i++) {
       const c = s.charCodeAt(i);
-      b += c >> 7 ? 3 : 1; // 오라클 UTF-8 기준 한글 3바이트 계산
+      b += c >> 7 ? 3 : 1;
     }
     return b;
   };
 
-  // 설명 입력 핸들러 (바이트 계산 포함)
   const handleContentChange = (e) => {
     const val = e.target.value;
     const currentByte = getByteLength(val);
@@ -51,7 +47,6 @@ const CarsEdit = () => {
     setByteCount(currentByte);
   };
 
-  // 1. 기존 데이터 불러오기
   useEffect(() => {
     if (!carId) return;
     if (!auth || !auth.accessToken) return;
@@ -92,14 +87,21 @@ const CarsEdit = () => {
       })
       .catch((err) => {
         console.error("❌ 상세 정보 로딩 실패:", err);
-        alert("차량 정보를 불러올 수 없거나 권한이 없습니다.");
+        if (err.response && err.response.status === 401) {
+          alert("세션이 만료되었습니다. 다시 로그인 해주세요.");
+          navigate("/login");
+        } else if (err.response && err.response.status === 404) {
+          alert("요청한 차량 정보를 찾을 수 없습니다.");
+          navigate("/admin/cars/settings");
+        } else {
+          alert("차량 정보를 불러올 수 없거나 권한이 없습니다.");
+        }
       })
       .finally(() => {
         setLoading(false);
       });
   }, [carId, auth]);
 
-  // 2. 주행거리 자동 계산
   useEffect(() => {
     const bat = parseFloat(battery);
     const eff = parseFloat(efficiency);
@@ -110,7 +112,6 @@ const CarsEdit = () => {
     }
   }, [battery, efficiency]);
 
-  // 3. 파일 선택
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
@@ -119,7 +120,6 @@ const CarsEdit = () => {
     }
   };
 
-  // 4. 저장 (예외처리 강화)
   const handleSave = () => {
     if (!carName) {
       alert("차량 이름은 필수입니다.");
@@ -133,6 +133,11 @@ const CarsEdit = () => {
 
     if (getByteLength(carContent) > 4000) {
       alert("차량 설명이 너무 깁니다. 내용을 줄여주세요.");
+      return;
+    }
+
+    if (!carName || !carContent || getByteLength(carContent) > 4000) {
+      alert("입력값을 확인해주세요.");
       return;
     }
 
@@ -151,7 +156,7 @@ const CarsEdit = () => {
     }
 
     axios
-      .post(`http://localhost:8081/admin/api/settings/update`, formData, {
+      .put(`http://localhost:8081/admin/api/settings/update`, formData, {
         headers: {
           Authorization: `Bearer ${auth.accessToken}`,
           "Content-Type": "multipart/form-data",
@@ -163,7 +168,20 @@ const CarsEdit = () => {
       })
       .catch((err) => {
         console.error("수정 실패:", err);
-        alert("수정에 실패했습니다.");
+
+        if (err.response) {
+          const status = err.response.status;
+          if (status === 401 || status === 403) {
+            alert("권한이 없거나 세션이 만료되었습니다.");
+            navigate("/login");
+          } else if (status === 404) {
+            alert("수정할 차량 정보를 찾을 수 없습니다.");
+          } else {
+            alert("수정 중 오류가 발생!");
+          }
+        } else {
+          alert("수정에 실패했습니다.");
+        }
       });
   };
 
@@ -175,6 +193,7 @@ const CarsEdit = () => {
     return (
       <div style={{ padding: "30px", textAlign: "center", color: "#6B4CE6" }}>
         <p>차량 정보를 불러오는 중입니다...</p>
+        <p>잠시만 기다려주세요.</p>
       </div>
     );
   }
@@ -274,7 +293,7 @@ const CarsEdit = () => {
               value={carContent}
               onChange={handleContentChange}
               placeholder="차량에 대한 상세 설명을 입력하세요."
-              $error={byteCount > 4000} // 스타일 파일에 에러 상태 전달
+              $error={byteCount > 4000}
             />
 
             <S.ByteInfo $error={byteCount > 4000}>
