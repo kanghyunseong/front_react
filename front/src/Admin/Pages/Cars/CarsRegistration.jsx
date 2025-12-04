@@ -9,7 +9,6 @@ const CarsRegistration = () => {
   const navigate = useNavigate();
   const { auth } = useContext(AuthContext);
 
-  // 상태 변수들
   const [carName, setCarName] = useState("");
   const [km, setKm] = useState("");
   const [type, setType] = useState("소형");
@@ -17,15 +16,14 @@ const CarsRegistration = () => {
   const [efficiency, setEfficiency] = useState("");
   const [range, setRange] = useState("0");
   const [seats, setSeats] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // ✅ 차량 설명 및 바이트 수 상태
   const [carContent, setCarContent] = useState("");
   const [byteCount, setByteCount] = useState(0);
 
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
 
-  // ✅ [Helper] 바이트 수 계산 함수 (한글 3byte, 영문 1byte)
   const getByteLength = (s) => {
     let b = 0;
     if (!s) return 0;
@@ -36,7 +34,6 @@ const CarsRegistration = () => {
     return b;
   };
 
-  // ✅ 설명 입력 핸들러 (바이트 계산 및 제한)
   const handleContentChange = (e) => {
     const val = e.target.value;
     const currentByte = getByteLength(val);
@@ -49,7 +46,6 @@ const CarsRegistration = () => {
     setByteCount(currentByte);
   };
 
-  // [자동 계산 로직] 주행 가능 거리
   useEffect(() => {
     const bat = parseFloat(battery);
     const eff = parseFloat(efficiency);
@@ -61,7 +57,6 @@ const CarsRegistration = () => {
     }
   }, [battery, efficiency]);
 
-  // [파일 선택 핸들러]
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
@@ -70,9 +65,9 @@ const CarsRegistration = () => {
     }
   };
 
-  // [저장] 등록 요청
-  const handleSave = () => {
-    // 유효성 검사
+  const handleSave = async () => {
+    if (loading) return;
+
     if (!carName) {
       alert("차량 이름은 필수입니다.");
       return;
@@ -81,7 +76,6 @@ const CarsRegistration = () => {
       alert("차량 설명을 입력해주세요.");
       return;
     }
-    // 저장 시 최종 바이트 체크
     if (getByteLength(carContent) > 4000) {
       alert("차량 설명이 너무 깁니다. 내용을 줄여주세요.");
       return;
@@ -96,27 +90,52 @@ const CarsRegistration = () => {
     formData.append("carSeet", seats || "0");
     formData.append("carContent", carContent);
 
-    const url = "http://localhost:8081/admin/api/settings";
-
     if (file) {
       formData.append("file", file);
     }
 
-    axios
-      .post(url, formData, {
+    const token = auth?.accessToken;
+    if (!token) {
+      alert("인증 정보가 없습니다. 다시 로그인해주세요.");
+      navigate("/login");
+      return;
+    }
+
+    const url = "http://localhost:8081/admin/api/settings";
+    setLoading(true);
+    try {
+      await axios.post(url, formData, {
         headers: {
-          Authorization: `Bearer ${auth.accessToken}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
         },
-      })
-      .then(() => {
-        alert("차량이 성공적으로 등록되었습니다.");
-        navigate("/admin/cars/settings");
-      })
-      .catch((err) => {
-        console.error("저장 실패:", err);
-        alert("차량 등록에 실패했습니다.");
       });
+
+      alert("차량이 성공적으로 등록되었습니다.");
+      navigate("/admin/cars/settings");
+    } catch (err) {
+      console.error("저장 실패:", err);
+
+      if (err.response) {
+        const status = err.response.status;
+        const serverMsg = err.response.data.message;
+
+        if (status === 401 || status === 403) {
+          alert(
+            "세션이 만료되었거나 접근 권한이 없습니다. 로그인 페이지로 이동합니다."
+          );
+          navigate("/login");
+        } else if (status === 413) {
+          alert("파일 용량이 너무 큽니다. 10MB 이하의 이미지를 사용해주세요.");
+        } else {
+          alert(`등록 실패: ${serverMsg || "서버 내부 오류가 발생했습니다."}`);
+        }
+      } else {
+        alert("네트워크 연결 오류 또는 서버 응답을 받을 수 없습니다.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCancel = () => {
@@ -211,7 +230,6 @@ const CarsRegistration = () => {
           </div>
         </S.FormGroup>
 
-        {/* ✅ [차량 설명 UI] */}
         <div style={{ marginBottom: "20px" }}>
           <div
             style={{
@@ -222,7 +240,6 @@ const CarsRegistration = () => {
             }}
           >
             <S.Label style={{ marginBottom: 0 }}>Car Description</S.Label>
-            {/* 바이트 수 표시 */}
             <S.ByteInfo $error={byteCount > 4000}>
               {byteCount} / 4000 Bytes
             </S.ByteInfo>
@@ -285,7 +302,7 @@ const CarsRegistration = () => {
         <S.ButtonGroup>
           <S.Button onClick={handleCancel}>Cancel</S.Button>
           <S.Button $primary onClick={handleSave}>
-            Create Car
+            {loading ? "등록 중..." : "Create Car"}
           </S.Button>
         </S.ButtonGroup>
       </S.Container>

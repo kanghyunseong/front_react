@@ -148,6 +148,9 @@ const Join = () => {
         }
       })
       .catch((error) => {
+        if (error.message === "Network Error") {
+          alert("서버네트워크의 문제가 생겼습니다.");
+        }
         alert(error.response.data["error-message"]);
         isLoading(false);
       });

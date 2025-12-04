@@ -35,9 +35,10 @@ function App() {
   const isAdminPage = location.pathname.startsWith("/admin");
   const isJoin = location.pathname.startsWith("/members/join");
   const isLogin = location.pathname.startsWith("/members/login");
+  const isKakaoLogin = location.pathname.startsWith("/members/KakaoJoin");
   return (
     <>
-      {!isJoin && !isAdminPage && !isLogin && <Header />}
+      {!isJoin && !isAdminPage && !isLogin && !isKakaoLogin && <Header />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/boards/boards" element={<Board />} />
@@ -87,7 +88,7 @@ function App() {
         <Route path="/members/detail/delete" element={<UserDelete />} />
         <Route path="/members/detail/update" element={<UserUpdate />} />
       </Routes>
-      {!isJoin && !isAdminPage && !isLogin && <Footer />}
+      {!isJoin && !isAdminPage && !isLogin && !isKakaoLogin && <Footer />}
     </>
   );
 }

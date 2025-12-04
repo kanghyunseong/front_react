@@ -29,7 +29,7 @@ export const SearchInput = styled.input`
   font-size: 16px;
   outline: none;
 
-  transsition: all 0.3s;
+  transition: all 0.3s;
   &:focus {
     border-color: 4092CD;
   }
@@ -87,7 +87,7 @@ export const Recomend = styled.button`
   margin-top: 40px;
   margin-right: 20px;
   background-color: white;
-  cusor: pointer;
+  cursor: pointer;
   border-radius: 5px;
   transition: all 0.3s;
   &.active {
@@ -105,13 +105,13 @@ export const Recomend = styled.button`
   }
 `;
 export const Comment = styled.input`
-width: 100%;
+  width: 100%;
   height: 30px;
   font-size: 20px;
   outline: none;
   margin-top: 40px;
 
-  transsition: all 0.3s;
+  transition: all 0.3s;
   &:focus {
     border-color: 4092CD;
   }
@@ -119,7 +119,8 @@ width: 100%;
     color: #aaa;
     font-size: 14px;
     font-style: italic;
-     flex-direction: column;
+    flex-direction: column;
+  }
 `;
 export const Registration = styled.button`
   width: 10%;

@@ -32,6 +32,7 @@ const CarsSearchList = () => {
   const [cars, setCars] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [errMsg, setErrMsg] = useState(null);
 
   useEffect(() => {
     axios
@@ -45,7 +46,7 @@ const CarsSearchList = () => {
           setHasMore(false);
         }
       })
-      .catch((err) => console.log(err));
+      .catch((err) => setErrMsg(err.response.data['error-message'], console.log(err)));
   }, [currentPage]);
 
   const increasePage = () => {
@@ -80,41 +81,64 @@ const CarsSearchList = () => {
 
         <BottomSection>
           <SectionTitle>차량 목록</SectionTitle>
-          <CarGrid>
-            {cars.map((car) => (
-              <CarCard key={car.carId}>
-                <CarImageArea>
-                  {car.carImage ? (
-                    <img src={car.carImage} alt="차량 이미지" style={{ width: '100%', height: '100%', borderRadius: '8px', objectFit: 'cover' }} />
-                  ) : (
-                    "이미지 없음"
-                  )}
-                </CarImageArea>
-                <CarInfo>
-                  <CarName>{car.carName}</CarName>
-                  <CarDetail></CarDetail>
-                  <CarDetail>주행 가능 거리 : {car.carDriving}km</CarDetail>
-                </CarInfo>
-                <CarBattery>
-                  <BatteryLabel>배터리</BatteryLabel>
-                  <BatteryValue>{car.battery}%</BatteryValue>
-                </CarBattery>
-                <DetailButton onClick={() => navi(`/cars/${car.carId}`)}>
-                  상세 보기
-                </DetailButton>
-              </CarCard>
-            ))}
-          </CarGrid>
 
-          {hasMore && (
-            <LoadMoreButton onClick={increasePage}>
-              더보기
-            </LoadMoreButton>
+          {/* 에러가 있으면 에러 메시지를 보여주고, 없으면 차량 목록을 보여줌 */}
+          {errMsg ? (
+            <div
+              style={{
+                padding: '20px',
+                textAlign: 'center',
+                color: '#d32f2f',
+                backgroundColor: '#ffebee',
+                borderRadius: '8px',
+                marginTop: '20px',
+                fontWeight: 'bold'
+              }}
+            >
+              ⚠️ {errMsg}
+            </div>
+          ) : (
+            <>
+              <CarGrid>
+                {cars.map((car) => (
+                  <CarCard key={car.carId}>
+                    <CarImageArea>
+                      {car.carImage ? (
+                        <img
+                          src={car.carImage}
+                          alt="차량 이미지"
+                          style={{ width: '100%', height: '100%', borderRadius: '8px', objectFit: 'cover' }}
+                        />
+                      ) : (
+                        "이미지 없음"
+                      )}
+                    </CarImageArea>
+                    <CarInfo>
+                      <CarName>{car.carName}</CarName>
+                      <CarDetail></CarDetail>
+                      <CarDetail>주행 가능 거리 : {car.carDriving}km</CarDetail>
+                    </CarInfo>
+                    <CarBattery>
+                      <BatteryLabel>배터리</BatteryLabel>
+                      <BatteryValue>{car.battery}%</BatteryValue>
+                    </CarBattery>
+                    <DetailButton onClick={() => navi(`/cars/${car.carId}`)}>
+                      상세 보기
+                    </DetailButton>
+                  </CarCard>
+                ))}
+              </CarGrid>
+
+              {hasMore && (
+                <LoadMoreButton onClick={increasePage}>
+                  더보기
+                </LoadMoreButton>
+              )}
+            </>
           )}
         </BottomSection>
       </MainContainer>
     </>
   );
 };
-
 export default CarsSearchList;

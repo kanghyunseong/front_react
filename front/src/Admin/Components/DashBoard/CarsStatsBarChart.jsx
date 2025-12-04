@@ -53,7 +53,7 @@ const CarsStatsBarChart = () => {
                 i === data.length - 1 ? "#6B4CE6" : "rgba(107, 76, 230, 0.5)"
               ),
               borderRadius: 4,
-              barThickness: 20, // 막대 두께도 조금 줄임 (공간 확보)
+              barThickness: 20,
             },
           ],
         });
@@ -75,7 +75,7 @@ const CarsStatsBarChart = () => {
     scales: {
       y: {
         beginAtZero: true,
-        ticks: { stepSize: 1, font: { size: 10 } }, // 글자 크기도 살짝 줄임
+        ticks: { stepSize: 1, font: { size: 10 } },
         grid: { borderDash: [5, 5], display: true },
       },
       x: {
