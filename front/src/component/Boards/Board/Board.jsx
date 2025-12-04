@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../Api.jsx";
 import {
   Container,
   Header,
@@ -46,8 +46,8 @@ const Board = () => {
     const isSearch = isSearchMode && searchParams;
 
     const url = isSearch
-      ? "http://localhost:8081/boards/boards/search"
-      : "http://localhost:8081/boards/boards";
+      ? "/boards/boards/search"
+      : "/boards/boards";
 
     const params = isSearch
       ? {
@@ -57,7 +57,7 @@ const Board = () => {
         }
       : { page };
 
-    axios
+    api
       .get(url, { params })
       .then((res) => {
         const data = res.data;
@@ -68,10 +68,11 @@ const Board = () => {
       })
       .catch((err) => {
         console.error("게시판 페이지 로딩 실패:", err);
+        // 상세 에러 알림은 인터셉터에서 공통 처리
       });
   }, [page, isSearchMode, searchParams]);
 
-  // 조회수 증가 + 상세 페이지 이동
+  // 상세 페이지 이동
   const handleView = (id) => {
     navi(`/boards/boards/${id}`);
   };
@@ -132,16 +133,17 @@ const Board = () => {
             boards.map((board, index) => {
               const rowNumber = totalElements - (page * size) - index;
               return (
-              <Tr key={board.boardNo}>
-                <Td>{rowNumber}</Td>
-                <TitleTd onClick={() => handleView(board.boardNo)}>
-                  {board.boardTitle}
-                </TitleTd>
-                <Td>{board.boardWriter}</Td>
-                <Td>{board.boardDate}</Td>
-                <Td>{board.count}</Td>
-              </Tr>
-            )})
+                <Tr key={board.boardNo}>
+                  <Td>{rowNumber}</Td>
+                  <TitleTd onClick={() => handleView(board.boardNo)}>
+                    {board.boardTitle}
+                  </TitleTd>
+                  <Td>{board.boardWriter}</Td>
+                  <Td>{board.boardDate}</Td>
+                  <Td>{board.count}</Td>
+                </Tr>
+              );
+            })
           ) : (
             <Tr>
               <Td colSpan={5}>등록된 게시글이 없습니다.</Td>

@@ -1,5 +1,7 @@
-import { useEffect, useState, useContext, useRef } from "react";
-import axios from "axios";
+// src/components/boards/imgBoard/ImgBoardComment.jsx
+
+import { useEffect, useContext, useState, useRef } from "react";
+import api from "../Api.jsx";
 import { AuthContext } from "../../../context/AuthContext.jsx";
 import ReportModal from "../ReportModal.jsx";
 import {
@@ -19,11 +21,13 @@ const ImgBoardComment = ({ imgBoardNo }) => {
   const { auth } = useContext(AuthContext);
   const isLoggedIn = auth?.isAuthenticated;
 
-  const [imgComments, setImgComments] = useState([]);
-  const [imgCommentContent, setImgCommentContent] = useState("");
+  const [comments, setComments] = useState([]);
+  const [commentContent, setCommentContent] = useState("");
 
-  const textareaRef = useRef(null); // 🔹 자동 높이 조절용 ref
+  // textarea 자동 높이 조절용 ref
+  const textareaRef = useRef(null);
 
+  // 수정 중인 댓글 상태
   const [editingId, setEditingId] = useState(null);
   const [editingContent, setEditingContent] = useState("");
 
@@ -31,17 +35,16 @@ const ImgBoardComment = ({ imgBoardNo }) => {
   const [reportOpen, setReportOpen] = useState(false);
   const [reportingCommentId, setReportingCommentId] = useState(null);
 
-  const loadImgComments = () => {
+  // ================= 댓글 목록 불러오기 =================
+  const loadComments = () => {
     if (!imgBoardNo) return;
 
-    axios
-      .get(`http://localhost:8081/imgComments?imgBoardNo=${imgBoardNo}`, {
-        headers: {
-          Authorization: `Bearer ${auth?.accessToken}`,
-        },
+    api
+      .get("/imgComments", {
+        params: { imgBoardNo },
       })
       .then((res) => {
-        setImgComments(res.data || []);
+        setComments(res.data || []);
       })
       .catch((err) => {
         console.error("갤러리 댓글 조회 실패:", err);
@@ -49,18 +52,19 @@ const ImgBoardComment = ({ imgBoardNo }) => {
   };
 
   useEffect(() => {
-    loadImgComments();
+    loadComments();
   }, [imgBoardNo]);
 
-  // 🔹 작성 textarea 자동 높이 조절
+  // 작성 textarea 자동 높이 조절
   useEffect(() => {
     if (!textareaRef.current) return;
     const ta = textareaRef.current;
     ta.style.height = "auto";
     ta.style.height = ta.scrollHeight + "px";
-  }, [imgCommentContent]);
+  }, [commentContent]);
 
-  const handleInsertImgComment = (e) => {
+  // ================= 댓글 등록 =================
+  const handleInsertComment = (e) => {
     e.preventDefault();
 
     if (!isLoggedIn) {
@@ -68,38 +72,34 @@ const ImgBoardComment = ({ imgBoardNo }) => {
       return;
     }
 
-    if (imgCommentContent.trim() === "") {
+    if (commentContent.trim() === "") {
       alert("댓글 내용을 입력해주세요.");
       return;
     }
 
-    axios
-      .post(
-        "http://localhost:8081/imgComments",
-        {
-          refIno: imgBoardNo,
-          imgCommentContent: imgCommentContent,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${auth.accessToken}`,
-          },
-        }
-      )
-      .then(() => {
-        alert("댓글이 등록되었습니다.");
-        setImgCommentContent("");
-        loadImgComments();
+    api
+      .post("/imgComments", {
+        refIno: imgBoardNo,
+        imgCommentContent: commentContent,
+      })
+      .then((res) => {
+        const msg = res.data?.message || "댓글이 등록되었습니다.";
+        alert(msg);
+        setCommentContent("");
+        loadComments();
       })
       .catch((err) => {
         console.error("갤러리 댓글 등록 실패:", err);
-        alert("댓글 등록에 실패했습니다.");
+        const msg =
+          err.response?.data?.["error-message"] || "댓글 등록에 실패했습니다.";
+        alert(msg);
       });
   };
 
-  const handleEditClick = (imgComment) => {
-    setEditingId(imgComment.imgCommentNo);
-    setEditingContent(imgComment.imgCommentContent);
+  // ================= 댓글 수정 =================
+  const handleEditClick = (comment) => {
+    setEditingId(comment.imgCommentNo);
+    setEditingContent(comment.imgCommentContent);
   };
 
   const handleEditCancel = () => {
@@ -107,56 +107,51 @@ const ImgBoardComment = ({ imgBoardNo }) => {
     setEditingContent("");
   };
 
-  const handleUpdateImgComment = (imgCommentNo) => {
+  const handleUpdateComment = (imgCommentNo) => {
     if (!editingContent.trim()) {
       alert("수정할 내용을 입력해주세요.");
       return;
     }
 
-    axios
-      .put(
-        `http://localhost:8081/imgComments/${imgCommentNo}`,
-        {
-          imgCommentContent: editingContent,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${auth.accessToken}`,
-          },
-        }
-      )
-      .then(() => {
-        alert("댓글이 수정되었습니다.");
+    api
+      .put(`/imgComments/${imgCommentNo}`, {
+        imgCommentContent: editingContent,
+      })
+      .then((res) => {
+        const msg = res.data?.message || "댓글이 수정되었습니다.";
+        alert(msg);
         setEditingId(null);
         setEditingContent("");
-        loadImgComments();
+        loadComments();
       })
       .catch((err) => {
         console.error("갤러리 댓글 수정 실패:", err);
-        alert("댓글 수정에 실패했습니다.");
+        const msg =
+          err.response?.data?.["error-message"] || "댓글 수정에 실패했습니다.";
+        alert(msg);
       });
   };
 
-  const handleDeleteImgComment = (imgCommentNo) => {
+  // ================= 댓글 삭제 =================
+  const handleDeleteComment = (imgCommentNo) => {
     if (!window.confirm("정말 이 댓글을 삭제하시겠습니까?")) return;
 
-    axios
-      .delete(`http://localhost:8081/imgComments/${imgCommentNo}`, {
-        headers: {
-          Authorization: `Bearer ${auth.accessToken}`,
-        },
-      })
-      .then(() => {
-        alert("댓글이 삭제되었습니다.");
-        loadImgComments();
+    api
+      .delete(`/imgComments/${imgCommentNo}`)
+      .then((res) => {
+        const msg = res.data?.message || "댓글이 삭제되었습니다.";
+        alert(msg);
+        loadComments();
       })
       .catch((err) => {
         console.error("갤러리 댓글 삭제 실패:", err);
-        alert("댓글 삭제에 실패했습니다.");
+        const msg =
+          err.response?.data?.["error-message"] || "댓글 삭제에 실패했습니다.";
+        alert(msg);
       });
   };
 
-  // 댓글 신고
+  // ================= 댓글 신고 =================
   const openReportForComment = (imgCommentNo) => {
     setReportingCommentId(imgCommentNo);
     setReportOpen(true);
@@ -168,30 +163,25 @@ const ImgBoardComment = ({ imgBoardNo }) => {
       return;
     }
 
-    const imgCommentNo = reportingCommentId;
-    axios
-      .post(
-        `http://localhost:8081/imgComments/${imgCommentNo}/report`,
-        {
-          reason,
-          reporter: auth.userId,
-          targetType: "IMGCOMMENT",
-          targetId: imgCommentNo,
-        },
-        { headers: { Authorization: `Bearer ${auth.accessToken}` } }
-      )
-      .then(() => {
-        alert("댓글 신고가 접수되었습니다.");
+    api
+      .post(`/imgComments/${reportingCommentId}/report`, { reason })
+      .then((res) => {
+        const msg = res.data?.message || "댓글 신고가 접수되었습니다.";
+        alert(msg);
         setReportOpen(false);
       })
       .catch((err) => {
-        console.error("댓글 신고 실패:", err);
-        alert("신고에 실패했습니다.");
+        console.error("갤러리 댓글 신고 실패:", err);
+        const msg =
+          err.response?.data?.["error-message"] || "신고에 실패했습니다.";
+        alert(msg);
       });
   };
 
+  // ================= 렌더링 =================
   return (
     <CommentArea>
+      {/* 위: 댓글쓰기 박스 */}
       <CommentWriteTitle>댓글쓰기</CommentWriteTitle>
 
       {!isLoggedIn ? (
@@ -209,16 +199,17 @@ const ImgBoardComment = ({ imgBoardNo }) => {
               resize: "none",
               overflow: "hidden",
             }}
-            value={imgCommentContent}
+            value={commentContent}
             placeholder="댓글을 작성해 주세요."
-            onChange={(e) => setImgCommentContent(e.target.value)}
+            onChange={(e) => setCommentContent(e.target.value)}
           />
           <CommentWriteButtonRow>
-            <Button onClick={handleInsertImgComment}>작성하기</Button>
+            <Button onClick={handleInsertComment}>작성하기</Button>
           </CommentWriteButtonRow>
         </>
       )}
 
+      {/* 아래: 댓글 리스트 테이블 */}
       <CommentTable>
         <thead>
           <tr>
@@ -230,41 +221,43 @@ const ImgBoardComment = ({ imgBoardNo }) => {
           </tr>
         </thead>
         <tbody>
-          {imgComments.length === 0 ? (
+          {comments.length === 0 ? (
             <tr>
               <CommentCell colSpan={5}>등록된 댓글이 없습니다.</CommentCell>
             </tr>
           ) : (
-            imgComments.map((imgComment, index) => {
-              const rowNumber = imgComments.length - index;
+            comments.map((comment, index) => {
+              const rowNumber = comments.length - index;
               const isCommentWriter =
-                imgComment.imgCommentWriter === auth.userId;
-              const isEditing = editingId === imgComment.imgCommentNo;
+                comment.imgCommentWriter === auth.userId;
+              const isEditing = editingId === comment.imgCommentNo;
 
               return (
-                <tr key={imgComment.imgCommentNo || index}>
+                <tr key={comment.imgCommentNo || index}>
                   <CommentCell>{rowNumber}</CommentCell>
-                  <CommentCell>{imgComment.imgCommentWriter}</CommentCell>
+                  <CommentCell>{comment.imgCommentWriter}</CommentCell>
                   <CommentCell>
                     {isEditing ? (
                       <CommentInput
                         as="textarea"
                         style={{ minHeight: "50px", marginTop: 0 }}
                         value={editingContent}
-                        onChange={(e) => setEditingContent(e.target.value)}
+                        onChange={(e) =>
+                          setEditingContent(e.target.value)
+                        }
                       />
                     ) : (
-                      imgComment.imgCommentContent
+                      comment.imgCommentContent
                     )}
                   </CommentCell>
-                  <CommentCell>{imgComment.imgCommentDate}</CommentCell>
+                  <CommentCell>{comment.imgCommentDate}</CommentCell>
                   <CommentCell>
                     {isCommentWriter ? (
                       isEditing ? (
                         <>
                           <CommentActionButton
                             onClick={() =>
-                              handleUpdateImgComment(imgComment.imgCommentNo)
+                              handleUpdateComment(comment.imgCommentNo)
                             }
                           >
                             저장
@@ -276,13 +269,13 @@ const ImgBoardComment = ({ imgBoardNo }) => {
                       ) : (
                         <>
                           <CommentActionButton
-                            onClick={() => handleEditClick(imgComment)}
+                            onClick={() => handleEditClick(comment)}
                           >
                             수정
                           </CommentActionButton>
                           <CommentActionButton
                             onClick={() =>
-                              handleDeleteImgComment(imgComment.imgCommentNo)
+                              handleDeleteComment(comment.imgCommentNo)
                             }
                           >
                             삭제
@@ -292,7 +285,7 @@ const ImgBoardComment = ({ imgBoardNo }) => {
                     ) : (
                       <CommentActionButton
                         onClick={() =>
-                          openReportForComment(imgComment.imgCommentNo)
+                          openReportForComment(comment.imgCommentNo)
                         }
                       >
                         댓글신고
@@ -305,11 +298,12 @@ const ImgBoardComment = ({ imgBoardNo }) => {
           )}
         </tbody>
       </CommentTable>
+
       <ReportModal
         open={reportOpen}
         onClose={() => setReportOpen(false)}
         onSubmit={handleSubmitReport}
-        targetLabel="댓글"
+        targetLabel="갤러리 댓글"
       />
     </CommentArea>
   );
