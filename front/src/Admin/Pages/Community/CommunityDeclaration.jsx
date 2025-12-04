@@ -3,15 +3,22 @@ import { FaFilePdf, FaTimes } from "react-icons/fa";
 import * as S from "./CommunityDeclaration.styles";
 import { AuthContext } from "../../../context/AuthContext";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const CommunityDeclaration = () => {
   const { auth } = useContext(AuthContext);
   const [reportList, setReportsList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (!auth || !auth.accessToken) return;
+    if (!auth || !auth.accessToken) {
+      setLoading(false);
+      return;
+    }
 
     const fetchReports = async () => {
+      setLoading(true);
       try {
         const response = await axios.get(
           `http://localhost:8081/admin/api/community/declaration`,
@@ -22,14 +29,25 @@ const CommunityDeclaration = () => {
         setReportsList(response.data);
       } catch (error) {
         console.error("데이터 로딩 실패", error);
+        alert("신고 목록을 불러오는 데 실패했습니다.");
+        setReportsList([]);
+      } finally {
+        setLoading(false);
       }
     };
     fetchReports();
   }, [auth]);
 
   const handleDelete = async (reportNo) => {
+    if (loading) return;
     if (!window.confirm("정말 해당 게시글(신고된 게시글)을 삭제하시겠습니까?"))
       return;
+
+    const token = auth.accessToken;
+    if (!token) {
+      alert("인증 정보가 없습니다. 다시 로그인 해주세요");
+      return;
+    }
 
     try {
       await axios.delete(
@@ -44,13 +62,36 @@ const CommunityDeclaration = () => {
       alert("삭제되었습니다.");
     } catch (error) {
       console.error("삭제 실패:", error);
-      alert("삭제 처리에 실패했습니다.");
+      const serverMsg =
+        error.response?.data?.message || "서버 내부 오류가 발생했습니다.";
+      if (error.response && error.response.status === 404) {
+        alert(
+          `삭제 실패: ${serverMsg} (이미 처리되었거나 ID를 찾을 수 없습니다.)`
+        );
+      } else if (
+        error.response &&
+        (error.response.status === 401 || error.response.status === 403)
+      ) {
+        alert("권한 오류: 로그인 세션이 만료되었습니다.");
+      } else {
+        alert(`삭제 처리에 실패했습니다: ${serverMsg}`);
+      }
+    } finally {
+      setLoading(false);
     }
   };
   const handleReject = async (reportNo) => {
+    if (loading) return;
     if (!window.confirm("정말 이 신고 내역을 반려하시겠습니까?")) return;
 
+    const token = auth.accessToken;
+    if (!token) {
+      alert("인증 정보가 없습니다. 다시 로그인 해주세요");
+      return;
+    }
+
     try {
+      setLoading(true);
       await axios.put(
         `http://localhost:8081/admin/api/community/declaration/reject/${reportNo}`,
         {},
@@ -64,10 +105,35 @@ const CommunityDeclaration = () => {
       alert("반려되었습니다.");
     } catch (error) {
       console.log("반려 실패 : ", error);
-      alert("반려 처리에 실패했습니다.");
+      const serverMsg =
+        error.response?.data?.message || "서버 내부 오류가 발생했습니다.";
+
+      if (error.response && error.response.status === 404) {
+        alert(
+          `반려 실패: ${serverMsg} (이미 처리되었거나 ID를 찾을 수 없습니다.)`
+        );
+      } else if (
+        error.response &&
+        (error.response.status === 401 || error.response.status === 403)
+      ) {
+        alert("권한 오류: 로그인 세션이 만료되었습니다.");
+      } else {
+        alert(`반려 처리에 실패했습니다: ${serverMsg}`);
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
+  if (loading && reportList.length === 0) {
+    return (
+      <S.Container
+        style={{ textAlign: "center", padding: "40px", color: "#6B4CE6" }}
+      >
+        신고 목록을 불러오는 중입니다...
+      </S.Container>
+    );
+  }
   return (
     <S.Container>
       <S.TitleArea>

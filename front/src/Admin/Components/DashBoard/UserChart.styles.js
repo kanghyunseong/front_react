@@ -1,8 +1,8 @@
 import styled from "styled-components";
 
 const PRIMARY_ACCENT = "#ff6384"; // 차트 라인 색상 (Red/Pink)
-const BG_COLOR = "#2c2f33"; // 어두운 배경
-const TEXT_COLOR = "#f0f0f0"; // 밝은 텍스트
+const BG_COLOR = "#FFF"; // 어두운 배경
+const TEXT_COLOR = "#333"; // 밝은 텍스트
 
 export const Container = styled.div`
   /* 전체 위젯 컨테이너 */

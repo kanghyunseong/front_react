@@ -63,6 +63,17 @@ const CarsReservation = () => {
         setReservations(response.data);
       } catch (error) {
         console.error("예약 목록 로딩 실패:", error);
+        if (
+          error.response &&
+          (error.response.status === 401 || error.response.status === 403)
+        ) {
+          alert("세션이 만료되었습니다. 로그인 페이지로 이동합니다.");
+        } else {
+          alert(
+            "예약 목록을 불러오는 데 실패했습니다. 서버 상태를 확인해주세요."
+          );
+          setReservations([]);
+        }
       } finally {
         setLoading(false);
       }
@@ -119,6 +130,27 @@ const CarsReservation = () => {
       }
     } catch (error) {
       console.error("예약 취소 실패:", error);
+      if (error.response) {
+        const status = error.response.status;
+        const serverMsg =
+          error.response.data.message || error.response.data || "서버 오류";
+
+        if (status === 404) {
+          alert(`취소 실패: ${serverMsg}`);
+        } else if (status === 401 || status === 403) {
+          alert("권한이 없거나 세션이 만료되었습니다.");
+          navigate("/login");
+        } else if (status >= 500) {
+          // 서버 내부 오류 (500)
+          alert(
+            `취소 처리 중 치명적인 서버 오류가 발생했습니다. (관리자 문의)`
+          );
+        } else {
+          alert(`취소 처리 중 오류가 발생했습니다. (오류: ${serverMsg})`);
+        }
+      } else {
+        alert(`네트워크 오류로 취소 요청에 실패했습니다.`);
+      }
       const errorMessage =
         error.response?.data?.message || error.response?.data || error.message;
       alert(`취소 처리 중 오류가 발생했습니다. (오류 메시지: ${errorMessage})`);

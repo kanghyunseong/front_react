@@ -14,6 +14,7 @@ import {
 import { FaCar, FaChargingStation, FaRoad, FaTools } from "react-icons/fa";
 import { AuthContext } from "../../../context/AuthContext";
 import * as S from "./CarsOverview.styles";
+import { useNavigate } from "react-router-dom";
 
 ChartJS.register(
   ArcElement,
@@ -29,6 +30,7 @@ const CarsOverview = () => {
   const { auth } = useContext(AuthContext);
   const [cars, setCars] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAllCars = async () => {
@@ -43,6 +45,18 @@ const CarsOverview = () => {
         setCars(response.data.cars || []);
       } catch (error) {
         console.error("대시보드 데이터 로딩 실패:", error);
+        if (
+          error.response &&
+          (error.response.status === 401 || error.response.status === 403)
+        ) {
+          alert(
+            "세션이 만료되었거나 접근 권한이 없습니다. 로그인 페이지로 이동합니다."
+          );
+          navigate("/login");
+        } else {
+          alert("데이터를 불러오는 데 실패했습니다. 서버 상태를 확인해주세요.");
+          setCars([]);
+        }
       } finally {
         setLoading(false);
       }
@@ -55,7 +69,7 @@ const CarsOverview = () => {
       return { total: 0, avgKm: 0, avgEff: 0, maintenanceCount: 0 };
     const total = cars.length;
     const totalKm = cars.reduce(
-      (acc, car) => acc + Number(car.carDriving || 0),
+      (acc, car) => acc + (parseFloat(car.carDriving) || 0),
       0
     );
     const totalEff = cars.reduce(
@@ -85,15 +99,11 @@ const CarsOverview = () => {
       else statusCount.Available++;
     });
     return {
-      labels: ["Available", "Rented", "Maintenance"],
+      labels: ["Available", "Rented"],
       datasets: [
         {
-          data: [
-            statusCount.Available,
-            statusCount.Rented,
-            statusCount.Maintenance,
-          ],
-          backgroundColor: ["#10B981", "#6B4CE6", "#EF4444"],
+          data: [statusCount.Available, statusCount.Rented],
+          backgroundColor: ["#10B981", "#6B4CE6"],
           borderWidth: 0,
           cutout: "75%",
         },
@@ -193,13 +203,6 @@ const CarsOverview = () => {
           value={`${summary.avgEff} km/kWh`}
           sub="Performance"
         />
-        <StatBox
-          icon={<FaTools />}
-          label="Maintenance"
-          value={summary.maintenanceCount}
-          sub={summary.maintenanceCount > 0 ? "Needs Action" : "All Good"}
-          isWarning={summary.maintenanceCount > 0}
-        />
       </S.Row>
 
       <S.Container>
@@ -217,7 +220,7 @@ const CarsOverview = () => {
                         plugins: {
                           legend: {
                             position: "right",
-                            labels: { boxWidth: 10, font: { size: 11 } },
+                            labels: { boxWidth: 10, font: { size: 24 } },
                           },
                         },
                       }}
