@@ -111,19 +111,15 @@ const CancelButtonStyled = styled.button`
   }
 `;
 
-const ReservationChangeModal = ({ isOpen, onClose, reservation, onConfirm }) => {
-  const [startTime, setStartTime] = useState(reservation?.startTime || "");
-  const [endTime, setEndTime] = useState(reservation?.endTime || "");
-  const [destination, setDestination] = useState(reservation?.destination || "");
+const ReviewChangeModal = ({ isOpen, onClose, review, onConfirm }) => {
+  const [reviewContent, setReviewContent] = useState(review?.reviewContent || "");
 
   if (!isOpen) return null;
 
   const handleSubmit = () => {
     const updatedData = {
-      reservationNo: reservation?.reservationNo,
-      startTime,
-      endTime,
-      destination
+      reviewNo: review?.reviewNo,
+      reviewContent
     };
     onConfirm(updatedData);
   };
@@ -132,45 +128,26 @@ const ReservationChangeModal = ({ isOpen, onClose, reservation, onConfirm }) => 
     <ModalOverlay onClick={onClose}>
       <ModalContent onClick={(e) => e.stopPropagation()}>
         <ModalHeader>
-          <ModalTitle>예약 변경</ModalTitle>
+          <ModalTitle>리뷰 수정</ModalTitle>
           <CloseButton onClick={onClose}>&times;</CloseButton>
         </ModalHeader>
 
         <FormGroup>
-          <Label>예약번호</Label>
+          <Label>리뷰번호</Label>
           <Input 
             type="text" 
-            value={reservation?.reservationNo || ""} 
+            value={review.reviewNo || ""} 
             disabled 
             style={{ backgroundColor: '#f5f5f5' }}
           />
         </FormGroup>
 
         <FormGroup>
-          <Label>시작 시간</Label>
-          <Input
-            type="datetime-local"
-            value={startTime}
-            onChange={(e) => setStartTime(e.target.value)}
-          />
-        </FormGroup>
-
-        <FormGroup>
-          <Label>종료 시간</Label>
-          <Input
-            type="datetime-local"
-            value={endTime}
-            onChange={(e) => setEndTime(e.target.value)}
-          />
-        </FormGroup>
-
-        <FormGroup>
-          <Label>반납 위치</Label>
+          <Label>리뷰 컨텐트</Label>
           <Input
             type="text"
-            value={destination}
-            onChange={(e) => setDestination(e.target.value)}
-            placeholder="반납 위치를 입력하세요"
+            value={reviewContent}
+            onChange={(e) => setReviewContent(e.target.value)}
           />
         </FormGroup>
 
@@ -179,7 +156,7 @@ const ReservationChangeModal = ({ isOpen, onClose, reservation, onConfirm }) => 
             취소
           </CancelButtonStyled>
           <ConfirmButton onClick={handleSubmit}>
-            변경 완료
+            수정 완료
           </ConfirmButton>
         </ButtonContainer>
       </ModalContent>
@@ -187,4 +164,4 @@ const ReservationChangeModal = ({ isOpen, onClose, reservation, onConfirm }) => 
   );
 };
 
-export default ReservationChangeModal;
+export default ReviewChangeModal;
