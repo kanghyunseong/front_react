@@ -14,6 +14,7 @@ export const AuthProvider = ({ children }) => {
     accessToken: null,
     refreshToken: null,
     role: null,
+    provider: null,
     isAuthenticated: false,
   });
 
@@ -28,6 +29,7 @@ export const AuthProvider = ({ children }) => {
     const birthDay = localStorage.getItem("birthDay");
     const licenseUrl = localStorage.getItem("licenseUrl");
     const refreshToken = localStorage.getItem("refreshToken");
+    const provider = localStorage.getItem("provider");
     const accessToken = localStorage.getItem("accessToken");
 
     if (
@@ -52,6 +54,7 @@ export const AuthProvider = ({ children }) => {
         birthDay,
         licenseUrl,
         accessToken,
+        provider: provider || null,
         refreshToken,
         isAuthenticated: true,
       });
@@ -69,7 +72,8 @@ export const AuthProvider = ({ children }) => {
     phone,
     email,
     birthDay,
-    licenseUrl
+    licenseUrl,
+    provider
   ) => {
     setAuth({
       userNo,
@@ -82,6 +86,7 @@ export const AuthProvider = ({ children }) => {
       licenseUrl,
       accessToken,
       refreshToken,
+      provider: provider || null,
       isAuthenticated: true,
     });
 
@@ -95,6 +100,9 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("licenseUrl", licenseUrl);
     localStorage.setItem("refreshToken", refreshToken);
     localStorage.setItem("accessToken", accessToken);
+    if (provider) {
+      localStorage.setItem("provider", provider);
+    }
   };
 
   // 로그아웃 함수
@@ -109,10 +117,12 @@ export const AuthProvider = ({ children }) => {
       licenseUrl: null,
       accessToken: null,
       refreshToken: null,
+      provider: null,
       role: null,
       isAuthenticated: false,
     });
 
+    localStorage.removeItem("provider");
     localStorage.removeItem("userNo");
     localStorage.removeItem("userName");
     localStorage.removeItem("userId");
