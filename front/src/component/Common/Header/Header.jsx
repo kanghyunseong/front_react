@@ -7,6 +7,9 @@ import {
   ButtonText,
   ButtonText2,
   IconLogo,
+  MainTitle,
+  SubTitle,
+  Title,
 } from "./Header.styles";
 import logo from "../../../assets/adminLogo.png";
 import { useNavigate } from "react-router-dom";

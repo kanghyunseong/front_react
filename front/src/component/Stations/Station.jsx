@@ -125,6 +125,7 @@ const Station = () => {
       .then((response) => {
         const result = response.data;
         console.log(result);
+        findAll();
         setIsRecomend(null);
         setComment("");
       })
