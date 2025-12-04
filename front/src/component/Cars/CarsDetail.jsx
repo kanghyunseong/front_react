@@ -28,6 +28,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../../context/AuthContext";
+import ReviewChangeModal from "./ReviewChangeModal";
 
 const CarsDetail = () => {
   const { auth } = useContext(AuthContext);
@@ -36,6 +37,9 @@ const CarsDetail = () => {
   const [car, setCar] = useState(null);
   const [load, isLoad] = useState(false);
   const [reviews, setReviews] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedReview, setSelectedReview] = useState(null);
+  const [refresh, setRefresh] = useState(0);
 
   // 차량 정보 가져오기
   useEffect(() => {
@@ -48,8 +52,10 @@ const CarsDetail = () => {
       })
       .catch((err) => {
         console.log(err);
+         alert(err.response.data["error-message"]);
+         navi("/cars/searchList")
       });
-  }, [carId]);
+  }, [carId, refresh]);
 
   // 리뷰 가져오기
   useEffect(() => {
@@ -63,13 +69,42 @@ const CarsDetail = () => {
       .catch((err) => {
         console.log(err);
       });
-  }, [carId]);
+  }, [carId, refresh]);
 
   // 리뷰 수정하기
+  const reviewUpdate = (updatedData) => {
+    axios
+      .put("http://localhost:8081/reviews", updatedData, {
+        headers: { Authorization: `Bearer ${auth.accessToken}` },
+      })
+      .then((result) => {
+        console.log(result);
+        alert("리뷰변경을 성공했습니다.");
+        setModalOpen(false);
+        setRefresh((prev) => prev + 1);
+      })
+      .catch((err) => {
+        console.log(err);
+        alert("리뷰변경을 실패했습니다.");
+      });
+  }
 
-  
+
   // 리뷰 삭제하기
-
+  const reviewDelete = (reviewNo) => {
+    if (!confirm("리뷰를 삭제하시겠습니까?")) return;
+    axios
+      .delete(`http://localhost:8081/reviews/${reviewNo}`, {
+        headers: { Authorization: `Bearer ${auth.accessToken}` },
+      })
+      .then((result) => {
+        console.log(result);
+        setRefresh((prev) => prev + 1);
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+  }
 
   if (car == null) return <div>빠이</div>;
 
@@ -125,22 +160,27 @@ const CarsDetail = () => {
             <SectionTitle>이용자 후기</SectionTitle>
             {reviews && reviews.length > 0 ? (
               reviews.map((review) => (
-                <ReviewItem key={review.reviewNo}>
+                <ReviewItem key={review?.reviewNo}>
                   <ReviewHeader>
                     <ReviewHeaderContent>
-                      <ReviewerName>{review.userName}</ReviewerName>
-                      <ReviewDate>{review.createDate}</ReviewDate>
+                      <ReviewerName>{review?.userName}</ReviewerName>
+                      <ReviewDate>{review?.createDate}</ReviewDate>
                     </ReviewHeaderContent>
 
                     {/* 로그인한 사용자와 리뷰 작성자가 같을 때만 버튼 표시 */}
-                    {auth?.userNo && String(auth.userNo) === String(review.reviewWriter) && (
+                    {auth.userNo === String(review?.reviewWriter) && (
                       <ReviewActionButtons>
-                        <EditButton>수정</EditButton>
-                        <DeleteButton>삭제</DeleteButton>
+                        <EditButton onClick={() => {
+                          setSelectedReview(review);
+                          setModalOpen(true);
+                        }}>수정</EditButton>
+                        <DeleteButton onClick={() => {
+                          reviewDelete(review?.reviewNo);
+                        }}>삭제</DeleteButton>
                       </ReviewActionButtons>
                     )}
                   </ReviewHeader>
-                  <ReviewText>{review.reviewContent}</ReviewText>
+                  <ReviewText>{review?.reviewContent}</ReviewText>
                 </ReviewItem>
               ))
             ) : (
@@ -152,6 +192,13 @@ const CarsDetail = () => {
             차량 예약하기
           </ReservationButton>
         </DetailCard>
+
+        <ReviewChangeModal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          review={selectedReview}
+          onConfirm={reviewUpdate}
+        />
       </MainContainer>
     </>
   );

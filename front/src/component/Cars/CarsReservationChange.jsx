@@ -64,12 +64,10 @@ const handleReturn = (reservationNo, carId) => {
       })
       .then((result) => {
         console.log(result);
-        alert(result);
         setRefresh((prev) => prev + 1);
       })
       .catch((err) => {
         console.log(err);
-        alert(err);
       });
   };
 
