@@ -23,7 +23,7 @@ const KakaoLoginCallback = () => {
           // 로그인 성공 후, AuthContext에 로그인 정보 저장
           const data = response.data;
           if (data.message === "회원가입 필요") {
-            console.log(data);
+            alert("회원가입 부터 해주세요");
             const { provider, accessToken, refreshToken, userId } = data;
 
             navi("/members/KakaoJoin", {
