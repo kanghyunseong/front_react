@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../Api";
 import {
   Container,
   Header,
@@ -25,6 +25,9 @@ const ImgBoard = () => {
   const [page, setPage] = useState(0); // 0부터 시작
   const [totalPages, setTotalPages] = useState(1);
 
+  const [totalElements, setTotalElements] = useState(0);
+  const [size, setSize] = useState(10);
+
   const [searchType, setSearchType] = useState("title");
   const [keyword, setKeyword] = useState("");
 
@@ -41,8 +44,8 @@ const ImgBoard = () => {
     const isSearch = isSearchMode && searchParams;
 
     const url = isSearch
-      ? "http://localhost:8081/boards/imgBoards/search"
-      : "http://localhost:8081/boards/imgBoards";
+      ? "/imgBoards/search"
+      : "/imgBoards";
 
     const params = isSearch
       ? {
@@ -52,21 +55,24 @@ const ImgBoard = () => {
         }
       : { page };
 
-    axios
+    api
       .get(url, { params })
       .then((res) => {
         const data = res.data;
         setImgBoards(data.content || []);
         setTotalPages(data.totalPages || 1);
+        setTotalElements(data.totalElements || 0);
+        setSize(data.size || 10);
       })
       .catch((err) => {
         console.error("갤러리 페이지 로딩 실패:", err);
+        // 메시지는 인터셉터에서 공통 처리
       });
   }, [page, isSearchMode, searchParams]);
 
-  // 상세 이동 (이미지는 상세에서만 보여줄 거라 여기선 번호만 넘김)
+  // 상세 이동
   const handleView = (id) => {
-    navi(`/boards/imgBoards/${id}`);
+    navi(`/imgBoards/${id}`);
   };
 
   // 검색 버튼 클릭
@@ -102,14 +108,13 @@ const ImgBoard = () => {
       </Header>
 
       <TabMenu>
-        <Tab onClick={() => navi("/boards/notices")}>공지사항</Tab>
-        <Tab onClick={() => navi("/boards/boards")}>일반</Tab>
-        <Tab $active onClick={() => navi("/boards/imgBoards")}>
+        <Tab onClick={() => navi("/notices")}>공지사항</Tab>
+        <Tab onClick={() => navi("/boards")}>일반</Tab>
+        <Tab $active onClick={() => navi("/imgBoards")}>
           갤러리
         </Tab>
       </TabMenu>
 
-      {/* 일반 게시판처럼 테이블 목록 */}
       <Table>
         <Thead>
           <Tr>
@@ -122,22 +127,24 @@ const ImgBoard = () => {
         </Thead>
         <tbody>
           {Array.isArray(imgBoards) && imgBoards.length > 0 ? (
-            imgBoards.map((board) => (
-              <Tr key={board.imgBoardNo}>
-                <Td>{board.imgBoardNo}</Td>
-                <TitleTd onClick={() => handleView(board.imgBoardNo)}>
-                  {board.imgBoardTitle}
-                </TitleTd>
-                <Td>{board.imgBoardWriter}</Td>
-                <Td>
-                  {/* 날짜 포맷 조정 (문자열이면 그대로, ISO형이면 잘라서) */}
-                  {typeof board.imgBoardDate === "string"
-                    ? board.imgBoardDate
-                    : ""}
-                </Td>
-                <Td>{board.imgCount}</Td>
-              </Tr>
-            ))
+            imgBoards.map((board, index) => {
+              const rowNumber = totalElements - page * size - index;
+              return (
+                <Tr key={board.imgBoardNo}>
+                  <Td>{rowNumber}</Td>
+                  <TitleTd onClick={() => handleView(board.imgBoardNo)}>
+                    {board.imgBoardTitle}
+                  </TitleTd>
+                  <Td>{board.imgBoardWriter}</Td>
+                  <Td>
+                    {typeof board.imgBoardDate === "string"
+                      ? board.imgBoardDate
+                      : ""}
+                  </Td>
+                  <Td>{board.imgCount}</Td>
+                </Tr>
+              );
+            })
           ) : (
             <Tr>
               <Td colSpan={5} style={{ textAlign: "center" }}>
@@ -243,7 +250,7 @@ const ImgBoard = () => {
               navi("/members/login");
               return;
             }
-            navi("/boards/imgBoards/write");
+            navi("/imgBoards/write");
           }}
         >
           글쓰기

@@ -139,7 +139,7 @@ const CarsReservation = () => {
           alert(`취소 실패: ${serverMsg}`);
         } else if (status === 401 || status === 403) {
           alert("권한이 없거나 세션이 만료되었습니다.");
-          navigate("/login");
+          navigate("/members/login");
         } else if (status >= 500) {
           // 서버 내부 오류 (500)
           alert(

@@ -1,7 +1,8 @@
-import { useEffect, useState, useContext } from "react";
-import axios from "axios";
-import { AuthContext } from "../../../context/AuthContext.jsx";
 
+import { useEffect, useContext, useState, useRef } from "react";
+import api from "../Api.jsx";
+import { AuthContext } from "../../../context/AuthContext.jsx";
+import ReportModal from "../ReportModal.jsx";
 import {
   CommentArea,
   CommentWriteTitle,
@@ -22,32 +23,45 @@ const BoardComment = ({ boardNo }) => {
   const [comments, setComments] = useState([]);
   const [commentContent, setCommentContent] = useState("");
 
+  // textarea 자동 높이 조절용 ref
+  const textareaRef = useRef(null);
+
   // 수정 중인 댓글 상태
   const [editingId, setEditingId] = useState(null);
   const [editingContent, setEditingContent] = useState("");
+
+  // 신고 기능
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportingCommentId, setReportingCommentId] = useState(null);
 
   // 댓글 목록 불러오기
   const loadComments = () => {
     if (!boardNo) return;
 
-    axios
-      .get(`http://localhost:8081/comments?boardNo=${boardNo}`, {
-        headers: {
-          Authorization: `Bearer ${auth?.accessToken}`,
-        },
+    api
+      .get("/comments", {
+        params: { boardNo },
       })
       .then((res) => {
         setComments(res.data || []);
       })
       .catch((err) => {
         console.error("댓글 조회 실패:", err);
+        // 401 등의 안내는 인터셉터에서
       });
   };
 
   useEffect(() => {
     loadComments();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [boardNo]);
+
+  // 작성 textarea 자동 높이 조절
+  useEffect(() => {
+    if (!textareaRef.current) return;
+    const ta = textareaRef.current;
+    ta.style.height = "auto";
+    ta.style.height = ta.scrollHeight + "px";
+  }, [commentContent]);
 
   // 댓글 등록
   const handleInsertComment = (e) => {
@@ -63,29 +77,22 @@ const BoardComment = ({ boardNo }) => {
       return;
     }
 
-    axios
-      .post(
-        "http://localhost:8081/comments",
-        {
-          // ✅ 백엔드 DTO 필드명에 맞게 변경 필요
-          // TB_COMMENT 의 REF_BNO 이고, DTO 가 refBno 인 경우
-          refBno: boardNo,
-          commentContent: commentContent,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${auth.accessToken}`,
-          },
-        }
-      )
+    api
+      .post("/comments", {
+        refBno: boardNo,
+        commentContent: commentContent,
+      })
       .then((res) => {
-        alert("댓글이 등록되었습니다.");
+        const msg = res.data?.message || "댓글이 등록되었습니다.";
+        alert(msg);
         setCommentContent("");
         loadComments();
       })
       .catch((err) => {
         console.error("댓글 등록 실패:", err);
-        alert("댓글 등록에 실패했습니다.");
+        const msg =
+          err.response?.data?.message || "댓글 등록에 실패했습니다.";
+        alert(msg);
       });
   };
 
@@ -108,27 +115,22 @@ const BoardComment = ({ boardNo }) => {
       return;
     }
 
-    axios
-      .put(
-        `http://localhost:8081/comments/${commentNo}`,
-        {
-          commentContent: editingContent,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${auth.accessToken}`,
-          },
-        }
-      )
+    api
+      .put(`/comments/${commentNo}`, {
+        commentContent: editingContent,
+      })
       .then((res) => {
-        alert("댓글이 수정되었습니다.");
+        const msg = res.data?.message || "댓글이 수정되었습니다.";
+        alert(msg);
         setEditingId(null);
         setEditingContent("");
         loadComments();
       })
       .catch((err) => {
         console.error("댓글 수정 실패:", err);
-        alert("댓글 수정에 실패했습니다.");
+        const msg =
+          err.response?.data?.message || "댓글 수정에 실패했습니다.";
+        alert(msg);
       });
   };
 
@@ -136,43 +138,45 @@ const BoardComment = ({ boardNo }) => {
   const handleDeleteComment = (commentNo) => {
     if (!window.confirm("정말 이 댓글을 삭제하시겠습니까?")) return;
 
-    axios
-      .delete(`http://localhost:8081/comments/${commentNo}`, {
-        headers: {
-          Authorization: `Bearer ${auth.accessToken}`,
-        },
-      })
-      .then(() => {
-        alert("댓글이 삭제되었습니다.");
+    api
+      .delete(`/comments/${commentNo}`)
+      .then((res) => {
+        const msg = res.data?.message || "댓글이 삭제되었습니다.";
+        alert(msg);
         loadComments();
       })
       .catch((err) => {
         console.error("댓글 삭제 실패:", err);
-        alert("댓글 삭제에 실패했습니다.");
+        const msg =
+          err.response?.data?.message || "댓글 삭제에 실패했습니다.";
+        alert(msg);
       });
   };
 
   // 댓글 신고
-  const handleReportComment = (commentNo) => {
-    const reason = window.prompt("신고 사유를 입력하세요.");
-    if (!reason) return;
+  const openReportForComment = (commentNo) => {
+    setReportingCommentId(commentNo);
+    setReportOpen(true);
+  };
 
-    axios
-      .post(
-        `http://localhost:8081/comments/${commentNo}/report`,
-        { reason },
-        {
-          headers: {
-            Authorization: `Bearer ${auth.accessToken}`,
-          },
-        }
-      )
-      .then(() => {
-        alert("신고가 접수되었습니다.");
+  const handleSubmitReport = (reason) => {
+    if (!reason) {
+      alert("신고 사유를 입력해주세요.");
+      return;
+    }
+
+    api
+      .post(`/comments/${reportingCommentId}/report`, { reason })
+      .then((res) => {
+        const msg = res.data?.message || "댓글 신고가 접수되었습니다.";
+        alert(msg);
+        setReportOpen(false);
       })
       .catch((err) => {
         console.error("댓글 신고 실패:", err);
-        alert("댓글 신고에 실패했습니다.");
+        const msg =
+          err.response?.data?.message || "신고에 실패했습니다.";
+        alert(msg);
       });
   };
 
@@ -188,6 +192,14 @@ const BoardComment = ({ boardNo }) => {
       ) : (
         <>
           <CommentInput
+            as="textarea"
+            ref={textareaRef}
+            rows={1}
+            style={{
+              minHeight: "40px",
+              resize: "none",
+              overflow: "hidden",
+            }}
             value={commentContent}
             placeholder="댓글을 작성해 주세요."
             onChange={(e) => setCommentContent(e.target.value)}
@@ -218,7 +230,6 @@ const BoardComment = ({ boardNo }) => {
             comments.map((comment, index) => {
               const rowNumber = comments.length - index;
               const isCommentWriter = comment.commentWriter === auth.userId;
-
               const isEditing = editingId === comment.commentNo;
 
               return (
@@ -274,7 +285,7 @@ const BoardComment = ({ boardNo }) => {
                     ) : (
                       <CommentActionButton
                         onClick={() =>
-                          handleReportComment(comment.commentNo)
+                          openReportForComment(comment.commentNo)
                         }
                       >
                         댓글신고
@@ -287,6 +298,13 @@ const BoardComment = ({ boardNo }) => {
           )}
         </tbody>
       </CommentTable>
+
+      <ReportModal
+        open={reportOpen}
+        onClose={() => setReportOpen(false)}
+        onSubmit={handleSubmitReport}
+        targetLabel="댓글"
+      />
     </CommentArea>
   );
 };

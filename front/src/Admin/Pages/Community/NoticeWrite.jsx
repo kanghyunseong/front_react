@@ -22,7 +22,7 @@ const NoticeWrite = () => {
 
     if (!token) {
       alert("로그인이 필요한 서비스입니다.");
-      navigate("/login");
+      navigate("/members/login");
       return;
     }
 
@@ -89,7 +89,7 @@ const NoticeWrite = () => {
           alert(
             "권한이 없거나 세션이 만료되었습니다. 로그인 페이지로 이동합니다."
           );
-          navigate("/login");
+          navigate("/members/login");
         } else if (status === 400) {
           alert(`등록 실패: 입력 값이 올바르지 않습니다. (${serverMsg})`);
         } else {

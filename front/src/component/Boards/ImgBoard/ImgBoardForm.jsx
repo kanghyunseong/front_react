@@ -1,7 +1,7 @@
 import { useEffect, useContext, useState } from "react";
 import { AuthContext } from "../../../context/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../Api";
 import {
   Container,
   Header,
@@ -15,7 +15,7 @@ import gasipan from "../../../assets/gasipan.png";
 const ImgBoardForm = () => {
   const [imgBoardTitle, setImgBoardTitle] = useState("");
   const [imgBoardContent, setImgBoardContent] = useState("");
-  const [files, setFiles] = useState([]);   // 여러 개
+  const [files, setFiles] = useState([]); // 여러 개
 
   const { auth } = useContext(AuthContext);
   const navi = useNavigate();
@@ -28,7 +28,7 @@ const ImgBoardForm = () => {
   }, [auth.isAuthenticated, navi]);
 
   const handelFileChange = (e) => {
-    const selectedFiles = Array.from(e.target.files); // FileList → 배열
+    const selectedFiles = Array.from(e.target.files || []);
     const allowTypes = ["image/jpg", "image/jpeg", "image/png", "image/gif"];
     const maxSize = 1024 * 1024 * 10;
 
@@ -46,11 +46,7 @@ const ImgBoardForm = () => {
       validFiles.push(file);
     }
 
-    if (validFiles.length === 0) {
-      setFiles([]);
-    } else {
-      setFiles(validFiles);
-    }
+    setFiles(validFiles);
   };
 
   const handleSubmit = (e) => {
@@ -68,28 +64,35 @@ const ImgBoardForm = () => {
     formData.append("imgBoardTitle", imgBoardTitle);
     formData.append("imgBoardContent", imgBoardContent);
 
-    // 여러 파일 전송
     files.forEach((file) => {
-      formData.append("files", file); // 컨트롤러 @RequestParam("files")
+      formData.append("files", file);
     });
 
-    axios
-      .post("http://localhost:8081/boards/imgBoards", formData, {
-        headers: {
-          Authorization: `Bearer ${auth.accessToken}`,
-          "Content-Type": "multipart/form-data",
-        },
-      })
+    api
+      .post("/imgBoards", formData)
       .then((res) => {
         if (res.status === 201 || res.status === 200) {
-          alert("갤러리 게시글이 등록되었습니다!");
-          navi("/boards/imgBoards");
+          alert(res.data?.message || "갤러리 게시글이 등록되었습니다!");
+          navi("/imgBoards");
         }
       })
       .catch((err) => {
         console.log(err);
-        alert("등록에 실패했습니다.");
+        const msg =
+          err.response?.data?.message || "등록에 실패했습니다.";
+        alert(msg);
       });
+  };
+
+  // 뒤로가기 버튼 처리
+  const handleBack = () => {
+    if (imgBoardTitle.trim() || imgBoardContent.trim()) {
+      const ok = window.confirm(
+        "작성 중인 내용이 사라집니다. 정말 뒤로가시겠어요?"
+      );
+      if (!ok) return;
+    }
+    navi(-1);
   };
 
   return (
@@ -133,7 +136,7 @@ const ImgBoardForm = () => {
         <Button type="submit">등록하기</Button>
         <Button
           type="button"
-          onClick={() => navi(-1)}
+          onClick={handleBack}
           style={{ background: "blue" }}
         >
           뒤로가기
@@ -142,6 +145,5 @@ const ImgBoardForm = () => {
     </Container>
   );
 };
-
 
 export default ImgBoardForm;

@@ -111,7 +111,7 @@ const CommentDeclaration = () => {
           alert(
             "권한이 없거나 세션이 만료되었습니다. 로그인 페이지로 이동하세요."
           );
-          Navigate("/login");
+          Navigate("/members/login");
         } else {
           alert(`반려 처리 중 오류가 발생했습니다: ${serverMsg}`);
         }
