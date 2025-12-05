@@ -40,13 +40,27 @@ const CarsSearchList = () => {
       .then((response) => {
         const newCars = response.data;
 
-        setCars([...cars, ...response.data]);
+        if (!newCars || newCars.length === 0) {
+          setHasMore(false);
+          return;
+        }
+
+        setCars((prevCars) => [...prevCars, ...newCars]);
 
         if (newCars.length < 4) {
           setHasMore(false);
         }
       })
-      .catch((err) => setErrMsg(err.response.data['error-message'], console.log(err)));
+      .catch((err) => {
+        const errorMessage = err.response?.data?.['error-message'];
+
+        if (errorMessage?.includes('조회된') || errorMessage?.includes('없습니다')) {
+          setHasMore(false);  
+        } else {
+          setErrMsg(errorMessage || '오류가 발생했습니다');
+          console.log(err);
+        }
+      });
   }, [currentPage]);
 
   const increasePage = () => {
