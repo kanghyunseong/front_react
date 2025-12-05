@@ -42,7 +42,7 @@ const CarsSettings = () => {
         alert(
           "세션이 만료되었거나 접근 권한이 없습니다. 로그인 페이지로 이동합니다."
         );
-        navigate("/login");
+        navigate("/members/login");
       } else {
         alert("차량 목록을 불러오는데 실패했습니다.");
         setCars([]);
@@ -62,7 +62,7 @@ const CarsSettings = () => {
     const token = auth.accessToken;
     if (!token) {
       alert("인증 정보가 없어 삭제할 수 없습니다.");
-      navigate("/login");
+      navigate("/members/login");
       return;
     }
 
@@ -93,7 +93,7 @@ const CarsSettings = () => {
             );
           } else if (status === 401 || status === 403) {
             alert("권한 오류: 로그인 페이지로 이동합니다.");
-            navigate("/login");
+            navigate("/members/login");
           } else if (status === 409) {
             alert(
               `삭제 불가: ${serverMsg} (해당 차량에 예약 내역이 존재합니다.)`

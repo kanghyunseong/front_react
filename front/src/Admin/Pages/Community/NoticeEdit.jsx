@@ -42,7 +42,7 @@ const NoticeEdit = () => {
         const token = auth?.accessToken || localStorage.getItem("accessToken");
         if (!token) {
           alert("로그인 정보가 없습니다.");
-          navigate("/login");
+          navigate("/members/login");
           return;
         }
         const response = await axios.get(
@@ -67,7 +67,7 @@ const NoticeEdit = () => {
           const status = error.response.status;
           if (status === 401 || status === 403) {
             alert("권한이 없거나 세션이 만료되었습니다");
-            navigate("/login");
+            navigate("/members/login");
             return;
           } else if (status === 404) {
             alert("해당 공지사항을 찾을 수 없습니다.");
@@ -106,7 +106,7 @@ const NoticeEdit = () => {
       const token = auth?.accessToken || localStorage.getItem("accessToken");
       if (!token) {
         alert("인증 정보가 없습니다. 다시 로그인해주세요");
-        navigate("/login");
+        navigate("/members/login");
         return;
       }
       await axios.put(
@@ -131,7 +131,7 @@ const NoticeEdit = () => {
           alert(
             "권한이 없거나 세션이 만료되었습니다. 로그인 페이지로 이동합니다."
           );
-          navigate("/login");
+          navigate("/members/login");
         } else {
           alert(`수정 중 오류가 발생했습니다: ${serverMsg}`);
         }
