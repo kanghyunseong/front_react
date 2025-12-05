@@ -33,7 +33,7 @@ const Header = () => {
         <Frame>
           <NavItem onClick={() => navi("/cars/searchList")}>차량찾기</NavItem>
           <NavItem onClick={() => navi("/stations")}>충전소</NavItem>
-          <NavItem onClick={() => navi("/boards/notices")}>커뮤니티</NavItem>
+          <NavItem onClick={() => navi("/notices")}>커뮤니티</NavItem>
           <ButtonWrapper>
             {isLogin ? (
               <>

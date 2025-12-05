@@ -97,7 +97,7 @@ const CarsRegistration = () => {
     const token = auth?.accessToken;
     if (!token) {
       alert("인증 정보가 없습니다. 다시 로그인해주세요.");
-      navigate("/login");
+      navigate("/members/login");
       return;
     }
 
@@ -124,7 +124,7 @@ const CarsRegistration = () => {
           alert(
             "세션이 만료되었거나 접근 권한이 없습니다. 로그인 페이지로 이동합니다."
           );
-          navigate("/login");
+          navigate("/members/login");
         } else if (status === 413) {
           alert("파일 용량이 너무 큽니다. 10MB 이하의 이미지를 사용해주세요.");
         } else {

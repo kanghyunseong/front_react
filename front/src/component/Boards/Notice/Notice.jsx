@@ -1,6 +1,7 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../Api";
 import {
   Container,
   Header,
@@ -22,6 +23,9 @@ const Notice = () => {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
 
+  const [totalElements, setTotalElements] = useState(0);
+  const [size, setSize] = useState(10);
+
   const [searchType, setSearchType] = useState("title");
   const [keyword, setKeyword] = useState("");
   const [isSearchMode, setIsSearchMode] = useState(false); // 검색 모드 여부
@@ -30,32 +34,28 @@ const Notice = () => {
 
   // 공지사항 목록(전체 조회 or 검색 결과) 로딩
   const loadNotices = () => {
-    const baseUrl = "http://localhost:8081/boards/notices";
+    const baseUrl = "/notices";
 
     // 검색 모드일 때는 /search 호출, 아니면 전체 조회
     const url = isSearchMode ? `${baseUrl}/search` : baseUrl;
 
     const params = isSearchMode
-      ? { type: searchType, keyword, page }
-      : {}; // 전체 조회는 page 안 보냄 (지금 List로 응답)
+      ? { type: searchType, keyword: keyword.trim(), page }
+      : { page };
 
-    axios
+    api
       .get(url, { params })
       .then((response) => {
         const data = response.data;
 
-        // 전체 조회는 List<NoticeDTO> 그대로 옴 (배열)
-        if (Array.isArray(data)) {
-          setNotices(data);
-          setTotalPages(1); // 페이지 1개만
-        } else {
-          // 검색 결과나 Page 형태일 경우
-          setNotices(data.content || []);
-          setTotalPages(data.totalPages || 1);
-        }
+        setNotices(data.content || []);
+        setTotalPages(data.totalPages || 1);
+        setTotalElements(data.totalElements || 0);
+        setSize(data.size || 10);
       })
       .catch((err) => {
         console.error("공지사항 페이지 로딩 실패:", err);
+        // 401/500 등 기본 에러 알림은 인터셉터에서 처리
         alert("공지사항 목록을 불러올 수 없습니다.");
       });
   };
@@ -63,14 +63,12 @@ const Notice = () => {
   // 페이지 / 검색 모드 변경 시 목록 다시 로딩
   useEffect(() => {
     loadNotices();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, isSearchMode]);
+  }, [page, isSearchMode]); // keyword, searchType 은 검색 버튼 눌렀을 때만 반영
 
-  // 상세보기 + 조회수 증가
+  // 상세보기
   const handleView = (id) => {
-    navi(`/boards/notices/${id}`);
+    navi(`/notices/${id}`);
   };
-
 
   // 검색 기능
   const handleSearch = () => {
@@ -78,9 +76,8 @@ const Notice = () => {
       alert("검색어를 입력하세요!");
       return;
     }
-    setPage(0); // 검색 시 첫 페이지로
+    setPage(0);        // 검색 시 첫 페이지로
     setIsSearchMode(true);
-    // loadNotices는 useEffect에서 자동 호출
   };
 
   // 검색 초기화 (전체 목록 보기)
@@ -100,11 +97,11 @@ const Notice = () => {
 
       {/* 탭 메뉴 */}
       <TabMenu>
-        <Tab $active onClick={() => navi("/boards/notices")}>
+        <Tab $active onClick={() => navi("/notices")}>
           공지사항
         </Tab>
-        <Tab onClick={() => navi("/boards/boards")}>일반</Tab>
-        <Tab onClick={() => navi("/boards/imgBoards")}>갤러리</Tab>
+        <Tab onClick={() => navi("/boards")}>일반</Tab>
+        <Tab onClick={() => navi("/imgBoards")}>갤러리</Tab>
       </TabMenu>
 
       {/* 테이블 */}
@@ -121,22 +118,25 @@ const Notice = () => {
 
         <tbody>
           {Array.isArray(notices) && notices.length > 0 ? (
-            notices.map((notice) => (
-              <Tr key={notice.noticeNo}>
-                <Td>{notice.noticeNo}</Td>
+            notices.map((notice, index) => {
+              const rowNumber = totalElements - page * size - index;
+              return (
+                <Tr key={notice.noticeNo}>
+                  <Td>{rowNumber}</Td>
 
-                <TitleTd
-                  style={{ cursor: "pointer" }}
-                  onClick={() => handleView(notice.noticeNo)}
-                >
-                  {notice.noticeTitle}
-                </TitleTd>
+                  <TitleTd
+                    style={{ cursor: "pointer" }}
+                    onClick={() => handleView(notice.noticeNo)}
+                  >
+                    {notice.noticeTitle}
+                  </TitleTd>
 
-                <Td>{notice.noticeWriter}</Td>
-                <Td>{notice.noticeDate}</Td>
-                <Td>{notice.noticeCount}</Td>
-              </Tr>
-            ))
+                  <Td>{notice.noticeWriter}</Td>
+                  <Td>{notice.noticeDate}</Td>
+                  <Td>{notice.noticeCount}</Td>
+                </Tr>
+              );
+            })
           ) : (
             <Tr>
               <Td colSpan={5}>등록된 공지사항이 없습니다.</Td>
@@ -145,7 +145,7 @@ const Notice = () => {
         </tbody>
       </Table>
 
-      {/* 페이지네이션 */}
+      {/* 페이지네이션 (1 ~ totalPages) */}
       <Pagination>
         {Array.from({ length: totalPages }, (_, i) => (
           <button

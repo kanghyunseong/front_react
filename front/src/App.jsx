@@ -29,6 +29,7 @@ import NaverLoginCallback from "./component/Member/Login/NaverCallback";
 import KakaoLoginCallback from "./component/Member/Login/KakaoCallback";
 import KakaoJoin from "./component/Member/Join/KakaoJoin";
 import CarsReviewForm from "./component/Cars/CarsReviewForm";
+import NoticeDetail from "./component/Boards/Notice/NoticeDetail";
 function App() {
   const location = useLocation();
   const isAdminPage = location.pathname.startsWith("/admin");
@@ -40,13 +41,14 @@ function App() {
       {!isJoin && !isAdminPage && !isLogin && !isKakaoLogin && <Header />}
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/boards/boards" element={<Board />} />
-        <Route path="/boards/notices" element={<Notice />} />
-        <Route path="/boards/boards/write" element={<BoardForm />} />
-        <Route path="/boards/boards/:id" element={<BoardDetail />} />
-        <Route path="/boards/imgBoards" element={<ImgBoard />} />
-        <Route path="/boards/imgBoards/write" element={<ImgBoardForm />} />
-        <Route path="/boards/imgBoards/:id" element={<ImgBoardDetail />} />
+        <Route path="/boards" element={<Board />} />
+        <Route path="/notices" element={<Notice />} />
+        <Route path="/notices/:id" element={<NoticeDetail />} />
+        <Route path="/boards/write" element={<BoardForm />} />
+        <Route path="/boards/:id" element={<BoardDetail />} />
+        <Route path="/imgBoards" element={<ImgBoard />} />
+        <Route path="/imgBoards/write" element={<ImgBoardForm />} />
+        <Route path="/imgBoards/:id" element={<ImgBoardDetail />} />
         <Route path="/cars/searchList" element={<CarsSearchList />} />
         <Route path="/cars/:carId" element={<CarsDetail />} />
         <Route path="/cars/:carId/reserve" element={<CarsReservation />} />
