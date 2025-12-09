@@ -41,7 +41,7 @@ const KakaoLoginCallback = () => {
               phone,
               email,
               birthDay,
-              licenseImg,
+              licenseUrl,
               provider,
             } = response.data;
 
@@ -55,7 +55,7 @@ const KakaoLoginCallback = () => {
               phone,
               email,
               birthDay,
-              licenseImg,
+              licenseUrl,
               provider
             );
 

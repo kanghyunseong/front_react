@@ -33,6 +33,7 @@ const NaverLoginCallback = () => {
             email,
             birthDay,
             provider,
+            licenseImg,
           } = response.data;
 
           // 로그인 함수 호출
@@ -46,7 +47,7 @@ const NaverLoginCallback = () => {
             phone,
             email,
             birthDay,
-            null,
+            licenseImg,
             provider
           );
           alert("로그인 성공!");

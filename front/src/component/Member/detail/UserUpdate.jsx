@@ -151,8 +151,16 @@ const UserUpdate = () => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={auth.provider} // provider가 있으면 비활성화
                 required
               />
+              {auth.provider && (
+                <p
+                  style={{ fontSize: "12px", color: "#666", marginTop: "5px" }}
+                >
+                  소셜 로그인 계정은 이메일을 변경할 수 없습니다.
+                </p>
+              )}
             </div>
 
             <div>
