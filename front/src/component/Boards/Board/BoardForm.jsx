@@ -86,7 +86,6 @@ const BoardForm = () => {
         />
 
         <Label>내용</Label>
-        {/* 필요하면 textarea로 바꾸기: <Input as="textarea" ... /> */}
         <Input
           type="text"
           value={boardContent}
