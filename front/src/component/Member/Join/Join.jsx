@@ -143,7 +143,7 @@ const Join = () => {
         if (result.status === 201) {
           alert("회원 가입 성공");
           setTimeout(() => {
-            navi("/");
+            navi("/members/login");
           }, 1000);
         }
       })

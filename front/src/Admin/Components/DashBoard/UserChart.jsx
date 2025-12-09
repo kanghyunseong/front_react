@@ -2,13 +2,13 @@ import React, { useState, useEffect, useContext } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
+  CategoryScale, // X축 (카테고리형: Jan, Feb, Mar...)
+  LinearScale, // Y축 (숫자형: 0, 100, 200...)
+  PointElement, // 점 (데이터 포인트)
+  LineElement, // 선 (데이터 연결선)
+  Title, // 차트 제목
+  Tooltip, // 마우스 올렸을 때 정보
+  Legend, // 범례 (데이터셋 설명)
 } from "chart.js";
 import axios from "axios";
 
@@ -25,6 +25,7 @@ import {
   SectionTitle,
 } from "./UserChart.styles";
 
+// Chart.js에 필요한 컴포넌트 등록 (사용하려면 필수!)
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -57,7 +58,9 @@ const UserChart = () => {
           year: { labels: ["2023", "2024", "2025"], values: [500, 1200, 350] },
         };
 
+        // 현재 선택된 unit에 맞는 데이터 가져오기
         const currentData = dummyData[unit] || dummyData.month;
+        // 총합 계산 (reduce 사용)
         const total = currentData.values.reduce((acc, cur) => acc + cur, 0);
 
         setChartData({
@@ -67,7 +70,7 @@ const UserChart = () => {
         setTotalCount(total);
         return;
       }
-
+      // 로그인 했으면 실제 API 호출
       try {
         const res = await axios.get(
           `http://localhost:8081/admin/api/users/trend?unit=${unit}`,

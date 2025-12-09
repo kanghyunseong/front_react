@@ -57,12 +57,7 @@ const SideBar = () => {
           <span>비밀번호 변경</span>
         </StyledSidebarButton>
 
-        <StyledSidebarButton
-          onClick={() =>
-            auth.provider ? null : navi("/members/detail/update")
-          }
-          disabled={!!auth.provider}
-        >
+        <StyledSidebarButton onClick={() => navi("/members/detail/update")}>
           <span>회원 수정</span>
         </StyledSidebarButton>
 
