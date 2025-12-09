@@ -13,14 +13,14 @@ import {
   SearchResult,
   SearchWrapper,
 } from "./Station.style";
-import { useEffect, useState, useContext } from "react"; // 이 줄이 있는지 확인!
+import { useEffect, useState, useContext, useRef } from "react";
 import axios from "axios";
 import { AuthContext } from "../../context/AuthContext";
 import { DetailButton } from "../Cars/CarsSearchList.style";
 
 const Station = () => {
   // ===========================
-  // 1. State 정의
+  // 1. State 정의 (원래 변수명 유지)
   // ===========================
   const { auth } = useContext(AuthContext);
   const [positions, setPositions] = useState([]);
@@ -36,31 +36,40 @@ const Station = () => {
   const [reviewId, setReviewId] = useState(null);
   const [refresh, setRefresh] = useState([]);
   const [stationName, setStationName] = useState("");
+  const mapRef = useRef(null);
+
   // ===========================
   // 2. 검색 관련 함수
   // ===========================
-  // handleSearch 함수를 useEffect 밖으로 이동
   const handleSearch = () => {
     const keyword = (searchStation || "").trim();
     if (!keyword) {
       alert("검색어를 입력하세요!");
       return;
     }
-    document.querySelector("#searchResult").style.background = "none";
+    const el = document.querySelector("#searchResult");
+    if (el) el.style.background = "none";
+
     axios
       .get("http://localhost:8081/station/search", {
         params: { keyword: keyword },
       })
       .then((response) => {
-        const result = response.data;
-        // 가공
+        const result = response.data || [];
+
+        if (!result || result.length === 0) {
+          alert("검색어를 찾을 수 없습니다.");
+          setSearchResult([]);
+          return;
+        }
+
         const mapped = result.map((e) => {
           return {
             stationId: e.stationId,
             stationName: e.stationName,
             address: e.address,
-            lat: e.latitude,
-            lng: e.longitude,
+            lat: e.latitude ?? e.lat ?? null,
+            lng: e.longitude ?? e.lng ?? null,
             detailAddress: e.detailAddress,
             tel: e.tel,
             useTime: e.useTime,
@@ -72,24 +81,47 @@ const Station = () => {
       })
       .catch((error) => {
         console.error("검색실패:", error);
+        alert("검색에 실패했습니다.");
       });
   };
 
-  const handleResultClick = (stationId) => {
-    console.log(stationId);
+  // 검색 결과 클릭 시 지도 이동 + 상세정보 조회
+  const handleResultClick = (stationIdParam) => {
+    const station = searchResult.find((s) => s.stationId === stationIdParam);
+    if (!station) return;
+
+    const lat = parseFloat(station.lat);
+    const lng = parseFloat(station.lng);
+
+    if (mapRef.current && !isNaN(lat) && !isNaN(lng)) {
+      const moveLatLng = new window.kakao.maps.LatLng(lat, lng);
+      if (typeof mapRef.current.panTo === "function") {
+        mapRef.current.panTo(moveLatLng);
+      } else if (typeof mapRef.current.setCenter === "function") {
+        mapRef.current.setCenter(moveLatLng);
+      }
+    } else {
+      console.warn("지도 객체가 준비되지 않았거나 좌표가 유효하지 않습니다.");
+    }
+
+    // 상세정보 요청 (지도 이동 후)
     axios
-      .get(`http://localhost:8081/station/searchDetail/${stationId}`)
+      .get(`http://localhost:8081/station/searchDetail/${stationIdParam}`)
       .then((res) => {
-        const station = res.data[0]; // 배열 안 첫 번째 객체
+        const stationDetail = Array.isArray(res.data) ? res.data[0] : res.data;
+        if (!stationDetail) {
+          alert("상세정보가 없습니다.");
+          return;
+        }
         const {
           address,
           detailAddress,
           regDate,
-          stationId,
-          stationName,
+          stationId: sid,
+          stationName: sname,
           tel,
           useTime,
-        } = station;
+        } = stationDetail;
         alert(
           "주소:" +
             address +
@@ -98,9 +130,9 @@ const Station = () => {
             "\n등록일자:" +
             regDate +
             "\n충전소ID:" +
-            stationId +
+            sid +
             "\n충전소 이름:" +
-            stationName +
+            sname +
             "\n연락처:" +
             tel +
             "\n이용시간:" +
@@ -111,6 +143,7 @@ const Station = () => {
         console.log(err);
       });
   };
+
   const register = () => {
     axios
       .post(
@@ -120,7 +153,7 @@ const Station = () => {
           commentContent: comment,
           recommend: isRecomend,
         },
-        { headers: { Authorization: `Bearer ${auth.accessToken}` } }
+        { headers: { Authorization: `Bearer ${auth?.accessToken}` } }
       )
       .then((response) => {
         const result = response.data;
@@ -131,9 +164,8 @@ const Station = () => {
       })
       .catch((error) => {
         if (error.response) {
-          // 서버가 응답을 주었을 때
           if (error.response.status === 400) {
-            alert("로그인부터 해주세요");
+            alert("추천,비추천 먼저 선텍해주세요!");
           } else if (
             error.response.data &&
             error.response.data["error-message"]
@@ -143,44 +175,51 @@ const Station = () => {
             alert("오류가 발생했습니다.");
           }
         } else if (error.request) {
-          // 요청은 되었지만 응답이 없을 때
           alert("서버가 응답하지 않습니다.");
         } else {
-          // 그 외 오류
           alert("오류: " + error.message);
         }
       });
   };
 
-  const elision = (reviewId) => {
-    console.log(reviewId);
+  const currentUserNo = auth?.userNo;
+
+  const elision = (reviewIdParam) => {
     axios
       .delete("http://localhost:8081/station", {
-        headers: { Authorization: `Bearer ${auth.accessToken}` },
-        data: { reviewId: reviewId }, // data 객체로 감싸기
+        headers: { Authorization: `Bearer ${auth?.accessToken}` },
+        data: { reviewId: reviewIdParam },
       })
       .then((response) => {
         alert(response.data);
         findAll();
       })
       .catch((error) => {
-        alert(error.response.data["error-message"]);
+        const msg =
+          error?.response?.data?.["error-message"] ||
+          "삭제 중 오류가 발생했습니다.";
+        alert(msg);
       });
   };
 
   const findAll = () => {
-    console.log(stationId);
     axios
-      .get(`http://localhost:8081/station/findAll?stationId=${stationId}`)
+      .get(`http://localhost:8081/station/findAll`, {
+        params: { stationId: stationId },
+      })
       .then((response) => {
-        console.log(response);
-        setRefresh(response.data);
+        setRefresh(response.data || []);
+      })
+      .catch((err) => {
+        console.error("리뷰 조회 실패:", err);
       });
   };
+
   // 3. 위치 정보 + 지도 + 마커 세팅 (useEffect)
   useEffect(() => {
-    // 이 부분 추가!
+    // 로딩 상태 초기화
     setLoading(false);
+
     if (!window.kakao || !window.kakao.maps) {
       setError("카카오 맵 API를 로드할 수 없습니다.");
       setLoading(false);
@@ -198,100 +237,124 @@ const Station = () => {
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
 
+        // 상태에 저장 (원하면 다른 곳에서 참조 가능)
         setLocation({
           latitude: lat,
           longitude: lng,
         });
 
-        if (!location) return;
+        // 지도 생성 및 충전소 로드 함수 (로컬 lat/lng 사용)
+        const stationCreate = async () => {
+          try {
+            const stationData = await axios.get(
+              "http://localhost:8081/station",
+              {
+                params: {
+                  lat: lat,
+                  lng: lng,
+                },
+              }
+            );
 
-        const fn1 = async (selectedId) => {
-          const abcd = await axios.get("http://localhost:8081/station", {
-            params: {
-              lat: location.latitude,
-              lng: location.longitude,
-              stationId: selectedId,
-            },
-          });
+            const data = stationData.data || [];
+            const mapping = data.map((e) => {
+              const parsedLat = parseFloat(e.lat ?? e.latitude);
+              const parsedLng = parseFloat(e.lng ?? e.longitude);
+              return {
+                title: e.stationName,
+                subtitle: e.address,
+                lat: parsedLat,
+                lng: parsedLng,
+                latlng:
+                  !isNaN(parsedLat) && !isNaN(parsedLng)
+                    ? new window.kakao.maps.LatLng(parsedLat, parsedLng)
+                    : null,
+                stationId: e.stationId,
+              };
+            });
 
-          const mmm = abcd.data.map((e) => {
-            return {
-              title: e.stationName,
-              subtitle: e.address,
-              latlng: new kakao.maps.LatLng(e.lat, e.lng),
-              stationId: e.stationId,
+            setPositions([...mapping]);
+
+            const container = document.getElementById("map");
+            const options = {
+              center: new window.kakao.maps.LatLng(lat, lng),
+              level: 3,
             };
-          });
 
-          setPositions([...mmm]);
+            const map = new window.kakao.maps.Map(container, options);
+            mapRef.current = map;
 
-          const container = document.getElementById("map");
-          const options = {
-            center: new window.kakao.maps.LatLng(lat, lng),
-            level: 3,
-          };
-
-          const map = new window.kakao.maps.Map(container, options);
-          var markerPosition = new kakao.maps.LatLng(lat, lng);
-
-          var marker = new kakao.maps.Marker({
-            position: markerPosition,
-          });
-
-          marker.setMap(map);
-
-          var imageSrc =
-            "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png";
-
-          for (let i = 0; i < mmm.length; i++) {
-            const item = mmm[i];
-            const imageSize = new kakao.maps.Size(24, 35);
-            const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
-            const marker = new kakao.maps.Marker({
-              map: map,
-              position: item.latlng,
-              title: item.title,
-              image: markerImage,
+            // 내 위치 마커
+            const markerPosition = new window.kakao.maps.LatLng(lat, lng);
+            const myMarker = new window.kakao.maps.Marker({
+              position: markerPosition,
             });
+            myMarker.setMap(map);
 
-            kakao.maps.event.addListener(marker, "click", () => {
-              const selectedId = item.stationId; // 이 마커에 해당하는
-              const selectedName = item.title;
+            const imageSrc =
+              "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png";
 
-              setStationId(selectedId);
+            for (let i = 0; i < mapping.length; i++) {
+              const item = mapping[i];
+              if (!item.latlng) continue;
+              const imageSize = new window.kakao.maps.Size(24, 35);
+              const markerImage = new window.kakao.maps.MarkerImage(
+                imageSrc,
+                imageSize
+              );
+              const stationMarker = new window.kakao.maps.Marker({
+                map: map,
+                position: item.latlng,
+                title: item.title,
+                image: markerImage,
+              });
 
-              setStationName(selectedName);
+              // 마커 클릭 시 상세 조회 및 상태 업데이트
+              window.kakao.maps.event.addListener(
+                stationMarker,
+                "click",
+                () => {
+                  const selectedId = item.stationId;
+                  setStationId(selectedId);
+                  setStationName(item.title);
+                  stationCreate(selectedId);
+                }
+              );
+            }
 
-              fn1(selectedId); // 선택한 ID 들고 fn1 다시 호출
+            const mapTypeControl = new window.kakao.maps.MapTypeControl();
+            map.addControl(
+              mapTypeControl,
+              window.kakao.maps.ControlPosition.TOPRIGHT
+            );
+
+            const zoomControl = new window.kakao.maps.ZoomControl();
+            map.addControl(
+              zoomControl,
+              window.kakao.maps.ControlPosition.RIGHT
+            );
+
+            const circle = new window.kakao.maps.Circle({
+              center: new window.kakao.maps.LatLng(lat, lng),
+              radius: 5000,
+              strokeWeight: 5,
+              strokeColor: "#75B8FA",
+              strokeOpacity: 1,
+              strokeStyle: "solid",
+              fillColor: "#CFE7FF",
+              fillOpacity: 0.3,
             });
+            circle.setMap(map);
+          } catch (err) {
+            console.error("지도/충전소 데이터 로드 실패:", err);
           }
-
-          const mapTypeControl = new window.kakao.maps.MapTypeControl();
-          map.addControl(
-            mapTypeControl,
-            window.kakao.maps.ControlPosition.TOPRIGHT
-          );
-
-          const zoomControl = new window.kakao.maps.ZoomControl();
-          map.addControl(zoomControl, window.kakao.maps.ControlPosition.RIGHT);
-
-          const circle = new window.kakao.maps.Circle({
-            center: new window.kakao.maps.LatLng(lat, lng),
-            radius: 3000,
-            strokeWeight: 5,
-            strokeColor: "#75B8FA",
-            strokeOpacity: 1,
-            strokeStyle: "solid",
-            fillColor: "#CFE7FF",
-            fillOpacity: 0.3,
-          });
-          circle.setMap(map);
         };
 
-        fn1();
+        // 초기 로드 (선택 ID 없이)
+        stationCreate();
       },
-      (error) => {
-        setError(error.message);
+      (err) => {
+        setError(err.message || "위치 정보를 가져오지 못했습니다.");
         setLoading(false);
       },
       {
@@ -300,10 +363,10 @@ const Station = () => {
         maximumAge: 0,
       }
     );
-  }, [location?.latitude]); // ? 추가
+    // 빈 배열: 컴포넌트 마운트 시 한 번만 실행
+  }, []);
 
   // 4. 로딩 / 에러 화면 처리
-
   if (loading) {
     return (
       <MainContainer>
@@ -336,30 +399,40 @@ const Station = () => {
             placeholder="궁금하신 내용을 입력하세요."
             maxLength={50}
             onChange={(e) => setSearchStation(e.target.value)}
+            value={searchStation}
           />
           <SearchButton onClick={handleSearch}>🔍</SearchButton>
         </SearchWrapper>
         <SearchResult id="searchResult">
-          <ol>
+          <ol style={{ paddingLeft: 0 }}>
             {searchResult &&
               searchResult.map((item, index) => {
                 return (
                   <li
                     key={index}
                     onClick={() => handleResultClick(item.stationId)}
-                    style={{ cursor: "pointer", marginBottom: "8px" }}
+                    style={{
+                      cursor: "pointer",
+                      marginBottom: "8px",
+                      padding: "8px",
+                      borderBottom: "1px solid #eee",
+                      listStyle: "none",
+                    }}
                   >
-                    <strong>{item.title}</strong>
-                    <div>{item.address}</div>
+                    <strong>{item.stationName}</strong>
+                    <div style={{ fontSize: "0.9rem", color: "#555" }}>
+                      {item.address}
+                    </div>
                   </li>
                 );
               })}
           </ol>
         </SearchResult>
       </LeftSection>
+
       {/* 오른쪽 : 지도 + 리뷰 + 페이지네이션 */}
       <RightSection>
-        <Map id="map"></Map>
+        <Map id="map" style={{ width: "100%", height: "420px" }}></Map>
         {location && <div></div>}
         <div style={{ marginTop: "15px" }}>
           선택된 충전소 이름 : {stationName}
@@ -377,17 +450,29 @@ const Station = () => {
             style={{
               display: "flex",
               gap: "20px",
-              listStylePosition: "inside", // 또는 아래 방법들 참고
+              listStylePosition: "inside",
               marginTop: "20px",
+              alignItems: "center",
             }}
           >
             <div style={{ flex: "0.5", textAlign: "center" }}>
               <p
                 style={{
-                  background: e.recommend === "추천" ? "#1abfb1" : "#992b2b",
+                  background:
+                    e.recommend === "추천" || e.recommend === "Y"
+                      ? "#1abfb1"
+                      : "#992b2b",
+                  color: "#fff",
+                  padding: "6px 8px",
+                  borderRadius: "6px",
+                  display: "inline-block",
                 }}
               >
-                {e.recommend}
+                {e.recommend === "Y"
+                  ? "추천"
+                  : e.recommend === "N"
+                  ? "비추천"
+                  : e.recommend}
               </p>
             </div>
             <div style={{ flex: "4" }}>
@@ -397,26 +482,37 @@ const Station = () => {
               <p> 작성일:{e.createdAt}</p>
             </div>
             <div style={{ flex: "3" }}>
-              <Elision
-                onClick={() => elision(e.reviewId)}
-                style={{ marginTop: "0px" }}
-              >
-                삭제
-              </Elision>
+              {currentUserNo && String(e.userNo) === String(currentUserNo) ? (
+                <Elision
+                  onClick={() => elision(e.reviewId)}
+                  style={{ marginTop: "0px" }}
+                >
+                  삭제
+                </Elision>
+              ) : null}
             </div>
           </li>
         ))}
 
-        <Review>
+        <Review
+          style={{
+            marginTop: "18px",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+          }}
+        >
           <Recomend
             onClick={() => setIsRecomend("Y")}
             className={isRecomend === "Y" ? "active" : ""}
+            style={{ cursor: "pointer" }}
           >
             추천
           </Recomend>
           <Recomend
             onClick={() => setIsRecomend("N")}
             className={isRecomend === "N" ? "dislike" : ""}
+            style={{ cursor: "pointer" }}
           >
             비추천
           </Recomend>
@@ -425,8 +521,11 @@ const Station = () => {
             placeholder="    남기고 싶은 리뷰를 입력하세요."
             maxLength={80}
             onChange={(e) => setComment(e.target.value)}
+            style={{ flex: 1 }}
           />
-          <Registration onClick={register}>등록</Registration>
+          <Registration onClick={register} style={{ marginLeft: "8px" }}>
+            등록
+          </Registration>
         </Review>
       </RightSection>
     </MainContainer>
