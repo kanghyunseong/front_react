@@ -67,7 +67,11 @@ const CarsSearchList = () => {
           return;
         }
 
-        setCars((prevCars) => [...prevCars, ...newCars]);
+        setCars((prevCars) => {
+          const existingIds = new Set(prevCars.map(car => car.carId));
+          const uniqueNewCars = newCars.filter(car => !existingIds.has(car.carId));
+          return [...prevCars, ...uniqueNewCars];
+        });
 
         if (newCars.length < 4) {
           setHasMore(false);
@@ -103,9 +107,9 @@ const CarsSearchList = () => {
                 <img
                   src={randomCar.carImage}
                   alt={`${randomCar.carName} 이미지`}
-                  style={{ 
-                    width: '100%', 
-                    height: '100%', 
+                  style={{
+                    width: '100%',
+                    height: '100%',
                     objectFit: 'cover',
                     borderRadius: 'inherit'
                   }}
@@ -173,11 +177,11 @@ const CarsSearchList = () => {
                         <img
                           src={car.carImage}
                           alt={`${car.carName} 이미지`}
-                          style={{ 
-                            width: '100%', 
-                            height: '100%', 
-                            borderRadius: '8px', 
-                            objectFit: 'cover' 
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            borderRadius: '8px',
+                            objectFit: 'cover'
                           }}
                         />
                       ) : (
