@@ -231,14 +231,14 @@ front/
 
 <div align="center">
 
-![PPT](https://www.canva.com/design/DAG6mvIZfgc/Jx0w7OrcKmoG9oADFLLASg/view?utm_content=DAG6mvIZfgc&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h23044f9e19)
-*메인 페이지 및 차량 예약 시연*
+![PPT 프레젠테이션]( https://www.canva.com/design/DAG6mvIZfgc/Jx0w7OrcKmoG9oADFLLASg/view?utm_content=DAG6mvIZfgc&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h23044f9e19 )
+*ppt*
 
 
 
 </div>
 
-### 시연 영상 (YouTube)
+### 시연 영상 (GIF)
 
 프로젝트 전체 시연 영상을 확인하실 수 있습니다.
 
