@@ -393,5 +393,5 @@ server: {
 **함께 만드는 지속가능한 미래 🌍**
 
 Made with ❤️ by EV Community
-
+https://www.canva.com/design/DAG6mvIZfgc/Jx0w7OrcKmoG9oADFLLASg/view?utm_content=DAG6mvIZfgc&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h23044f9e19
 </div>
