@@ -45,6 +45,7 @@ export const InfoRow = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 12px;
+  gap: 20px;
 `;
 
 export const InfoLabel = styled.span`

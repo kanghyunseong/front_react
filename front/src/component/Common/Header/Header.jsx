@@ -7,10 +7,12 @@ import {
   ButtonText,
   ButtonText2,
   IconLogo,
+  MainTitle,
+  SubTitle,
+  Title,
 } from "./Header.styles";
 import logo from "../../../assets/adminLogo.png";
 import { useNavigate } from "react-router-dom";
-import Board from "../../Boards/Board/Board";
 import { useContext } from "react";
 import { AuthContext } from "../../../context/AuthContext";
 
@@ -31,7 +33,7 @@ const Header = () => {
         <Frame>
           <NavItem onClick={() => navi("/cars/searchList")}>차량찾기</NavItem>
           <NavItem onClick={() => navi("/stations")}>충전소</NavItem>
-          <NavItem onClick={() => navi("/boards/notices")}>커뮤니티</NavItem>
+          <NavItem onClick={() => navi("/notices")}>커뮤니티</NavItem>
           <ButtonWrapper>
             {isLogin ? (
               <>
@@ -44,7 +46,7 @@ const Header = () => {
                   </>
                 )}
 
-                <ButtonText onClick={() => navi("/members/myinfo")}>
+                <ButtonText onClick={() => navi("/members/detail")}>
                   내정보
                 </ButtonText>
                 <ButtonText2>/</ButtonText2>

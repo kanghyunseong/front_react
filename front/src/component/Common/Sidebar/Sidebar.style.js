@@ -32,6 +32,7 @@ export const StyledSideHeaderButton = styled.div`
   background: none;
   border: none;
   background-color: #f3f4f6;
+  gap: 30px;
 `;
 
 export const StyledSidebarLogoBox = styled.div`

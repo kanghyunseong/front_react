@@ -10,10 +10,14 @@ export const Input = styled.input`
   border: 1px solid rgba(255, 255, 255, 1);
   border-radius: 4px;
   width: 400px;
-  color: gray;
+  color: #000000;
   &:focus {
     outline: none;
     border-color: lightpink;
+  }
+
+  &::placeholder {
+    color: #fafafa;
   }
 `;
 
@@ -143,4 +147,29 @@ export const Title = styled.h2`
   font-size: 33px;
   color: #33333;
   margin-bottom: 70px;
+`;
+
+export const ProfileFileLabel = styled.label`
+  width: 500px;
+  height: 300px;
+  margin: 0 auto;
+  background-image: url(${(props) => props.fileImg});
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+
+  cursor: pointer;
+  position: relative;
+  transition: 0.3s ease;
+
+  &:hover {
+    filter: brightness(0.7);
+
+    &::after {
+      content: "";
+
+      inset: 0;
+      background: rgba(255, 255, 255, 0.25);
+    }
+  }
 `;

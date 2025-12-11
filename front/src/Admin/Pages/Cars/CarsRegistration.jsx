@@ -1,59 +1,162 @@
-import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { FaCloudUploadAlt } from "react-icons/fa";
+import axios from "axios";
 import * as S from "./CarsRegistration.styles";
+import { AuthContext } from "../../../context/AuthContext";
 
-const CarsRegistration = ({ isEditMode = false }) => {
-  const location = useLocation();
-  const passedData = location.state?.carData;
+const CarsRegistration = () => {
+  const navigate = useNavigate();
+  const { auth } = useContext(AuthContext);
 
   const [carName, setCarName] = useState("");
   const [km, setKm] = useState("");
-  const [type, setType] = useState("");
-  const [battery, setBattery] = useState(""); // 충전량 (%)
-  const [efficiency, setEfficiency] = useState(""); // 전비 (km/kWh)
-  const [batteryRemaining, setBatteryRemaining] = useState(""); // 배터리 잔량 (kWh)
-  const [range, setRange] = useState("0"); // 주행가능거리 (계산값)
+  const [type, setType] = useState("소형");
+  const [battery, setBattery] = useState("");
+  const [efficiency, setEfficiency] = useState("");
+  const [range, setRange] = useState("0");
+  const [seats, setSeats] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // 수정 모드일 때 데이터 채우기
-  useEffect(() => {
-    if (isEditMode && passedData) {
-      setCarName(passedData.name || "");
-      setKm(passedData.km || "");
-      setType(passedData.type || "");
-      setBattery(passedData.battery?.replace("%", "") || "");
-      setEfficiency(passedData.efficiency || "");
-      setBatteryRemaining(passedData.batteryRemaining || "");
+  const [carContent, setCarContent] = useState("");
+  const [byteCount, setByteCount] = useState(0);
+
+  const [file, setFile] = useState(null);
+  const [preview, setPreview] = useState(null);
+
+  const getByteLength = (s) => {
+    let b = 0;
+    if (!s) return 0;
+    for (let i = 0; i < s.length; i++) {
+      const c = s.charCodeAt(i);
+      b += c >> 7 ? 3 : 1;
     }
-  }, [isEditMode, passedData]);
+    return b;
+  };
 
-  // 주행가능거리 자동 계산
+  const handleContentChange = (e) => {
+    const val = e.target.value;
+    const currentByte = getByteLength(val);
+
+    if (currentByte > 4000) {
+      alert("작성 가능한 최대 글자 수(4000 Byte)를 초과했습니다.");
+      return;
+    }
+    setCarContent(val);
+    setByteCount(currentByte);
+  };
+
   useEffect(() => {
-    if (efficiency && batteryRemaining) {
-      const calculatedRange = (
-        parseFloat(efficiency) * parseFloat(batteryRemaining)
-      ).toFixed(1);
-      setRange(calculatedRange);
+    const bat = parseFloat(battery);
+    const eff = parseFloat(efficiency);
+    if (!isNaN(bat) && !isNaN(eff) && bat > 0 && eff > 0) {
+      const calculatedRange = Math.round(bat * eff);
+      setRange(calculatedRange.toString());
     } else {
       setRange("0");
     }
-  }, [efficiency, batteryRemaining]);
+  }, [battery, efficiency]);
+
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+      setPreview(URL.createObjectURL(selectedFile));
+    }
+  };
+
+  const handleSave = async () => {
+    if (loading) return;
+
+    if (!carName) {
+      alert("차량 이름은 필수입니다.");
+      return;
+    }
+    if (!carContent) {
+      alert("차량 설명을 입력해주세요.");
+      return;
+    }
+    if (getByteLength(carContent) > 4000) {
+      alert("차량 설명이 너무 깁니다. 내용을 줄여주세요.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("carName", carName);
+    formData.append("carDriving", km || "0");
+    formData.append("carSize", type || "소형");
+    formData.append("battery", battery || "0");
+    formData.append("carEfficiency", efficiency || "0");
+    formData.append("carSeet", seats || "0");
+    formData.append("carContent", carContent);
+
+    if (file) {
+      formData.append("file", file);
+    }
+
+    const token = auth?.accessToken;
+    if (!token) {
+      alert("인증 정보가 없습니다. 다시 로그인해주세요.");
+      navigate("/members/login");
+      return;
+    }
+
+    const url = "http://localhost:8081/admin/api/settings";
+    setLoading(true);
+    try {
+      await axios.post(url, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      alert("차량이 성공적으로 등록되었습니다.");
+      navigate("/admin/cars/settings");
+    } catch (err) {
+      console.error("저장 실패:", err);
+
+      if (err.response) {
+        const status = err.response.status;
+        const serverMsg = err.response.data.message;
+
+        if (status === 401 || status === 403) {
+          alert(
+            "세션이 만료되었거나 접근 권한이 없습니다. 로그인 페이지로 이동합니다."
+          );
+          navigate("/members/login");
+        } else if (status === 413) {
+          alert("파일 용량이 너무 큽니다. 10MB 이하의 이미지를 사용해주세요.");
+        } else {
+          alert(`등록 실패: ${serverMsg || "서버 내부 오류가 발생했습니다."}`);
+        }
+      } else {
+        alert("네트워크 연결 오류 또는 서버 응답을 받을 수 없습니다.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancel = () => {
+    navigate(-1);
+  };
 
   return (
     <div>
       <h2 style={{ marginBottom: "20px", color: "#6B4CE6" }}>
-        {isEditMode ? "Cars / Cars Edit" : "Cars / Cars Registration"}
+        Cars / Cars Registration
       </h2>
-
       <S.Container>
-        <h3 style={{ marginBottom: "5px" }}>
-          {isEditMode ? "Edit Page" : "New Car Registration"}
+        <h3
+          style={{
+            marginBottom: "20px",
+            borderBottom: "1px solid #eee",
+            paddingBottom: "10px",
+          }}
+        >
+          New Car Registration
         </h3>
-        <p style={{ color: "#999", marginBottom: "30px", fontSize: "14px" }}>
-          {isEditMode
-            ? "Edit Car name, Km, Battery, Efficiency information"
-            : "Create new car"}
-        </p>
 
         <S.FormGroup>
           <div>
@@ -61,118 +164,145 @@ const CarsRegistration = ({ isEditMode = false }) => {
             <S.Input
               value={carName}
               onChange={(e) => setCarName(e.target.value)}
-              placeholder="아이오닉 6"
+              placeholder="예: 아이오닉 6"
             />
           </div>
+
           <div>
-            <S.Label>Km</S.Label>
+            <S.Label>Km (Driving)</S.Label>
             <S.Input
+              type="number"
               value={km}
               onChange={(e) => setKm(e.target.value)}
-              placeholder="12460"
-              type="number"
+              placeholder="주행거리 (km)"
             />
           </div>
         </S.FormGroup>
 
         <S.FormGroup>
           <div>
-            <S.Label>Large / Small</S.Label>
+            <S.Label>Type (Size)</S.Label>
             <S.Input
+              as="select"
               value={type}
               onChange={(e) => setType(e.target.value)}
-              placeholder="Large"
-            />
+              style={{ height: "42px" }}
+            >
+              <option value="소형">소형</option>
+              <option value="중형">중형</option>
+              <option value="대형">대형</option>
+            </S.Input>
           </div>
           <div>
-            <S.Label>충전량 (%)</S.Label>
+            <S.Label>Battery (kWh)</S.Label>
             <S.Input
+              type="number"
               value={battery}
               onChange={(e) => setBattery(e.target.value)}
-              placeholder="98"
-              type="number"
-              min="0"
-              max="100"
+              placeholder="배터리 용량"
             />
           </div>
         </S.FormGroup>
 
         <S.FormGroup>
           <div>
-            <S.Label>전비 (km/kWh)</S.Label>
+            <S.Label>Efficiency (km/kWh)</S.Label>
             <S.Input
+              type="number"
+              step="0.1"
               value={efficiency}
               onChange={(e) => setEfficiency(e.target.value)}
-              placeholder="5.2"
-              type="number"
-              step="0.1"
+              placeholder="전비"
             />
           </div>
+
           <div>
-            <S.Label>배터리 잔량 (kWh)</S.Label>
+            <S.Label>Range (Auto Calculated)</S.Label>
             <S.Input
-              value={batteryRemaining}
-              onChange={(e) => setBatteryRemaining(e.target.value)}
-              placeholder="72"
-              type="number"
-              step="0.1"
+              value={`${range} Km`}
+              readOnly
+              style={{
+                backgroundColor: "#f3f0ff",
+                fontWeight: "bold",
+                color: "#6B4CE6",
+              }}
             />
           </div>
         </S.FormGroup>
 
-        {/* 주행가능거리 표시 (읽기 전용) */}
         <div style={{ marginBottom: "20px" }}>
-          <S.Label>주행가능거리 (자동 계산)</S.Label>
-          <S.Input
-            value={`${range} Km`}
-            readOnly
+          <div
             style={{
-              backgroundColor: "#f5f5f5",
-              cursor: "not-allowed",
-              fontWeight: "bold",
-              color: "#6B4CE6",
-            }}
-          />
-          <p
-            style={{
-              fontSize: "12px",
-              color: "#999",
-              marginTop: "5px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "5px",
             }}
           >
-            * 주행가능거리 = 전비 × 배터리 잔량
-          </p>
+            <S.Label style={{ marginBottom: 0 }}>Car Description</S.Label>
+            <S.ByteInfo $error={byteCount > 4000}>
+              {byteCount} / 4000 Bytes
+            </S.ByteInfo>
+          </div>
+
+          <S.TextArea
+            value={carContent}
+            onChange={handleContentChange}
+            placeholder="차량에 대한 상세 설명을 입력하세요."
+            $error={byteCount > 4000}
+          />
+          {byteCount > 4000 && (
+            <p style={{ color: "red", fontSize: "12px", marginTop: "5px" }}>
+              작성 가능한 용량을 초과했습니다. 내용을 줄여주세요.
+            </p>
+          )}
         </div>
 
-        {/* 등록 모드일 때만 날짜/이미지 업로드 표시 */}
-        {!isEditMode && (
-          <>
-            <S.FormGroup>
-              <div>
-                <S.Label>Start Date</S.Label>
-                <S.Input type="date" />
-              </div>
-              <div>
-                <S.Label>End Date</S.Label>
-                <S.Input type="date" />
-              </div>
-            </S.FormGroup>
+        <div style={{ marginBottom: "20px" }}>
+          <S.Label>Seats (인승)</S.Label>
+          <S.Input
+            type="number"
+            value={seats}
+            onChange={(e) => setSeats(e.target.value)}
+            placeholder="탑승 가능 인원"
+          />
+        </div>
 
-            <div>
-              <S.Label>Car profile Image</S.Label>
-              <S.UploadBox>
+        <div style={{ marginBottom: "20px" }}>
+          <S.Label>Car Profile Image</S.Label>
+          <input
+            type="file"
+            id="carImgInput"
+            style={{ display: "none" }}
+            onChange={handleFileChange}
+            accept="image/*"
+          />
+          <S.UploadBox
+            onClick={() => document.getElementById("carImgInput").click()}
+          >
+            {preview ? (
+              <>
+                <img src={preview} alt="preview" />
+                <div
+                  style={{ marginTop: "10px", fontSize: "12px", color: "#999" }}
+                >
+                  Click to change image
+                </div>
+              </>
+            ) : (
+              <>
                 <FaCloudUploadAlt size={30} />
-                <div>Click to upload or drag and drop</div>
-                <p>SVG, PNG, JPG or GIF (max. 800x400px)</p>
-              </S.UploadBox>
-            </div>
-          </>
-        )}
+                <div style={{ marginTop: "10px" }}>Click to upload</div>
+                <p>SVG, PNG, JPG</p>
+              </>
+            )}
+          </S.UploadBox>
+        </div>
 
         <S.ButtonGroup>
-          <S.Button>Cancel</S.Button>
-          <S.Button $primary>
-            {isEditMode ? "Save Change" : "Create project"}
+          <S.Button onClick={handleCancel}>Cancel</S.Button>
+          <S.Button $primary onClick={handleSave}>
+            {loading ? "등록 중..." : "Create Car"}
           </S.Button>
         </S.ButtonGroup>
       </S.Container>

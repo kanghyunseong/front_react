@@ -25,20 +25,29 @@ const Login = () => {
   const { login } = useContext(AuthContext);
 
   const kakaoLogin = () => {
-    axios.get("http://localhost:8081/members/kakao").then((result) => {
-      console.log(result);
-    });
+    location.href =
+      "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=9ab6eed4ca0b2e40761693da623540b9&redirect_uri=http://localhost:5173/members/kakao/callback";
   };
-
   const naverLogin = () => {
-    axios
-      .get("http://localhost:8081/members/naver")
+    location.href =
+      "https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=Kki4fyVYcYf_zkU2HAq8&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2Fmembers%2Fnaver%2Fcallback&state=state_1763619065972_14825";
+
+    //const barabam = await axios.get("http://localhost:8081/members/naver");
+    /*
       .then((result) => {
         const naverLoginUrl = result.data;
-        window.location.href = naverLoginUrl;
+
+        var abc = window.open(naverLoginUrl, "_blank", "width=500,height=600");
+        console.log(abc);
+
       })
       .catch((err) => console.error(err));
+      */
+    //const naverLoginUrl = barabam.data;
+
+    //window.open(naverLoginUrl, "_blank", "width=500,height=600");
   };
+
   // 서버에 요청
   const handleLogin = (e) => {
     e.preventDefault();
@@ -46,10 +55,10 @@ const Login = () => {
     const regexpPwd = /^[a-zA-Z0-9]*$/;
 
     if (!regexpPwd.test(memberId)) {
-      setMsg("아이디나 비밀번호는 영문이거나 숫자만 사용가능합니다.");
+      setMsg("아이디나 비밀번호를 확인해주세요");
       return;
     } else if (!regexpPwd.test(memberPwd)) {
-      setMsg("아이디나 비밀번호는 영문이거나 숫자만 사용가능합니다.");
+      setMsg("아이디나 비밀번호를 확인해주세요");
       return;
     } else {
       setMsg("");
@@ -70,6 +79,7 @@ const Login = () => {
           phone,
           email,
           birthDay,
+          licenseUrl,
           refreshToken,
           accessToken,
         } = result.data;
@@ -83,7 +93,8 @@ const Login = () => {
           role,
           phone,
           email,
-          birthDay
+          birthDay,
+          licenseUrl
         );
         alert("로그인에 성공하셨습니다.");
         navi("/");

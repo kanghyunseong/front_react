@@ -1,42 +1,31 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import DashBoard from "../Components/DashBoard/DashBoard";
-
-// Cars Components
 import CarsOverview from "./Cars/CarsOverview";
 import CarsReservation from "./Cars/CarsReservation";
 import CarsRegistration from "./Cars/CarsRegistration";
 import CarsSettings from "./Cars/CarsSettings";
-
-// Community Components
 import CommunityDeclaration from "./Community/CommunityDeclaration";
 import CommentDeclaration from "./Community/CommentDeclaration";
-
 import Layout from "../Components/Layout/Layout";
 import NoticeList from "./Community/NoticeList";
 import NoticeWrite from "./Community/NoticeWrite";
-import Visualization from "./Enviroments/Visualization";
 import UserRanking from "./Enviroments/UserRanking";
 import UserOverview from "./User/UserOverview";
+import UserEdit from "./User/UserEdit";
+import CarsEdit from "./Cars/CarsEdit";
+import NoticeEdit from "./Community/NoticeEdit";
 
 const AdminHome = () => {
   return (
     <Layout>
       <Routes>
-        {/* 대시보드 (기본 경로) */}
         <Route path="/" element={<DashBoard />} />
-
-        {/* Cars */}
         <Route path="cars/overview" element={<CarsOverview />} />
         <Route path="cars/reservation" element={<CarsReservation />} />
         <Route path="cars/registration" element={<CarsRegistration />} />
-        <Route
-          path="cars/edit"
-          element={<CarsRegistration isEditMode={true} />}
-        />
+        <Route path="cars/edit/:carId" element={<CarsEdit />} />
         <Route path="cars/settings" element={<CarsSettings />} />
-
-        {/* Community */}
         <Route
           path="community/declaration"
           element={<CommunityDeclaration />}
@@ -52,14 +41,15 @@ const AdminHome = () => {
           element={<NoticeWrite isEditMode={true} />}
         />
         <Route
-          path="enviroments/enviromentsVisualization"
-          element={<Visualization />}
-        />
-        <Route
           path="enviroments/enviromentsUserRanking"
           element={<UserRanking />}
         />
         <Route path="user/userOverview" element={<UserOverview />} />
+        <Route path="user/edit/:userNo" element={<UserEdit />} />
+        <Route
+          path="community/notice/edit/:noticeNo"
+          element={<NoticeEdit />}
+        />
       </Routes>
     </Layout>
   );

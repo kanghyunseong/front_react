@@ -1,5 +1,5 @@
-// CarsUsageHistory.jsx
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import SideBar from "../Common/Sidebar/Sidebar";
 import {
   MainContainer,
@@ -7,12 +7,6 @@ import {
   HistoryCard,
   Section,
   SectionTitle,
-  StatsGrid,
-  StatItem,
-  StatLabel,
-  StatValue,
-  DateInfo,
-  DateLabel,
   RecordList,
   RecordItem,
   RecordInfo,
@@ -21,39 +15,110 @@ import {
   RecordStatus,
   LoadMoreButton,
 } from "../Cars/CarsUsageHistory.style";
+import axios from "axios";
+import { AuthContext } from "../../context/AuthContext";
 
 const CarsUsageHistory = () => {
-  const [visibleCount, setVisibleCount] = useState(5); // 처음에 5개만 보여줌
+  const { auth } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const [reservation, setReservation] = useState([]);
+  const [visibleCount, setVisibleCount] = useState(5);
+  const [loading, setLoading] = useState(true);
 
-  const usageStats = {
-    totalDistance: "1,240 km",
-    tripCount: "8 회",
-    co2Reduction: "76 kg",
-    period: "2025-10-01 ~ 2025-11-10",
-    lastUsed: "2025-11-08",
-  };
+  useEffect(() => {
+    setLoading(true);
+    axios
+      .get("http://localhost:8081/reserve/history", {
+        headers: { Authorization: `Bearer ${auth.accessToken}` }
+      })
+      .then((result) => {
+        console.log(result.data);
+        setReservation(result.data);
+      })
+      .catch((err) => {
+        console.error("에러:", err);
+        if (err.response?.status === 401) {
+          alert("로그인이 만료되었습니다.");
+          navigate("/members/login");
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [auth?.accessToken, navigate]);
 
-
-  const allRecords = [
-    { id: 1, date: "2025-11-08", car: "EV-X 2024", distance: "120km", co2: "7.4kg", status: "완료" },
-    { id: 2, date: "2025-11-08", car: "EV-X 2024", distance: "120km", status: "예약취소", cancelled: true },
-    { id: 3, date: "2025-11-05", car: "EV-X 2024", distance: "95km", co2: "5.8kg", status: "완료" },
-    { id: 4, date: "2025-11-03", car: "EV-X 2024", distance: "150km", co2: "9.2kg", status: "완료" },
-    { id: 5, date: "2025-11-01", car: "EV-X 2024", distance: "180km", co2: "11.0kg", status: "완료" },
-    { id: 6, date: "2025-10-28", car: "EV-X 2024", distance: "210km", co2: "12.9kg", status: "완료" },
-    { id: 7, date: "2025-10-25", car: "EV-X 2024", distance: "140km", co2: "8.6kg", status: "완료" },
-    { id: 8, date: "2025-10-20", car: "EV-X 2024", distance: "165km", co2: "10.1kg", status: "완료" },
-    { id: 9, date: "2025-10-15", car: "EV-X 2024", distance: "90km", co2: "5.5kg", status: "완료" },
-    { id: 10, date: "2025-10-10", car: "EV-X 2024", distance: "110km", co2: "6.7kg", status: "완료" },
-  ];
-
-
-  const visibleRecords = allRecords.slice(0, visibleCount);
-  const hasMore = visibleCount < allRecords.length;
+  // 표시할 데이터
+  const visibleRecords = reservation.slice(0, visibleCount);
+  const hasMore = visibleCount < reservation.length;
 
   const handleLoadMore = () => {
-    setVisibleCount((prev) => prev + 5); 
+    setVisibleCount((prev) => prev + 5);
   };
+
+  // 상태 표시 텍스트 변환
+  const getStatusText = (reservationStatus, returnStatus) => {
+    if (returnStatus === 'Y') return '반납완료';
+    if (reservationStatus === 'Y') return '이용중';
+    if (reservationStatus === 'N') return '예약취소';
+    return '알 수 없음';
+  };
+
+  // 상태별 스타일 반환
+  const getStatusStyle = (reservationStatus, returnStatus) => {
+    if (returnStatus === 'Y') {
+      // 반납완료 - 초록색
+      return {
+        color: '#27ae60',
+        backgroundColor: '#d4edda',
+        padding: '6px 12px',
+        borderRadius: '8px',
+        fontWeight: '600'
+      };
+    }
+    if (reservationStatus === 'Y') {
+      // 이용중 - 파란색
+      return {
+        color: '#3498db',
+        backgroundColor: '#d1ecf1',
+        padding: '6px 12px',
+        borderRadius: '8px',
+        fontWeight: '600'
+      };
+    }
+    if (reservationStatus === 'N') {
+      // 예약취소 - 빨간색
+      return {
+        color: '#e74c3c',
+        backgroundColor: '#f8d7da',
+        padding: '6px 12px',
+        borderRadius: '8px',
+        fontWeight: '600'
+      };
+    }
+    // 기본
+    return {
+      color: '#1f1f13',
+      backgroundColor: '#e9ecef',
+      padding: '6px 12px',
+      borderRadius: '8px',
+      fontWeight: '600'
+    };
+  };
+
+  // 로딩중
+  if (loading) {
+    return (
+      <>
+        <SideBar />
+        <MainContainer>
+          <PageTitle>차량 이용 기록 내역</PageTitle>
+          <div style={{ textAlign: 'center', padding: '50px' }}>
+            로딩중...
+          </div>
+        </MainContainer>
+      </>
+    );
+  }
 
   return (
     <>
@@ -63,64 +128,52 @@ const CarsUsageHistory = () => {
 
         <HistoryCard>
           <Section>
-            <SectionTitle>차량 이용 기록</SectionTitle>
-            
-            <StatsGrid>
-              <StatItem>
-                <StatLabel>총 주행거리</StatLabel>
-                <StatValue>{usageStats.totalDistance}</StatValue>
-              </StatItem>
-              
-              <StatItem>
-                <StatLabel>이용 횟수</StatLabel>
-                <StatValue>{usageStats.tripCount}</StatValue>
-              </StatItem>
-              
-              <StatItem>
-                <StatLabel>절감된 이산화탄소</StatLabel>
-                <StatValue>{usageStats.co2Reduction}</StatValue>
-              </StatItem>
-            </StatsGrid>
+            <SectionTitle>지난 이용 목록 ({reservation.length}건)</SectionTitle>
 
-            <StatsGrid>
-              <DateInfo>
-                <DateLabel>기간 : {usageStats.period}</DateLabel>
-              </DateInfo>
-              
-              <DateInfo>
-                <DateLabel>최근 이용: {usageStats.lastUsed}</DateLabel>
-              </DateInfo>
-              
-              <DateInfo>
-                <DateLabel>신뢰 점수 기준</DateLabel>
-              </DateInfo>
-            </StatsGrid>
-          </Section>
+            {reservation.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '50px', color: '#666' }}>
+                이용 기록이 없습니다.
+              </div>
+            ) : (
+              <>
+                <RecordList>
+                  {visibleRecords.map((record) => (
+                    <RecordItem key={record.reservation.reservationNo}>
+                      <RecordInfo>
+                        <RecordDate>
+                          {record.reservation.startTime} ~ {record.reservation.endTime}
+                        </RecordDate>
+                        <RecordDetail>
+                          차량: {record.car.carName} ({record.car.carSize}) · 
+                          목적지: {record.reservation.destination}
+                        </RecordDetail>
+                        <RecordDetail style={{ fontSize: '0.9em', color: '#888' }}>
+                          주행거리: {record.car.carDriving}km · 
+                          배터리: {record.car.battery}kWh · 
+                          효율: {record.car.carEfficiency}km/kWh
+                        </RecordDetail>
+                      </RecordInfo>
+                      <RecordStatus 
+                        style={getStatusStyle(
+                          record.reservation.reservationStatus,
+                          record.reservation.returnStatus
+                        )}
+                      >
+                        {getStatusText(
+                          record.reservation.reservationStatus, 
+                          record.reservation.returnStatus
+                        )}
+                      </RecordStatus>
+                    </RecordItem>
+                  ))}
+                </RecordList>
 
-          <Section>
-            <SectionTitle>지난 이용 목록</SectionTitle>
-            
-            <RecordList>
-              {visibleRecords.map((record) => (
-                <RecordItem key={record.id}>
-                  <RecordInfo>
-                    <RecordDate>{record.date} - {record.car}</RecordDate>
-                    <RecordDetail>
-                      {record.distance}
-                      {record.co2 && ` · 절감 CO₂: ${record.co2}`}
-                    </RecordDetail>
-                  </RecordInfo>
-                  <RecordStatus $cancelled={record.cancelled}>
-                    {record.status}
-                  </RecordStatus>
-                </RecordItem>
-              ))}
-            </RecordList>
-
-            {hasMore && (
-              <LoadMoreButton onClick={handleLoadMore}>
-                더보기 ({visibleCount} / {allRecords.length})
-              </LoadMoreButton>
+                {hasMore && (
+                  <LoadMoreButton onClick={handleLoadMore}>
+                    더보기 ({visibleCount} / {reservation.length})
+                  </LoadMoreButton>
+                )}
+              </>
             )}
           </Section>
         </HistoryCard>

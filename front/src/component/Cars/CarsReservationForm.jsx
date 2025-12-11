@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { use, useContext, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import SideBar from "../Common/Sidebar/Sidebar";
 import {
   MainContainer,
@@ -15,34 +15,68 @@ import {
   TimeInput,
   TimeNote,
   LocationSection,
-  LocationLabel,
   LocationInput,
   SubmitButton,
 } from "../Cars/CarsReservationForm.style";
+import { AuthContext } from "../../context/AuthContext";
+import axios from "axios";
 
 const CarReservationForm = () => {
   const navi = useNavigate();
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
-  const [location, setLocation] = useState("");
+  const [destination, setDestination] = useState("");
+  const { carId } = useParams();
+  const { auth } = useContext(AuthContext);
 
-  const userInfo = {
-    name: "",
-    birthDate: "",
-    phone: "",
-  };
+  useEffect(() => {
+    if (!auth.isAuthenticated) {
+      alert("로그인하세요.");
+      navi("/members/login");
+    }
 
-  const handleSubmit = () => {
-    if (!startTime || !endTime || !location) {
+  }, [auth.isAuthenticated]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // 필수 입력 체크
+    if (!startTime.trim() || !endTime.trim() || !destination.trim()) {
       alert("모든 항목을 입력해주세요.");
       return;
     }
-    console.log("예약 확인", { startTime, endTime, location });
-    navi("/cars/reserve/confirm", {
-    state: { startTime, endTime, location }
-    });
-};
 
+    const start = new Date(startTime);
+    const end = new Date(endTime);
+
+    if (end <= start) {
+      alert("종료 시간은 시작 시간 이후여야 합니다.");
+      return;
+    }
+
+    const diffDays = (end - start) / (1000 * 60 * 60 * 24);
+    if (diffDays > 7) {
+      alert("최대 이용 가능 기간은 7일입니다.");
+      return;
+    }
+
+    axios.post(
+      "http://localhost:8081/reserve",
+      { carId, startTime, endTime, destination },
+      { headers: { Authorization: `Bearer ${auth.accessToken}` } }
+    )
+      .then((res) => {
+        console.log("전체 응답:", res.data);
+        const reservationNo = res.data;
+        navi(`/cars/reserve/${reservationNo}/confirm`);
+      })
+      .catch((err) => {
+        console.error(err);
+        alert("예약에 실패했습니다.");
+      });
+  };
+
+  if (!auth.accessToken) return <div>빠이</div>;
   return (
     <>
       <SideBar />
@@ -54,35 +88,35 @@ const CarReservationForm = () => {
             <SectionTitle>사용자 정보</SectionTitle>
             <InfoRow>
               <InfoLabel>사용자 이름 :</InfoLabel>
-              <InfoValue>{userInfo.name || "-"}</InfoValue>
+              <InfoValue>{auth.userName || "-"}</InfoValue>
             </InfoRow>
             <InfoRow>
               <InfoLabel>사용자 생년월일 :</InfoLabel>
-              <InfoValue>{userInfo.birthDate || "-"}</InfoValue>
+              <InfoValue>{auth.birthDay || "-"}</InfoValue>
             </InfoRow>
             <InfoRow>
               <InfoLabel>사용자 전화번호 :</InfoLabel>
-              <InfoValue>{userInfo.phone || "-"}</InfoValue>
+              <InfoValue>{auth.phone || "-"}</InfoValue>
             </InfoRow>
           </Section>
 
           <TimeSection>
             <SectionTitle>이용시간 선택</SectionTitle>
-            
-            <TimeLabel>시작 시간</TimeLabel>
+
+            <TimeLabel>시작 날짜</TimeLabel>
             <TimeInput
-              type="datetime-local"
+              type="date"
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
-              placeholder="년 - 월 - 일  -- : -- : --"
+              placeholder="년-월-일"
             />
 
-            <TimeLabel>종료 시간</TimeLabel>
+            <TimeLabel>종료 날짜</TimeLabel>
             <TimeInput
-              type="datetime-local"
+              type="date"
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
-              placeholder="년 - 월 - 일  -- : -- : --"
+              placeholder="년-월-일"
             />
 
             <TimeNote>※ 최대 이용 가능 기간은 일주일입니다.</TimeNote>
@@ -92,14 +126,14 @@ const CarReservationForm = () => {
             <SectionTitle>반납 목적지 입력</SectionTitle>
             <LocationInput
               type="text"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
+              value={destination}
+              onChange={(e) => setDestination(e.target.value)}
               placeholder="예: 서울시 ○ ○"
             />
           </LocationSection>
 
           <SubmitButton onClick={handleSubmit}>
-            예약 확인 하기
+            예약 하기
           </SubmitButton>
         </FormCard>
       </MainContainer>
