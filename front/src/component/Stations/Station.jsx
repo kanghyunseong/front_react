@@ -37,7 +37,7 @@ const Station = () => {
   const [refresh, setRefresh] = useState([]);
   const [stationName, setStationName] = useState("");
   const mapRef = useRef(null);
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   // ===========================
   // 2. 검색 관련 함수
   // ===========================
@@ -51,7 +51,7 @@ const Station = () => {
     if (el) el.style.background = "none";
 
     axios
-      .get("http://localhost:8081/station/search", {
+      .get(`${apiUrl}/station/search`, {
         params: { keyword: keyword },
       })
       .then((response) => {
@@ -106,7 +106,7 @@ const Station = () => {
 
     // 상세정보 요청 (지도 이동 후)
     axios
-      .get(`http://localhost:8081/station/searchDetail/${stationIdParam}`)
+      .get(`${apiUrl}/${stationIdParam}`)
       .then((res) => {
         const stationDetail = Array.isArray(res.data) ? res.data[0] : res.data;
         if (!stationDetail) {
@@ -147,7 +147,7 @@ const Station = () => {
   const register = () => {
     axios
       .post(
-        "http://localhost:8081/station/insert",
+        `${apiUrl}/station/insert`,
         {
           stationId: stationId,
           commentContent: comment,
@@ -186,7 +186,7 @@ const Station = () => {
 
   const elision = (reviewIdParam) => {
     axios
-      .delete("http://localhost:8081/station", {
+      .delete(`${apiUrl}/station`, {
         headers: { Authorization: `Bearer ${auth?.accessToken}` },
         data: { reviewId: reviewIdParam },
       })
@@ -204,7 +204,7 @@ const Station = () => {
 
   const findAll = () => {
     axios
-      .get(`http://localhost:8081/station/findAll`, {
+      .get(`${apiUrl}/station/findAll`, {
         params: { stationId: stationId },
       })
       .then((response) => {
@@ -246,15 +246,12 @@ const Station = () => {
         // 지도 생성 및 충전소 로드 함수 (로컬 lat/lng 사용)
         const stationCreate = async () => {
           try {
-            const stationData = await axios.get(
-              "http://localhost:8081/station",
-              {
-                params: {
-                  lat: lat,
-                  lng: lng,
-                },
-              }
-            );
+            const stationData = await axios.get(`${apiUrl}/station`, {
+              params: {
+                lat: lat,
+                lng: lng,
+              },
+            });
 
             const data = stationData.data || [];
             const mapping = data.map((e) => {

@@ -19,6 +19,7 @@ import defaultImg from "../../../assets/LoginFileImg.png";
 import axios from "axios";
 
 const Join = () => {
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   const navi = useNavigate();
   const [loading, isLoading] = useState(false);
   const [userId, setUserId] = useState("");
@@ -137,7 +138,7 @@ const Join = () => {
     }
 
     axios
-      .post("http://localhost:8081/members", formData)
+      .post(`${apiUrl}/members`, formData)
       .then((result) => {
         console.log(result);
         if (result.status === 201) {

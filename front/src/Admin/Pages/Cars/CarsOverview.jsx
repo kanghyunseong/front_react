@@ -31,13 +31,13 @@ const CarsOverview = () => {
   const [cars, setCars] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   useEffect(() => {
     const fetchAllCars = async () => {
       if (!auth || !auth.accessToken) return;
       try {
         const response = await axios.get(
-          "http://localhost:8081/admin/api/settings?page=1&limit=100",
+          `${apiUrl}/admin/api/settings?page=1&limit=100`,
           {
             headers: { Authorization: `Bearer ${auth.accessToken}` },
           }

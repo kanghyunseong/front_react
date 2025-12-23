@@ -19,7 +19,7 @@ const NoticeDetail = () => {
 
   const [notice, setNotice] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   useEffect(() => {
     // 토큰 없으면 로그인 페이지로
     if (!auth?.accessToken) {
@@ -30,7 +30,7 @@ const NoticeDetail = () => {
 
     setLoading(true);
     api
-      .get(`/notices/${id}`)
+      .get(`${apiUrl}/notices/${id}`)
       .then((res) => setNotice(res.data))
       .catch((err) => {
         console.error("공지 상세 조회 실패:", err);
@@ -66,9 +66,7 @@ const NoticeDetail = () => {
 
       <Content>{notice.noticeContent}</Content>
 
-      <BackButton onClick={() => navi("/notices")}>
-        목록보기
-      </BackButton>
+      <BackButton onClick={() => navi("/notices")}>목록보기</BackButton>
     </Container>
   );
 };

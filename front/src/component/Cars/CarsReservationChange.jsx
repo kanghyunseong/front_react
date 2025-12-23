@@ -27,14 +27,14 @@ const CarsReservationChange = () => {
   const { auth } = useContext(AuthContext);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState(null);
-
-const handleReturn = (reservationNo, carId) => {
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
+  const handleReturn = (reservationNo, carId) => {
     if (!confirm("반납하시겠습니까?")) return;
     const wantsReview = confirm("리뷰를 작성하시겠습니까?");
 
     // 차량 반납
     axios
-      .put("http://localhost:8081/reserve/return", reservationNo, {
+      .put(`${apiUrl}/reserve/return`, reservationNo, {
         headers: {
           Authorization: `Bearer ${auth.accessToken}`,
           "Content-Type": "application/json",
@@ -42,12 +42,12 @@ const handleReturn = (reservationNo, carId) => {
       })
       .then((result) => {
         console.log(result);
-        alert("반납 처리가 완료되었습니다.")
-        
+        alert("반납 처리가 완료되었습니다.");
+
         if (wantsReview) {
           navi(`/cars/${carId}/review/write?reservationNo=${reservationNo}`);
         } else {
-          setRefresh(prev => prev + 1);
+          setRefresh((prev) => prev + 1);
         }
       })
       .catch((err) => {
@@ -59,7 +59,7 @@ const handleReturn = (reservationNo, carId) => {
   const handleCancel = (reservationNo) => {
     if (!confirm("예약을 취소하시겠습니까?")) return;
     axios
-      .delete(`http://localhost:8081/reserve/${reservationNo}`, {
+      .delete(`${apiUrl}/reserve/${reservationNo}`, {
         headers: { Authorization: `Bearer ${auth.accessToken}` },
       })
       .then((result) => {
@@ -73,7 +73,7 @@ const handleReturn = (reservationNo, carId) => {
 
   const handleChange = (updatedData) => {
     axios
-      .put("http://localhost:8081/reserve/change", updatedData, {
+      .put(`${apiUrl}/reserve/change`, updatedData, {
         headers: { Authorization: `Bearer ${auth.accessToken}` },
       })
       .then((result) => {
@@ -90,7 +90,7 @@ const handleReturn = (reservationNo, carId) => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8081/reserve/searchList", {
+      .get(`${apiUrl}/reserve/searchList`, {
         headers: { Authorization: `Bearer ${auth.accessToken}` },
       })
       .then((result) => {
@@ -151,7 +151,14 @@ const handleReturn = (reservationNo, carId) => {
                       {item.reservation?.returnStatus === "Y" ? (
                         <InfoText>✓ 반납 완료</InfoText>
                       ) : new Date() >= new Date(item.reservation?.endTime) ? (
-                        <ReturnButton onClick={() => handleReturn(item.reservation?.reservationNo, item.car?.carId)}>
+                        <ReturnButton
+                          onClick={() =>
+                            handleReturn(
+                              item.reservation?.reservationNo,
+                              item.car?.carId
+                            )
+                          }
+                        >
                           반납하기
                         </ReturnButton>
                       ) : (

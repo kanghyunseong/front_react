@@ -10,7 +10,7 @@ const CommunityDeclaration = () => {
   const [reportList, setReportsList] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   useEffect(() => {
     if (!auth || !auth.accessToken) {
       setLoading(false);
@@ -21,7 +21,7 @@ const CommunityDeclaration = () => {
       setLoading(true);
       try {
         const response = await axios.get(
-          `http://localhost:8081/admin/api/community/declaration`,
+          `${apiUrl}/admin/api/community/declaration`,
           {
             headers: { Authorization: `Bearer ${auth.accessToken}` },
           }
@@ -51,7 +51,7 @@ const CommunityDeclaration = () => {
 
     try {
       await axios.delete(
-        `http://localhost:8081/admin/api/community/declaration/delete/${reportNo}`,
+        `${apiUrl}/admin/api/community/declaration/delete/${reportNo}`,
         {
           headers: { Authorization: `Bearer ${auth.accessToken}` },
         }
@@ -93,7 +93,7 @@ const CommunityDeclaration = () => {
     try {
       setLoading(true);
       await axios.put(
-        `http://localhost:8081/admin/api/community/declaration/reject/${reportNo}`,
+        `${apiUrl}/admin/api/community/declaration/reject/${reportNo}`,
         {},
         {
           headers: { Authorization: `Bearer ${auth.accessToken}` },

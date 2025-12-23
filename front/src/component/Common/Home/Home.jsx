@@ -24,6 +24,7 @@ import { useNavigate } from "react-router-dom";
 import { MainTitle, SubTitle, Title } from "../Header/Header.styles";
 
 const Home = () => {
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   const navi = useNavigate();
   const [countMembers, setCountMembers] = useState("");
   const [countCars, setCountCars] = useState("");
@@ -39,7 +40,7 @@ const Home = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get("http://localhost:8081/main");
+        const response = await axios.get(`${apiUrl}/main`);
 
         // API 응답 구조에 맞게 수정하세요
         setCountMembers(response.data.countMembers);

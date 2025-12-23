@@ -1,4 +1,3 @@
-
 # Share EV - 전기차 공유 플랫폼
 
 <div align="center">
@@ -26,6 +25,7 @@
 **Share EV**는 전기차를 공유하고 빌릴 수 있는 커뮤니티 기반 플랫폼입니다. 회원들 간의 전기차 공유를 통해 탄소 배출을 줄이고 지속 가능한 미래를 만들어가는 것을 목표로 합니다.
 
 ### 핵심 가치
+
 - 🚗 **다양한 차량**: 소형부터 대형 SUV까지 원하는 전기차를 자유롭게 선택
 - 🎁 **무료 대여**: 커뮤니티 회원들과 무료로 차량을 나누고 함께 성장
 - 🌍 **환경 보호**: 공유를 통해 탄소 배출을 줄이고 지속 가능한 미래를 만들어요
@@ -37,6 +37,7 @@
 ### 👤 팀원별 담당 기능
 
 #### 강병준 1: 회원 관리 및 인증 시스템
+
 - 일반 회원가입 및 로그인 기능 구현
 - 소셜 로그인 연동 (카카오, 네이버)
 - JWT 토큰 기반 인증 처리
@@ -44,6 +45,7 @@
 - AuthContext를 통한 전역 인증 상태 관리
 
 #### 김하늘 2: 차량 예약 시스템
+
 - 차량 검색 및 목록 조회 기능
 - 차량 상세 정보 페이지 구현
 - 차량 예약 및 예약 확인 기능
@@ -51,6 +53,7 @@
 - 예약 내역 조회 및 관리
 
 #### 유성현 3: 리뷰 및 커뮤니티 시스템
+
 - 차량 이용 후 리뷰 작성/수정/삭제 기능
 - 자유 게시판 CRUD 기능 구현
 - 이미지 게시판 기능 구현
@@ -58,6 +61,7 @@
 - 게시글 신고 기능
 
 #### 강현성 4: 관리자 대시보드 및 관리 기능
+
 - 관리자 대시보드 구현 (Chart.js 활용)
 - 회원 통계 및 트렌드 분석 차트
 - 차량 통계 및 일일 예약 현황 시각화
@@ -65,6 +69,7 @@
 - 회원 관리 및 커뮤니티 신고 처리
 
 #### 배주영 5: 충전소 및 공지사항 시스템
+
 - 충전소 검색 및 상세 정보 조회
 - 내가 저장한 충전소 관리 기능
 - 공지사항 조회 및 상세 페이지
@@ -75,6 +80,7 @@
 ## 🛠 기술 스택
 
 ### Frontend
+
 - **React** 19.2.0 - UI 라이브러리
 - **Vite** 7.2.2 - 빌드 도구
 - **React Router DOM** 7.9.5 - 라우팅
@@ -86,6 +92,7 @@
 - **React Datepicker** 8.9.0 - 날짜 선택 컴포넌트
 
 ### 개발 도구
+
 - **ESLint** - 코드 린팅
 - **React Hooks Plugin** - React Hooks 규칙 검사
 
@@ -94,6 +101,7 @@
 ## 🚀 시작하기
 
 ### 필수 요구사항
+
 - Node.js (v18 이상 권장)
 - npm 또는 yarn
 - 백엔드 서버 (포트 8081)
@@ -101,27 +109,29 @@
 ### 설치 및 실행
 
 1. **저장소 클론**
+
 ```bash
 git clone <repository-url>
 cd react/front
 ```
 
 2. **의존성 설치**
+
 ```bash
 npm install
 ```
 
 3. **개발 서버 실행**
+
 ```bash
 npm run dev
 ```
 
 4. **브라우저에서 확인**
+
 ```
 http://localhost:5173
 ```
-
-
 
 ---
 
@@ -178,6 +188,7 @@ front/
 ## 🔑 주요 페이지
 
 ### 사용자 페이지
+
 - `/` - 홈 페이지
 - `/cars/searchList` - 차량 검색
 - `/cars/:carId` - 차량 상세 정보
@@ -189,6 +200,7 @@ front/
 - `/members/detail` - 내 정보
 
 ### 관리자 페이지
+
 - `/admin` - 관리자 대시보드
 - `/admin/cars/overview` - 차량 목록
 - `/admin/cars/registration` - 차량 등록
@@ -211,6 +223,7 @@ front/
 프로젝트는 백엔드 API와 연동됩니다. 기본 API URL은 `http://localhost:8081`입니다.
 
 ### 주요 API 엔드포인트
+
 - `/members/*` - 회원 관련 API
 - `/cars/*` - 차량 관련 API
 - `/reserve/*` - 예약 관련 API
@@ -232,12 +245,11 @@ front/
 <div align="center">
 
 ![PPT 프레젠테이션 링크]
+
 <div>
   https://www.canva.com/design/DAG6mvIZfgc/Jx0w7OrcKmoG9oADFLLASg/view?utm_content=DAG6mvIZfgc&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h23044f9e19
 </div>
 *ppt*
-
-
 
 </div>
 
@@ -245,17 +257,18 @@ front/
 
 프로젝트 전체 시연 영상을 확인하실 수 있습니다.
 
-시연 영상의 경우 GIF로 대체하고자 합니다. 해당 부분은 빠른 시일내에 촬영하여 GIF로 변경하겠습니다. 
+시연 영상의 경우 GIF로 대체하고자 합니다. 해당 부분은 빠른 시일내에 촬영하여 GIF로 변경하겠습니다.
 
-
-> 
+>
 
 ---
 
 ## 🐛 트러블슈팅
 
 ### 1. Axios 인터셉터 문법 오류
+
 **문제**: `instance.interceptors.response.use` 뒤에 괄호가 누락되어 문법 오류 발생
+
 ```javascript
 // ❌ 문제 코드
 instance.interceptors.response.use
@@ -264,6 +277,7 @@ instance.interceptors.response.use
 ```
 
 **해결**: 괄호를 추가하여 올바른 함수 호출 형태로 수정
+
 ```javascript
 // ✅ 해결 코드
 instance.interceptors.response.use(
@@ -273,35 +287,44 @@ instance.interceptors.response.use(
 ```
 
 ### 2. API 인스턴스 중복 문제
+
 **문제**: `api/instance.js`와 `component/Boards/api.jsx`에 두 개의 axios 인스턴스가 존재하여 코드 중복 발생
 
 **해결**: 공통 인스턴스를 `api/instance.js`로 통일하고, 모든 컴포넌트에서 이를 import하여 사용하도록 리팩토링
 
 ### 3. ProtectedRoute의 authLoading 상태 오류
+
 **문제**: `AuthContext`에 `authLoading` 상태가 정의되지 않았는데 `ProtectedRoute`에서 사용
 
 **해결**: `AuthContext`에 `authLoading` 상태를 추가하거나, 조건부 렌더링 로직을 수정하여 인증 상태 확인 후 라우팅 처리
 
 ### 4. 하드코딩된 API URL
+
 **문제**: 61개 파일에 `http://localhost:8081`이 하드코딩되어 있어 환경별 설정 변경이 어려움
 
 **해결**: 환경 변수(`.env`)를 사용하여 API URL을 관리하도록 변경
+
 ```javascript
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081';
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8081";
 ```
 
 ### 5. 소셜 로그인 클라이언트 ID 노출
+
 **문제**: 카카오, 네이버 클라이언트 ID가 코드에 직접 노출
 
 **해결**: 환경 변수로 관리하여 보안 강화
+
 ```javascript
 const KAKAO_CLIENT_ID = import.meta.env.VITE_KAKAO_CLIENT_ID;
 ```
 
 ### 6. CORS 에러 처리
+
 **문제**: 백엔드와 프론트엔드가 다른 포트에서 실행되어 CORS 에러 발생
 
 **해결**: Vite의 프록시 설정을 활용하여 개발 환경에서 CORS 문제 해결
+
 ```javascript
 // vite.config.js
 server: {
@@ -319,6 +342,7 @@ server: {
 ## 💡 프로젝트를 통해 얻은 것
 
 ### 기술적 성장
+
 - **React Hooks 활용**: useState, useEffect, useContext 등을 활용한 상태 관리 및 생명주기 관리
 - **Context API**: 전역 상태 관리 패턴 학습 및 적용
 - **React Router**: SPA 라우팅 구현 및 보호된 라우트 구현 경험
@@ -327,12 +351,14 @@ server: {
 - **Axios**: HTTP 클라이언트를 통한 RESTful API 연동
 
 ### 협업 및 프로젝트 관리
+
 - **Git/GitHub**: 버전 관리 및 협업 워크플로우 학습
 - **컴포넌트 설계**: 재사용 가능한 컴포넌트 설계 및 구조화
 - **코드 리뷰**: 팀원 간 코드 리뷰를 통한 코드 품질 향상
 - **이슈 관리**: 프로젝트 이슈 추적 및 해결 과정 경험
 
 ### 문제 해결 능력
+
 - **디버깅**: 브라우저 개발자 도구를 활용한 문제 진단 및 해결
 - **에러 처리**: 다양한 에러 상황에 대한 적절한 처리 방법 학습
 - **성능 최적화**: 불필요한 리렌더링 방지 및 최적화 기법 적용
@@ -342,6 +368,7 @@ server: {
 ## 🔮 개선사항
 
 ### 단기 개선사항
+
 - [ ] 환경 변수를 통한 API URL 및 소셜 로그인 키 관리
 - [ ] API 인스턴스 통합 및 중복 코드 제거
 - [ ] console.log 제거 및 로깅 라이브러리 도입
@@ -350,6 +377,7 @@ server: {
 - [ ] 에러 처리 통일 및 사용자 친화적 에러 메시지 개선
 
 ### 중기 개선사항
+
 - [ ] TypeScript 도입을 통한 타입 안정성 확보
 - [ ] 테스트 코드 작성 (Jest, React Testing Library)
 - [ ] 로딩 상태 및 스켈레톤 UI 구현
@@ -358,6 +386,7 @@ server: {
 - [ ] 성능 최적화 (코드 스플리팅, lazy loading)
 
 ### 장기 개선사항
+
 - [ ] PWA(Progressive Web App) 기능 추가
 - [ ] 실시간 알림 기능 (WebSocket)
 - [ ] 다국어 지원 (i18n)
@@ -368,14 +397,13 @@ server: {
 
 ## 👥 팀원 정보
 
-| 이름 | 역할 | 담당 기능 | GitHub |
-|------|------|----------|--------|
-| 팀원 1 | Frontend Developer | 회원 관리 및 인증 시스템 | [@Yagkom](https://github.com/Yakgom) |
-| 팀원 2 | Frontend Developer | 차량 예약 시스템 | [@haneul](https://github.com/haneul1748) |
-| 팀원 3 | Frontend Developer | 리뷰 및 커뮤니티 시스템 | [@yoosh0610](https://github.com/yoosh0610) |
+| 이름   | 역할               | 담당 기능                    | GitHub                                             |
+| ------ | ------------------ | ---------------------------- | -------------------------------------------------- |
+| 팀원 1 | Frontend Developer | 회원 관리 및 인증 시스템     | [@Yagkom](https://github.com/Yakgom)               |
+| 팀원 2 | Frontend Developer | 차량 예약 시스템             | [@haneul](https://github.com/haneul1748)           |
+| 팀원 3 | Frontend Developer | 리뷰 및 커뮤니티 시스템      | [@yoosh0610](https://github.com/yoosh0610)         |
 | 팀원 4 | Frontend Developer | 관리자 대시보드 및 관리 기능 | [@kanghyunseong](https://github.com/kanghyunseong) |
-| 팀원 5 | Frontend Developer | 충전소 및 공지사항 시스템 | [@ju1002](https://github.com/ju1002) |
-
+| 팀원 5 | Frontend Developer | 충전소 및 공지사항 시스템    | [@ju1002](https://github.com/ju1002)               |
 
 ---
 

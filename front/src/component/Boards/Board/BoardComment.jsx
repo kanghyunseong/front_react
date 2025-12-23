@@ -1,4 +1,3 @@
-
 import { useEffect, useContext, useState, useRef } from "react";
 import api from "../Api.jsx";
 import { AuthContext } from "../../../context/AuthContext.jsx";
@@ -33,13 +32,13 @@ const BoardComment = ({ boardNo }) => {
   // 신고 기능
   const [reportOpen, setReportOpen] = useState(false);
   const [reportingCommentId, setReportingCommentId] = useState(null);
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   // 댓글 목록 불러오기
   const loadComments = () => {
     if (!boardNo) return;
 
     api
-      .get("/comments", {
+      .get(`${apiUrl}/comments`, {
         params: { boardNo },
       })
       .then((res) => {
@@ -78,7 +77,7 @@ const BoardComment = ({ boardNo }) => {
     }
 
     api
-      .post("/comments", {
+      .post(`${apiUrl}/comments`, {
         refBno: boardNo,
         commentContent: commentContent,
       })
@@ -90,8 +89,7 @@ const BoardComment = ({ boardNo }) => {
       })
       .catch((err) => {
         console.error("댓글 등록 실패:", err);
-        const msg =
-          err.response?.data?.message || "댓글 등록에 실패했습니다.";
+        const msg = err.response?.data?.message || "댓글 등록에 실패했습니다.";
         alert(msg);
       });
   };
@@ -116,7 +114,7 @@ const BoardComment = ({ boardNo }) => {
     }
 
     api
-      .put(`/comments/${commentNo}`, {
+      .put(`${apiUrl}/comments/${commentNo}`, {
         commentContent: editingContent,
       })
       .then((res) => {
@@ -128,8 +126,7 @@ const BoardComment = ({ boardNo }) => {
       })
       .catch((err) => {
         console.error("댓글 수정 실패:", err);
-        const msg =
-          err.response?.data?.message || "댓글 수정에 실패했습니다.";
+        const msg = err.response?.data?.message || "댓글 수정에 실패했습니다.";
         alert(msg);
       });
   };
@@ -139,7 +136,7 @@ const BoardComment = ({ boardNo }) => {
     if (!window.confirm("정말 이 댓글을 삭제하시겠습니까?")) return;
 
     api
-      .delete(`/comments/${commentNo}`)
+      .delete(`${apiUrl}/comments/${commentNo}`)
       .then((res) => {
         const msg = res.data?.message || "댓글이 삭제되었습니다.";
         alert(msg);
@@ -147,8 +144,7 @@ const BoardComment = ({ boardNo }) => {
       })
       .catch((err) => {
         console.error("댓글 삭제 실패:", err);
-        const msg =
-          err.response?.data?.message || "댓글 삭제에 실패했습니다.";
+        const msg = err.response?.data?.message || "댓글 삭제에 실패했습니다.";
         alert(msg);
       });
   };
@@ -166,7 +162,7 @@ const BoardComment = ({ boardNo }) => {
     }
 
     api
-      .post(`/comments/${reportingCommentId}/report`, { reason })
+      .post(`${apiUrl}/comments/${reportingCommentId}/report`, { reason })
       .then((res) => {
         const msg = res.data?.message || "댓글 신고가 접수되었습니다.";
         alert(msg);
@@ -174,8 +170,7 @@ const BoardComment = ({ boardNo }) => {
       })
       .catch((err) => {
         console.error("댓글 신고 실패:", err);
-        const msg =
-          err.response?.data?.message || "신고에 실패했습니다.";
+        const msg = err.response?.data?.message || "신고에 실패했습니다.";
         alert(msg);
       });
   };
@@ -242,9 +237,7 @@ const BoardComment = ({ boardNo }) => {
                         as="textarea"
                         style={{ minHeight: "50px", marginTop: 0 }}
                         value={editingContent}
-                        onChange={(e) =>
-                          setEditingContent(e.target.value)
-                        }
+                        onChange={(e) => setEditingContent(e.target.value)}
                       />
                     ) : (
                       comment.commentContent
@@ -284,9 +277,7 @@ const BoardComment = ({ boardNo }) => {
                       )
                     ) : (
                       <CommentActionButton
-                        onClick={() =>
-                          openReportForComment(comment.commentNo)
-                        }
+                        onClick={() => openReportForComment(comment.commentNo)}
                       >
                         댓글신고
                       </CommentActionButton>

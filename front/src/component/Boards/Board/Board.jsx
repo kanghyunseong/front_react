@@ -37,7 +37,7 @@ const Board = () => {
 
   const navi = useNavigate();
   const { auth } = useContext(AuthContext);
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   // 공통 목록 로딩 (일반 / 검색 둘 다 여기서 처리)
   useEffect(() => {
     // 검색 모드인데 아직 검색 파라미터가 없으면 호출 X
@@ -45,9 +45,7 @@ const Board = () => {
 
     const isSearch = isSearchMode && searchParams;
 
-    const url = isSearch
-      ? "/boards/search"
-      : "/boards";
+    const url = isSearch ? `${apiUrl}/boards/search` : `${apiUrl}/boards`;
 
     const params = isSearch
       ? {
@@ -131,7 +129,7 @@ const Board = () => {
         <tbody>
           {Array.isArray(boards) && boards.length > 0 ? (
             boards.map((board, index) => {
-              const rowNumber = totalElements - (page * size) - index;
+              const rowNumber = totalElements - page * size - index;
               return (
                 <Tr key={board.boardNo}>
                   <Td>{rowNumber}</Td>
@@ -209,9 +207,7 @@ const Board = () => {
 
         {/* 다음 */}
         <button
-          onClick={() =>
-            setPage((prev) => Math.min(prev + 1, totalPages - 1))
-          }
+          onClick={() => setPage((prev) => Math.min(prev + 1, totalPages - 1))}
           disabled={page === totalPages - 1}
           style={{
             padding: "6px 10px",

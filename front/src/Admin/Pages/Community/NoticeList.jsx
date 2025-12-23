@@ -9,7 +9,7 @@ const NoticeList = () => {
   const [loading, setLoading] = useState(true);
   const [notices, setNotices] = useState([]);
   const { auth } = useContext(AuthContext);
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   useEffect(() => {
     const fetchNotices = async () => {
       if (!auth || !auth.accessToken) {
@@ -19,10 +19,9 @@ const NoticeList = () => {
 
       try {
         setLoading(true);
-        const response = await axios.get(
-          "http://localhost:8081/admin/api/notice/list",
-          { headers: { Authorization: `Bearer ${auth.accessToken}` } }
-        );
+        const response = await axios.get("${apiUrl}/admin/api/notice/list", {
+          headers: { Authorization: `Bearer ${auth.accessToken}` },
+        });
         setNotices(response.data);
       } catch (error) {
         console.log("공지사항 목록 로딩 실패: ", error);
@@ -63,10 +62,9 @@ const NoticeList = () => {
 
     try {
       setLoading(true);
-      await axios.delete(
-        `http://localhost:8081/admin/api/notice/delete/${noticeNo}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axios.delete(`${apiUrl}/admin/api/notice/delete/${noticeNo}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setNotices((prevNotices) =>
         prevNotices.filter((notice) => notice.noticeNo !== noticeNo)
       );

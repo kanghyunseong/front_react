@@ -32,13 +32,13 @@ const ImgBoardComment = ({ imgBoardNo }) => {
   // 신고 기능
   const [reportOpen, setReportOpen] = useState(false);
   const [reportingCommentId, setReportingCommentId] = useState(null);
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   // ================= 댓글 목록 불러오기 =================
   const loadComments = () => {
     if (!imgBoardNo) return;
 
     api
-      .get("/imgComments", {
+      .get(`${apiUrl}/imgComments`, {
         params: { imgBoardNo },
       })
       .then((res) => {
@@ -226,8 +226,7 @@ const ImgBoardComment = ({ imgBoardNo }) => {
           ) : (
             comments.map((comment, index) => {
               const rowNumber = comments.length - index;
-              const isCommentWriter =
-                comment.imgCommentWriter === auth.userId;
+              const isCommentWriter = comment.imgCommentWriter === auth.userId;
               const isEditing = editingId === comment.imgCommentNo;
 
               return (
@@ -240,9 +239,7 @@ const ImgBoardComment = ({ imgBoardNo }) => {
                         as="textarea"
                         style={{ minHeight: "50px", marginTop: 0 }}
                         value={editingContent}
-                        onChange={(e) =>
-                          setEditingContent(e.target.value)
-                        }
+                        onChange={(e) => setEditingContent(e.target.value)}
                       />
                     ) : (
                       comment.imgCommentContent

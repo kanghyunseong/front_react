@@ -17,6 +17,7 @@ import {
 import gasipan from "../../../assets/gasipan.png";
 
 const ImgBoardDetail = () => {
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   const { id } = useParams();
   const navi = useNavigate();
 
@@ -73,7 +74,7 @@ const ImgBoardDetail = () => {
     if (!window.confirm("정말 삭제할까요?")) return;
 
     api
-      .delete(`/imgBoards/${id}`)
+      .delete(`${apiUrl}/imgBoards/${id}`)
       .then((res) => {
         const msg = res.data?.message || "삭제되었습니다!";
         alert(msg);
@@ -81,8 +82,7 @@ const ImgBoardDetail = () => {
       })
       .catch((err) => {
         console.error("삭제 실패:", err);
-        const msg =
-          err.response?.data?.message || "삭제에 실패했습니다.";
+        const msg = err.response?.data?.message || "삭제에 실패했습니다.";
         alert(msg);
       });
   };
@@ -113,7 +113,7 @@ const ImgBoardDetail = () => {
     }
 
     api
-      .put(`/imgBoards/${id}`, formData)
+      .put(`${apiUrl}/imgBoards/${id}`, formData)
       .then((res) => {
         alert("수정되었습니다!");
 
@@ -125,8 +125,7 @@ const ImgBoardDetail = () => {
       })
       .catch((err) => {
         console.error("수정 실패:", err);
-        const msg =
-          err.response?.data?.message || "수정에 실패했습니다.";
+        const msg = err.response?.data?.message || "수정에 실패했습니다.";
         alert(msg);
       });
   };
@@ -145,7 +144,7 @@ const ImgBoardDetail = () => {
     }
 
     api
-      .post(`/imgBoards/${id}/report`, { reason })
+      .post(`${apiUrl}/imgBoards/${id}/report`, { reason })
       .then((res) => {
         const msg =
           res.data?.message ||
@@ -155,8 +154,7 @@ const ImgBoardDetail = () => {
       })
       .catch((err) => {
         console.error("게시글 신고 실패:", err);
-        const msg =
-          err.response?.data?.message || "신고 접수에 실패했습니다.";
+        const msg = err.response?.data?.message || "신고 접수에 실패했습니다.";
         alert(msg);
       });
   };
@@ -201,9 +199,7 @@ const ImgBoardDetail = () => {
               accept="image/*"
               multiple
               onChange={(e) => {
-                const files = e.target.files
-                  ? Array.from(e.target.files)
-                  : [];
+                const files = e.target.files ? Array.from(e.target.files) : [];
                 setEditFiles(files);
               }}
             />

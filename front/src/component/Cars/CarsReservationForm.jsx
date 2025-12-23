@@ -28,13 +28,12 @@ const CarReservationForm = () => {
   const [destination, setDestination] = useState("");
   const { carId } = useParams();
   const { auth } = useContext(AuthContext);
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   useEffect(() => {
     if (!auth.isAuthenticated) {
       alert("로그인하세요.");
       navi("/members/login");
     }
-
   }, [auth.isAuthenticated]);
 
   const handleSubmit = (e) => {
@@ -60,11 +59,12 @@ const CarReservationForm = () => {
       return;
     }
 
-    axios.post(
-      "http://localhost:8081/reserve",
-      { carId, startTime, endTime, destination },
-      { headers: { Authorization: `Bearer ${auth.accessToken}` } }
-    )
+    axios
+      .post(
+        `${apiUrl}/reserve`,
+        { carId, startTime, endTime, destination },
+        { headers: { Authorization: `Bearer ${auth.accessToken}` } }
+      )
       .then((res) => {
         console.log("전체 응답:", res.data);
         const reservationNo = res.data;
@@ -132,9 +132,7 @@ const CarReservationForm = () => {
             />
           </LocationSection>
 
-          <SubmitButton onClick={handleSubmit}>
-            예약 하기
-          </SubmitButton>
+          <SubmitButton onClick={handleSubmit}>예약 하기</SubmitButton>
         </FormCard>
       </MainContainer>
     </>

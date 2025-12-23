@@ -36,16 +36,14 @@ const ImgBoard = () => {
 
   const navi = useNavigate();
   const { auth } = useContext(AuthContext);
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   // 공통 목록 로딩
   useEffect(() => {
     if (isSearchMode && !searchParams) return;
 
     const isSearch = isSearchMode && searchParams;
 
-    const url = isSearch
-      ? "/imgBoards/search"
-      : "/imgBoards";
+    const url = isSearch ? `${apiUrl}/imgBoards/search` : `${apiUrl}/imgBoards`;
 
     const params = isSearch
       ? {
@@ -208,9 +206,7 @@ const ImgBoard = () => {
         ))}
 
         <button
-          onClick={() =>
-            setPage((prev) => Math.min(prev + 1, totalPages - 1))
-          }
+          onClick={() => setPage((prev) => Math.min(prev + 1, totalPages - 1))}
           disabled={page === totalPages - 1}
           style={{
             padding: "6px 10px",

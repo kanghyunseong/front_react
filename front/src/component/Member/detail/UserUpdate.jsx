@@ -72,9 +72,9 @@ const UserUpdate = () => {
     formData.append("email", email);
     formData.append("phone", phone);
     if (file) formData.append("licenseImg", file);
-
+    const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
     axios
-      .put("http://localhost:8081/members/updateUser", formData, {
+      .put(`${apiUrl}/members/updateUser`, formData, {
         headers: {
           Authorization: `Bearer ${auth.accessToken}`,
           "Content-Type": "multipart/form-data",

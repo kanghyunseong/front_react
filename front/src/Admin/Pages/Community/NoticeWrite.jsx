@@ -14,7 +14,7 @@ const NoticeWrite = () => {
     noticeContent: "",
     noticeWriter: 0,
   });
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   const [displayWriter, setDisplayWriter] = useState("로딩중...");
 
   useEffect(() => {
@@ -67,15 +67,11 @@ const NoticeWrite = () => {
       setLoading(true);
       const token = auth?.accessToken || localStorage.getItem("accessToken");
 
-      await axios.post(
-        "http://localhost:8081/admin/api/notice/insert",
-        submitData,
-        {
-          headers: {
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-        }
-      );
+      await axios.post(`${apiUrl}/admin/api/notice/insert`, submitData, {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      });
 
       alert("등록되었습니다.");
       navigate("/admin/community/notice/noticeList");

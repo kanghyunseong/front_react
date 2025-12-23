@@ -13,11 +13,11 @@ const NaverLoginCallback = () => {
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
     const state = params.get("state");
-
+    const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
     if (code && state) {
       // 백엔드로 code와 state를 전달하는 요청
       axios
-        .get("http://localhost:8081/members/naver/callback", {
+        .get(`${apiUrl}/members/naver/callback`, {
           params: { code, state }, // code와 state를 쿼리 파라미터로 전달
         })
         .then((response) => {

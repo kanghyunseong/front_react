@@ -23,10 +23,9 @@ const Login = () => {
   const [memberPwd, setUserPwd] = useState("");
   const [msg, setMsg] = useState("");
   const { login } = useContext(AuthContext);
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   const kakaoLogin = () => {
-    location.href =
-      "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=9ab6eed4ca0b2e40761693da623540b9&redirect_uri=http://localhost:5173/members/kakao/callback";
+    location.href = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=9ab6eed4ca0b2e40761693da623540b9&redirect_uri=http://localhost:5173/members/kakao/callback`;
   };
   const naverLogin = () => {
     location.href =

@@ -20,6 +20,7 @@ import axios from "axios";
 import { useLocation } from "react-router-dom";
 const KakaoJoin = () => {
   const location = useLocation();
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   const { userId, refreshToken, accessToken, provider } = location.state || {};
   console.log(
     "카카오 회원가입 데이터:",
@@ -142,7 +143,7 @@ const KakaoJoin = () => {
     }
 
     axios
-      .post("http://localhost:8081/members/kakao", formData)
+      .post(`${apiUrl}/members/kakao`, formData)
       .then((result) => {
         console.log(result);
         if (result.status === 200) {

@@ -8,7 +8,7 @@ const CommentDeclaration = () => {
   const { auth } = useContext(AuthContext);
   const [reportList, setReportList] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   useEffect(() => {
     if (!auth || !auth.accessToken) {
       setLoading(false);
@@ -19,7 +19,7 @@ const CommentDeclaration = () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          `http://localhost:8081/admin/api/community/comment/declaration`,
+          `${apiUrl}/admin/api/community/comment/declaration`,
           {
             headers: { Authorization: `Bearer ${auth.accessToken}` },
           }
@@ -47,7 +47,7 @@ const CommentDeclaration = () => {
 
     try {
       await axios.delete(
-        `http://localhost:8081/admin/api/community/comment/declaration/delete/${reportNo}`,
+        `${apiUrl}/admin/api/community/comment/declaration/delete/${reportNo}`,
         {
           headers: { Authorization: `Bearer ${auth.accessToken}` },
         }
@@ -87,7 +87,7 @@ const CommentDeclaration = () => {
 
     try {
       await axios.put(
-        `http://localhost:8081/admin/api/community/comment/declaration/reject/${reportNo}`,
+        `${apiUrl}/admin/api/community/comment/declaration/reject/${reportNo}`,
         {},
         {
           headers: { Authorization: `Bearer ${auth.accessToken}` },

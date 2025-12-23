@@ -24,7 +24,7 @@ const CarsEdit = () => {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   const getByteLength = (s) => {
     let b = 0;
     if (!s) return 0;
@@ -54,7 +54,7 @@ const CarsEdit = () => {
     setLoading(true);
 
     axios
-      .get(`http://localhost:8081/admin/api/settings/${carId}`, {
+      .get(`${apiUrl}/admin/api/settings/${carId}`, {
         headers: { Authorization: `Bearer ${auth.accessToken}` },
       })
       .then((response) => {
@@ -82,7 +82,7 @@ const CarsEdit = () => {
 
         const dbImage = data.carImage || data.CARIMAGE;
         if (dbImage) {
-          setPreview(`http://localhost:8081/uploads/${dbImage}`);
+          setPreview(`${apiUrl}/uploads/${dbImage}`);
         }
       })
       .catch((err) => {
@@ -156,7 +156,7 @@ const CarsEdit = () => {
     }
 
     axios
-      .put(`http://localhost:8081/admin/api/settings/update`, formData, {
+      .put(`${apiUrl}/admin/api/settings/update`, formData, {
         headers: {
           Authorization: `Bearer ${auth.accessToken}`,
           "Content-Type": "multipart/form-data",

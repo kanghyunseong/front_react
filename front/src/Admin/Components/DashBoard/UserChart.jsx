@@ -42,7 +42,7 @@ const UserChart = () => {
   const [unit, setUnit] = useState("month");
   const [chartData, setChartData] = useState({ labels: [], values: [] });
   const [totalCount, setTotalCount] = useState(0);
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   useEffect(() => {
     const fetchData = async () => {
       if (!auth.accessToken) {
@@ -73,7 +73,7 @@ const UserChart = () => {
       // 로그인 했으면 실제 API 호출
       try {
         const res = await axios.get(
-          `http://localhost:8081/admin/api/users/trend?unit=${unit}`,
+          `${apiUrl}/admin/api/users/trend?unit=${unit}`,
           {
             headers: { Authorization: `Bearer ${auth.accessToken}` },
           }

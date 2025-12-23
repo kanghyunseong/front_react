@@ -10,7 +10,7 @@ const NoticeEdit = () => {
   const { noticeNo } = useParams();
   const { auth } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   const [formData, setFormData] = useState({
     noticeNo: "",
     noticeTitle: "",
@@ -46,7 +46,7 @@ const NoticeEdit = () => {
           return;
         }
         const response = await axios.get(
-          `http://localhost:8081/admin/api/notice/${noticeNo}`,
+          `${apiUrl}/admin/api/notice/${noticeNo}`,
           {
             headers: {
               Authorization: token ? `Bearer ${token}` : "",
@@ -109,13 +109,9 @@ const NoticeEdit = () => {
         navigate("/members/login");
         return;
       }
-      await axios.put(
-        `http://localhost:8081/admin/api/notice/modify`,
-        formData,
-        {
-          headers: { Authorization: token ? `Bearer ${token}` : "" },
-        }
-      );
+      await axios.put(`${apiUrl}/admin/api/notice/modify`, formData, {
+        headers: { Authorization: token ? `Bearer ${token}` : "" },
+      });
 
       alert("수정이 완료되었습니다.");
       navigate("/admin/community/notice/noticeList");

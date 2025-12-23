@@ -16,7 +16,7 @@ const ImgBoardForm = () => {
   const [imgBoardTitle, setImgBoardTitle] = useState("");
   const [imgBoardContent, setImgBoardContent] = useState("");
   const [files, setFiles] = useState([]); // 여러 개
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   const { auth } = useContext(AuthContext);
   const navi = useNavigate();
 
@@ -69,7 +69,7 @@ const ImgBoardForm = () => {
     });
 
     api
-      .post("/imgBoards", formData)
+      .post(`${apiUrl}/imgBoards`, formData)
       .then((res) => {
         if (res.status === 201 || res.status === 200) {
           alert(res.data?.message || "갤러리 게시글이 등록되었습니다!");
@@ -78,8 +78,7 @@ const ImgBoardForm = () => {
       })
       .catch((err) => {
         console.log(err);
-        const msg =
-          err.response?.data?.message || "등록에 실패했습니다.";
+        const msg = err.response?.data?.message || "등록에 실패했습니다.";
         alert(msg);
       });
   };
