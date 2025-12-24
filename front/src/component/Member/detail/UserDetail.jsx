@@ -24,7 +24,7 @@ const UserDetail = () => {
   const [phone, setPhone] = useState("");
   const [licenseImg, setlicenseImg] = useState("");
   const [loading, setLoading] = useState(true);
-
+const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   // 로그인 체크 (한 번만)
   useEffect(() => {
     if (auth && auth.isAuthenticated !== undefined) {

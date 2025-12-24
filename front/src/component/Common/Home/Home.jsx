@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import {
   Body,
   CarCardContainer,
@@ -22,9 +21,9 @@ import {
 } from "./Home.styles";
 import { useNavigate } from "react-router-dom";
 import { MainTitle, SubTitle, Title } from "../Header/Header.styles";
+import { axiosPublic } from "../../../api/reqService";
 
 const Home = () => {
-  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   const navi = useNavigate();
   const [countMembers, setCountMembers] = useState("");
   const [countCars, setCountCars] = useState("");
@@ -40,8 +39,11 @@ const Home = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${apiUrl}/main`);
+        // const response = await axios.get(`${apiUrl}/main`);
+        const response = await axiosPublic.getList("/main");
 
+        console.log(response.data);
+       
         // API 응답 구조에 맞게 수정하세요
         setCountMembers(response.data.countMembers);
         setCountCars(response.data.countCars);

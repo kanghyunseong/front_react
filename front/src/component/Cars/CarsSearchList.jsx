@@ -26,6 +26,7 @@ import {
   DetailButton,
   LoadMoreButton,
 } from "./CarsSearchList.style";
+import { axiosPublic } from "../../api/reqService";
 
 const CarsSearchList = () => {
   const navi = useNavigate();
@@ -42,13 +43,13 @@ const CarsSearchList = () => {
     axios
       .get(`${apiUrl}/main`)
       .then((res) => {
-        setMains(res.data);
+        setMains(res.data.data);
         // popularCars 배열에서 랜덤으로 하나 선택
         if (res.data.popularCars && res.data.popularCars.length > 0) {
           const randomIndex = Math.floor(
             Math.random() * res.data.popularCars.length
           );
-          setRandomCar(res.data.popularCars[randomIndex]);
+          setRandomCar(res.data.data.popularCars[randomIndex]);
         }
       })
       .catch((err) => {
@@ -59,10 +60,14 @@ const CarsSearchList = () => {
   // 차량 목록 가져오기
   useEffect(() => {
     setIsLoading(true);
-    axios
-      .get(`${apiUrl}/cars?page=${currentPage}`)
+    // axios
+    //   .get(`${apiUrl}/cars?page=${currentPage}`)
+    axiosPublic.getList(`/cars?page=${currentPage}`)
       .then((response) => {
+        console.log(response);
+        
         const newCars = response.data;
+      
 
         if (!newCars || newCars.length === 0) {
           setHasMore(false);
