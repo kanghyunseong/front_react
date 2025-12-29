@@ -17,7 +17,6 @@ import CarsReservationConfirm from "./component/Cars/CarsReservationConfirm";
 import CarsReservation from "./component/Cars/CarsReservationForm";
 import CarsReservationChange from "./component/Cars/CarsReservationChange";
 import CarsUsageHistory from "./component/Cars/CarsUsageHistory";
-import Station from "./component/Stations/Station";
 import Notice from "./component/Boards/Notice/Notice";
 import ImgBoardDetail from "./component/Boards/ImgBoard/ImgBoardDetail";
 import Login from "./component/Member/Login/Login";
@@ -30,6 +29,10 @@ import KakaoLoginCallback from "./component/Member/Login/KakaoCallback";
 import KakaoJoin from "./component/Member/Join/KakaoJoin";
 import CarsReviewForm from "./component/Cars/CarsReviewForm";
 import NoticeDetail from "./component/Boards/Notice/NoticeDetail";
+import ReviewSection from "./component/Stations/ReviewSection";
+import MapSection from "./component/Stations/MapSection";
+import SearchSection from "./component/Stations/SearchSection";
+import Station from "./component/Stations/Station";
 function App() {
   const location = useLocation();
   const isAdminPage = location.pathname.startsWith("/admin");
@@ -74,6 +77,10 @@ function App() {
         <Route path="/members/join" element={<Join />} />
         <Route path="/members/kakaoJoin" element={<KakaoJoin />} />
         <Route path="/stations" element={<Station />} />
+        <Route path="/reviewSection" element={<ReviewSection />} />
+        <Route path="/mapSection" element={<MapSection />} />
+        <Route path="searchSection" element={<SearchSection />} />
+
         <Route
           path="/members/naver/callback"
           element={<NaverLoginCallback />}
