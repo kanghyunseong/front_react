@@ -1,196 +1,298 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 
-// 전체 레이아웃 (왼쪽 2 : 오른쪽 1)
+const fadeIn = keyframes`
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+`;
+
 export const Container = styled.div`
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 20px;
-  
-  @media (max-width: 1024px) {
-    grid-template-columns: 1fr; /* 반응형: 작은 화면에선 1단 */
-  }
+  padding: 40px;
+  background-color: #f4f7fa;
+  min-height: 100vh;
+  font-family: "Pretendard", -apple-system, sans-serif;
+  animation: ${fadeIn} 0.5s ease-out;
 `;
 
-// 페이지 제목
+export const PageHeader = styled.div`
+  margin-bottom: 32px;
+`;
+
 export const PageTitle = styled.h2`
-  margin-bottom: 20px;
-  color: #6B4CE6;
-`;
-
-// 가로 배치 컨테이너 (StatBox, 차트 병렬 배치용)
-export const Row = styled.div`
-  display: flex;
-  gap: 20px;
-  margin-bottom: 20px;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-  }
-`;
-
-// 세로 배치 컨테이너 (왼쪽/오른쪽 컬럼 내부용)
-export const Column = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  flex: ${(props) => props.flex || 1};
-`;
-
-// 기본 카드 스타일
-export const Card = styled.div`
-  background: white;
-  padding: 20px;
-  border-radius: 15px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-
-  h3 {
-    font-size: 16px;
-    color: #555;
-    margin-bottom: 15px;
-    margin-top: 0;
-  }
-`;
-
-// --------------------------------------------------------
-// StatBox (상단 요약 카드) 관련 스타일
-// --------------------------------------------------------
-export const StatCard = styled.div`
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  flex: 1;
-  margin: 0 10px;
+  font-size: 26px;
+  font-weight: 800;
+  color: #1a202c;
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 12px;
+  margin-bottom: 8px;
 
-  /* 첫번째, 마지막 마진 조정 */
-  &:first-child { margin-left: 0; }
-  &:last-child { margin-right: 0; }
+  &::before {
+    content: "";
+    width: 5px;
+    height: 24px;
+    background: #6c5ce7;
+    border-radius: 4px;
+  }
+`;
+
+export const LastUpdated = styled.span`
+  font-size: 13px;
+  color: #a0aec0;
+  font-weight: 500;
+`;
+
+export const StatRow = styled.div`
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-bottom: 32px;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+export const StatCard = styled.div`
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  border: 1px solid ${(props) => (props.$isWarning ? "#feb2b2" : "#edf2f7")};
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.08);
+  }
 `;
 
 export const IconWrapper = styled.div`
-  /* props.$isWarning에 따라 배경/글자색 변경 */
-  background: ${(props) => (props.$isWarning ? "#FEE2E2" : "#EDE9FE")};
-  color: ${(props) => (props.$isWarning ? "#EF4444" : "#6B4CE6")};
-  padding: 12px;
-  border-radius: 50%;
-  font-size: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 24px;
+  background: ${(props) => (props.$isWarning ? "#fff5f5" : "#f0f5ff")};
+  color: ${(props) => (props.$isWarning ? "#f56565" : "#6c5ce7")};
 `;
 
-export const StatInfo = styled.div`
+export const StatContent = styled.div`
+  .label {
+    font-size: 13px;
+    color: #718096;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .value-group {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    .value {
+      font-size: 24px;
+      font-weight: 800;
+      color: #1a202c;
+    }
+    .unit {
+      font-size: 14px;
+      font-weight: 600;
+      color: #718096;
+    }
+  }
+  .desc {
+    font-size: 11px;
+    color: #a0aec0;
+    margin-top: 2px;
+  }
+`;
+
+export const MainGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 24px;
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+export const SideColumn = styled.div`
   display: flex;
   flex-direction: column;
+  gap: 24px;
 `;
 
-export const StatLabel = styled.div`
-  font-size: 12px;
-  color: #888;
+export const Card = styled.div`
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 28px;
+  border: 1px solid #edf2f7;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
 `;
 
-export const StatValue = styled.div`
-  font-size: 20px;
-  font-weight: bold;
-  color: #333;
-  margin: 2px 0;
+export const CardHeader = styled.div`
+  margin-bottom: 24px;
+  h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #2d3748;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    span {
+      font-size: 12px;
+      color: #cbd5e0;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
 `;
 
-export const StatSub = styled.div`
-  font-size: 11px;
-  color: ${(props) => (props.$isWarning ? "#EF4444" : "#10B981")};
-`;
-
-// --------------------------------------------------------
-// 차트 관련 스타일
-// --------------------------------------------------------
-
-// 차트 높이 고정용 래퍼
 export const ChartContainer = styled.div`
-  height: ${(props) => props.height || "200px"};
-  width: 100%;
-  position: relative; /* 도넛 차트 중앙 텍스트 배치를 위해 필요 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
 `;
 
-// 도넛 차트 중앙 텍스트 (Total Cars)
-export const DonutOverlay = styled.div`
+export const ChartWrapper = styled.div`
+  position: relative;
+  height: 280px;
+  width: 100%;
+  max-width: 400px;
+`;
+
+export const DonutCenter = styled.div`
   position: absolute;
-  top: 50%;
-  left: 50%; /* 도넛 차트의 경우 범례 위치에 따라 조정 필요할 수 있음 */
+  top: 42%; /* 범례가 아래로 갔으므로 중앙 조정 */
+  left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
-  pointer-events: none; /* 마우스 이벤트가 차트에 도달하도록 */
+  pointer-events: none;
 
-  /* 범례가 오른쪽에 있을 경우 중앙 정렬 보정 (필요시 조정) */
-  @media (min-width: 768px) {
-    left: 35%; 
+  .num {
+    font-size: 38px;
+    font-weight: 900;
+    color: #1a202c;
+    line-height: 1;
+  }
+  .label {
+    font-size: 12px;
+    color: #a0aec0;
+    font-weight: 700;
+    margin-top: 6px;
+    text-transform: uppercase;
   }
 `;
 
-export const OverlayValue = styled.div`
-  font-size: 24px;
-  font-weight: bold;
-  color: #333;
-`;
-
-export const OverlayLabel = styled.div`
-  font-size: 10px;
-  color: #888;
-`;
-
-export const SubText = styled.p`
-  font-size: 12px;
-  color: #999;
-  margin-bottom: 10px;
-  margin-top: -10px;
-`;
-
-// 데이터 없을 때 표시
-export const NoData = styled.div`
-  text-align: center;
-  margin-top: 80px;
-  color: #ccc;
-  font-size: 14px;
-`;
-
-// --------------------------------------------------------
-// 리스트 (배터리 경고 등) 스타일
-// --------------------------------------------------------
-export const List = styled.ul`
-  list-style: none;
-  padding: 0;
-  margin-top: 10px;
-`;
-
-export const ListItem = styled.li`
-  display: flex;
-  justify-content: space-between;
-  padding: 12px 0;
-  border-bottom: 1px solid #eee;
-  font-size: 14px;
-
+export const BatteryProgress = styled.div`
+  margin-bottom: 20px;
   &:last-child {
-    border-bottom: none;
+    margin-bottom: 0;
+  }
+
+  .label-group {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    .car-name {
+      font-weight: 700;
+      font-size: 14px;
+      color: #4a5568;
+    }
+    .battery-val {
+      font-weight: 800;
+      font-size: 14px;
+      color: #2d3748;
+    }
   }
 `;
 
-export const BatteryLevel = styled.span`
-  color: #EF4444;
-  font-weight: bold;
+export const ProgressBar = styled.div`
+  height: 8px;
+  background: #edf2f7;
+  border-radius: 10px;
+  overflow: hidden;
 `;
 
-export const SafeMessage = styled.div`
-  padding: 20px;
+export const ProgressFill = styled.div`
+  height: 100%;
+  width: ${(props) => props.$width}%;
+  background: ${(props) =>
+    props.$width < 20
+      ? "linear-gradient(90deg, #f56565, #fc8181)"
+      : props.$width < 50
+      ? "linear-gradient(90deg, #ed8936, #f6ad55)"
+      : "linear-gradient(90deg, #48bb78, #68d391)"};
+  border-radius: 10px;
+  transition: width 1.5s cubic-bezier(0.1, 0, 0.2, 1);
+`;
+
+export const ActionCard = styled(Card)`
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  border: none;
+  h3 {
+    color: #ffffff;
+    margin-bottom: 16px;
+  }
+  p {
+    font-size: 14px;
+    opacity: 0.9;
+    line-height: 1.6;
+    margin-bottom: 24px;
+    strong {
+      font-weight: 800;
+      text-decoration: underline;
+    }
+  }
+`;
+
+export const ActionButton = styled.button`
+  width: 100%;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(4px);
+  border-radius: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  &:hover {
+    background: #ffffff;
+    color: #667eea;
+    transform: scale(1.02);
+  }
+`;
+
+export const EmptyState = styled.div`
   text-align: center;
-  color: #10B981;
+  padding: 40px;
+  color: #a0aec0;
+  font-weight: 500;
   font-size: 14px;
-  background: #F0FDF4;
-  border-radius: 8px;
-  margin-top: 10px;
+`;
+
+export const LoadingWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 18px;
+  font-weight: 700;
+  color: #6c5ce7;
+  letter-spacing: 1px;
 `;

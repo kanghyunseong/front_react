@@ -1,4 +1,11 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  useMemo,
+  useCallback,
+  useRef,
+} from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -9,11 +16,10 @@ import {
   Title,
   Tooltip,
   Legend,
+  Filler,
 } from "chart.js";
-import axios from "axios";
-
 import { AuthContext } from "../../../context/AuthContext";
-
+import { axiosAuth } from "../../../api/reqService";
 import {
   Container,
   InfoSection,
@@ -23,6 +29,7 @@ import {
   TotalCount,
   SubText,
   SectionTitle,
+  RightInfo,
 } from "./UserChart.styles";
 
 ChartJS.register(
@@ -32,117 +39,136 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 );
 
 const UserChart = () => {
   const { auth } = useContext(AuthContext);
-
+  const chartRef = useRef(null);
   const [unit, setUnit] = useState("month");
   const [chartData, setChartData] = useState({ labels: [], values: [] });
   const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!auth.accessToken) {
-        const dummyData = {
-          day: {
-            labels: ["01", "02", "03", "04", "05"],
-            values: [5, 10, 3, 8, 12],
-          },
-          month: {
-            labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-            values: [120, 190, 300, 50, 200, 30],
-          },
-          year: { labels: ["2023", "2024", "2025"], values: [500, 1200, 350] },
-        };
-
-        const currentData = dummyData[unit] || dummyData.month;
-        const total = currentData.values.reduce((acc, cur) => acc + cur, 0);
-
-        setChartData({
-          labels: currentData.labels,
-          values: currentData.values,
-        });
-        setTotalCount(total);
-        return;
-      }
-
       try {
-        const res = await axios.get(
-          `http://localhost:8081/admin/api/users/trend?unit=${unit}`,
-          {
-            headers: { Authorization: `Bearer ${auth.accessToken}` },
-          }
-        );
+        let labels = [];
+        let values = [];
 
-        const data = res.data;
-        const labels = data.map((d) => d.DATALABEL);
-        const values = data.map((d) => {
-          const countValue = Number(d.COUNT);
-          // 만약 countValue가 숫자가 아니면 (NaN) 0으로 처리합니다.
-          return isNaN(countValue) ? 0 : countValue;
-        });
-        const total = values.reduce((acc, cur) => acc + cur, 0);
+        if (!auth.accessToken) {
+          const dummyData = {
+            day: {
+              labels: ["01", "02", "03", "04", "05"],
+              values: [5, 10, 3, 8, 12],
+            },
+            month: {
+              labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+              values: [120, 190, 300, 50, 200, 30],
+            },
+            year: {
+              labels: ["2023", "2024", "2025"],
+              values: [500, 1200, 350],
+            },
+          };
+          const current = dummyData[unit];
+          labels = current.labels;
+          values = current.values;
+        } else {
+          const res = await axiosAuth.getActual(
+            `/api/admin/users/trend?unit=${unit}`
+          );
+          labels = res.map((d) => d.DATALABEL);
+          values = res.map((d) => Number(d.COUNT) || 0);
+        }
 
         setChartData({ labels, values });
-        setTotalCount(total);
+        setTotalCount(values.reduce((acc, cur) => acc + cur, 0));
       } catch (err) {
         console.error("차트 데이터 로딩 실패:", err);
       }
     };
-
     fetchData();
   }, [unit, auth.accessToken]);
 
-  const data = {
-    labels: chartData.labels,
-    datasets: [
-      {
-        label: "dataLabel",
-        data: chartData.values,
-        borderColor: "rgb(255, 99, 132)",
-        borderWidth: 3,
-        borderDash: [8, 4],
-        backgroundColor: "rgba(255, 255, 255, 0.1)",
-        tension: 0,
-        pointRadius: 6,
-        pointBackgroundColor: "red",
-      },
-    ],
-  };
-
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: { legend: { display: false } },
-    scales: {
-      x: {
-        ticks: {
-          color: "#333",
-          font: {
-            size: 14,
-            weight: "bold",
+  const data = useMemo(() => {
+    return {
+      labels: chartData.labels,
+      datasets: [
+        {
+          fill: true,
+          label: "신규 가입자",
+          data: chartData.values,
+          borderColor: "#ff6384",
+          backgroundColor: (context) => {
+            const chart = context.chart;
+            const { ctx, chartArea } = chart;
+            if (!chartArea) return null;
+            const gradient = ctx.createLinearGradient(
+              0,
+              chartArea.top,
+              0,
+              chartArea.bottom
+            );
+            gradient.addColorStop(0, "rgba(255, 99, 132, 0.2)");
+            gradient.addColorStop(1, "rgba(255, 99, 132, 0)");
+            return gradient;
           },
+          borderWidth: 4,
+          pointRadius: 4,
+          pointBackgroundColor: "#fff",
+          pointBorderColor: "#ff6384",
+          pointBorderWidth: 2,
+          pointHoverRadius: 7,
+          pointHoverBackgroundColor: "#ff6384",
+          pointHoverBorderColor: "#fff",
+          tension: 0.4, // 곡선 적용으로 더 부드럽게
         },
-        grid: { display: false },
+      ],
+    };
+  }, [chartData]);
+
+  const options = useMemo(
+    () => ({
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        intersect: false,
+        mode: "index",
       },
-      y: {
-        ticks: { display: false },
-        grid: {
-          color: "rgba(0,0,0,0.1)",
-          borderDash: [5, 5],
-          drawBorder: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: "#2d3436",
+          padding: 12,
+          titleFont: { size: 14, weight: "bold" },
+          bodyFont: { size: 13 },
+          cornerRadius: 8,
+          displayColors: false,
         },
-        beginAtZero: true,
       },
-    },
-    backgroundColor: "transparent",
-  };
-  const renderButton = (type, label) => (
-    <FilterButton $active={unit === type} onClick={() => setUnit(type)}>
-      {label}
-    </FilterButton>
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { color: "#b2bec3", font: { size: 12, weight: "500" } },
+        },
+        y: {
+          beginAtZero: true,
+          grid: { color: "rgba(0,0,0,0.05)", drawBorder: false },
+          ticks: { color: "#b2bec3", font: { size: 12 } },
+        },
+      },
+    }),
+    []
+  );
+
+  const renderButton = useCallback(
+    (type, label) => (
+      <FilterButton $active={unit === type} onClick={() => setUnit(type)}>
+        {label}
+      </FilterButton>
+    ),
+    [unit]
   );
 
   return (
@@ -154,21 +180,18 @@ const UserChart = () => {
             {renderButton("month", "Month")}
             {renderButton("year", "Year")}
           </ButtonContainer>
-
-          <TotalCount>{isNaN(totalCount) ? 0 : totalCount}</TotalCount>
-          <SubText>New Users ({unit})</SubText>
+          <TotalCount>{totalCount.toLocaleString()}</TotalCount>
+          <SubText>Total New Users in this {unit}</SubText>
         </div>
 
-        <div>
-          <SectionTitle>Active</SectionTitle>
-          <SubText>Trend Stats</SubText>
-        </div>
+        <RightInfo>
+          <SectionTitle>Real-time Active</SectionTitle>
+          <SubText>User Growth Trend</SubText>
+        </RightInfo>
       </InfoSection>
 
       <ChartSection>
-        <div style={{ height: "100%", width: "100%" }}>
-          <Line data={data} options={options} />
-        </div>
+        <Line data={data} options={options} />
       </ChartSection>
     </Container>
   );

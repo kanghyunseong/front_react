@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const instance = axios.create({
-  baseURL: "http://localhost:8081",
+  baseURL: window.ENV?.API_URL || "http://localhost:8081",
 });
 
 // 요청 인터셉터: 토큰 자동 설정
@@ -17,7 +17,6 @@ instance.interceptors.request.use((config) => {
 instance.interceptors.response.use(
   (response) => response,
   (error) => {
-
     if (error.response) {
       const status = error.response.status;
 
@@ -27,14 +26,12 @@ instance.interceptors.response.use(
         window.location.href = "/login";
       } else if (status === 500) {
         alert("서버 내부 오류가 발생했습니다. 관리자에게 문의하세요.");
-
       } else {
         alert(error.response.data.message || "오류가 발생했습니다.");
       }
     }
 
     return Promise.reject(error);
-
   }
 );
 

@@ -62,7 +62,6 @@ function App() {
         />
         <Route path="/cars/reserves/detail" element={<CarsUsageHistory />} />
         <Route path="/cars/:carId/review/write" element={<CarsReviewForm />} />
-        {/* :방패: 관리자 페이지 보호 라우트 적용 :방패: */}
         <Route
           path="/admin/*"
           element={

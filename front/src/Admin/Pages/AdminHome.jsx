@@ -50,6 +50,14 @@ const AdminHome = () => {
           path="community/notice/edit/:noticeNo"
           element={<NoticeEdit />}
         />
+        <Route
+          path="community/declaration"
+          element={<CommunityDeclaration />}
+        />
+        <Route
+          path="community/notice/noticeEdit/:noticeNo"
+          element={<NoticeEdit />}
+        />
       </Routes>
     </Layout>
   );

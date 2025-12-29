@@ -1,112 +1,189 @@
 import styled from "styled-components";
 
-export const Container = styled.div`
-  background: white;
+export const PageWrapper = styled.div`
   padding: 40px;
-  border-radius: 15px;
-  max-width: 900px;
-  margin: 20px auto;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  background-color: #f8fafc;
+  min-height: 100vh;
+  font-family: "Pretendard", sans-serif;
 `;
 
-export const Header = styled.div`
-  margin-bottom: 30px;
+export const TitleSection = styled.div`
+  max-width: 900px;
+  margin: 0 auto 30px;
+
+  .back-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 12px;
+    &:hover {
+      color: #6366f1;
+    }
+  }
+
   h2 {
-    color: #6b4ce6;
-    margin-bottom: 5px;
+    color: #1e293b;
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 6px;
+  }
+
+  p {
+    color: #64748b;
+    font-size: 15px;
   }
 `;
 
-export const SectionTitle = styled.h3`
-  margin-bottom: 5px;
-  font-size: 18px;
+export const Container = styled.div`
+  background: white;
+  padding: 50px;
+  border-radius: 24px;
+  max-width: 900px;
+  margin: 0 auto;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
 `;
-export const SectionDesc = styled.p`
-  color: #999;
-  font-size: 14px;
+
+export const SectionHeader = styled.h3`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
   margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f1f5f9;
+  svg {
+    color: #6366f1;
+  }
+`;
+
+export const FormLayout = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 `;
 
 export const FormGroup = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 20px;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 24px;
+`;
+
+export const InputBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+export const FullWidthBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 `;
 
 export const Label = styled.label`
-  display: block;
-  margin-bottom: 8px;
   font-size: 14px;
-  color: #333;
+  font-weight: 600;
+  color: #475569;
 `;
 
 export const Input = styled.input`
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #eee;
-  border-radius: 8px;
-  background-color: #f9fafb;
+  padding: 14px 16px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 15px;
+  background-color: #fcfdfe;
+  transition: all 0.2s;
+
   &:focus {
     outline: none;
-    border-color: #6b4ce6;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.08);
   }
 `;
 
-/* ★ 이 부분들이 누락되었을 수 있습니다 */
+export const ReadOnlyField = styled.div`
+  padding: 14px 16px;
+  border: 1.5px solid #f1f5f9;
+  border-radius: 12px;
+  background-color: #f8fafc;
+  color: #64748b;
+  font-size: 15px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .user-icon {
+    font-size: 18px;
+    color: #cbd5e1;
+  }
+`;
+
 export const TextAreaBox = styled.div`
-  background: #f9fafb;
-  border: 1px solid #eee;
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 30px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  background-color: #fcfdfe;
+  transition: all 0.2s;
+  overflow: hidden;
+
+  &:focus-within {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.08);
+  }
 `;
 
 export const TextArea = styled.textarea`
   width: 100%;
-  height: 150px;
+  height: 350px;
+  padding: 20px;
   border: none;
   background: transparent;
   resize: none;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #1e293b;
+  font-family: inherit;
+
   &:focus {
     outline: none;
-  }
-`;
-
-export const UploadBox = styled.div`
-  border: 2px dashed #6b4ce6;
-  border-radius: 10px;
-  padding: 40px;
-  text-align: center;
-  background-color: #f3f0ff;
-  color: #6b4ce6;
-  cursor: pointer;
-
-  p {
-    margin-top: 10px;
-    font-size: 12px;
-    color: #666;
   }
 `;
 
 export const ButtonGroup = styled.div`
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  margin-top: 30px;
+  gap: 12px;
+  margin-top: 10px;
+  padding-top: 24px;
+  border-top: 1px solid #f1f5f9;
 `;
 
 export const Button = styled.button`
-  padding: 10px 25px;
-  border-radius: 5px;
+  padding: 12px 30px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
   cursor: pointer;
-  font-weight: bold;
-  /* Transient Props 적용 ($primary) */
-  background-color: ${(props) => (props.$primary ? "#6B4CE6" : "white")};
-  color: ${(props) => (props.$primary ? "white" : "#666")};
-  border: ${(props) => (props.$primary ? "none" : "1px solid #ccc")};
+  transition: all 0.2s;
+
+  background-color: ${(props) => (props.$primary ? "#6366f1" : "white")};
+  color: ${(props) => (props.$primary ? "white" : "#64748b")};
+  border: ${(props) => (props.$primary ? "none" : "1px solid #e2e8f0")};
 
   &:hover {
-    opacity: 0.9;
+    filter: brightness(0.95);
+    background-color: ${(props) => (props.$primary ? "#4f46e5" : "#f8fafc")};
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 `;

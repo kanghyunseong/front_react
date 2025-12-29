@@ -1,121 +1,257 @@
 import styled from "styled-components";
 
+export const PageWrapper = styled.div`
+  padding: 40px;
+  background-color: #f8fafc;
+  min-height: 100vh;
+  font-family: "Pretendard", sans-serif;
+`;
+
+export const TitleSection = styled.div`
+  max-width: 850px;
+  margin: 0 auto 30px;
+
+  .back-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 16px;
+    transition: color 0.2s;
+    &:hover {
+      color: #6366f1;
+    }
+  }
+
+  h2 {
+    color: #0f172a;
+    font-size: 28px;
+    font-weight: 800;
+    span {
+      color: #94a3b8;
+      font-size: 18px;
+      margin-left: 8px;
+      font-weight: 500;
+    }
+  }
+
+  p {
+    color: #64748b;
+    font-size: 15px;
+    margin-top: 4px;
+  }
+`;
+
 export const Container = styled.div`
-  max-width: 800px;
+  background: white;
+  padding: 48px;
+  border-radius: 24px;
+  max-width: 850px;
   margin: 0 auto;
-  padding: 30px;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+`;
+
+export const SectionTitle = styled.h4`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 32px 0 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f1f5f9;
+  &:first-child {
+    margin-top: 0;
+  }
+  svg {
+    color: #6366f1;
+  }
 `;
 
 export const FormGroup = styled.div`
-  display: flex;
-  gap: 20px;
-  margin-bottom: 20px;
-
-  & > div {
-    flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
   }
+`;
+
+export const InputBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 `;
 
 export const Label = styled.label`
-  display: block;
-  margin-bottom: 8px;
-  font-weight: bold;
-  color: #333;
   font-size: 14px;
+  font-weight: 600;
+  color: #475569;
 `;
 
 export const Input = styled.input`
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-  font-size: 14px;
-  transition: border-color 0.2s;
-
+  padding: 12px 16px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 15px;
+  color: #1e293b;
+  transition: all 0.2s;
   &:focus {
-    border-color: #6b4ce6;
     outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.08);
   }
 `;
 
-// ✅ [추가] 설명 입력창용 TextArea (에러 상태 처리 포함)
+export const Select = styled.select`
+  padding: 12px 16px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 15px;
+  background-color: white;
+  cursor: pointer;
+`;
+
+export const RangeDisplay = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f5f3ff;
+  border: 1px solid #ddd6fe;
+  padding: 16px 20px;
+  border-radius: 14px;
+  .val {
+    font-size: 24px;
+    font-weight: 800;
+    color: #4f46e5;
+  }
+  .unit {
+    font-size: 14px;
+    font-weight: 600;
+    color: #6366f1;
+  }
+  .info-icon {
+    margin-left: auto;
+    color: #a5b4fc;
+  }
+`;
+
+export const FullWidthBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
 export const TextArea = styled.textarea`
   width: 100%;
-  height: 150px;
-  padding: 12px;
-  border: 1px solid ${(props) => (props.$error ? "red" : "#ccc")}; /* 에러 시 빨간 테두리 */
-  border-radius: 4px;
-  resize: vertical;
-  font-family: inherit;
+  height: 180px;
+  padding: 16px;
+  border: 1.5px solid ${(props) => (props.$error ? "#ef4444" : "#e2e8f0")};
+  border-radius: 14px;
   font-size: 14px;
-  line-height: 1.5;
-  outline: none;
-  box-sizing: border-box;
-  transition: border-color 0.2s;
-
+  line-height: 1.6;
+  resize: none;
   &:focus {
-    border-color: ${(props) => (props.$error ? "red" : "#6b4ce6")};
+    outline: none;
+    border-color: #6366f1;
   }
 `;
 
-// ✅ [추가] 바이트 수 표시용 텍스트
-export const ByteInfo = styled.div`
-  display: flex;
-  justify-content: flex-end;
+export const ByteInfo = styled.span`
   font-size: 12px;
-  color: ${(props) => (props.$error ? "red" : "#888")};
-  margin-top: 5px;
+  font-weight: 600;
+  color: ${(props) => (props.$error ? "#ef4444" : "#94a3b8")};
 `;
 
 export const UploadBox = styled.div`
-  height: 200px;
-  border: 2px dashed #6b4ce6;
-  border-radius: 8px;
+  border: 2px dashed #cbd5e1;
+  border-radius: 16px;
+  height: 280px;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #6b4ce6;
+  background-color: #f8fafc;
   cursor: pointer;
-  background-color: #f9f9ff;
-  transition: background-color 0.2s, border-color 0.2s;
-
+  overflow: hidden;
+  transition: all 0.2s;
   &:hover {
-    background-color: #f0f0ff;
-    border-color: #5a3aba;
+    border-color: #6366f1;
+    background-color: #f1f5ff;
   }
 
-  img {
-    max-height: 150px;
-    width: auto;
-    object-fit: contain;
-    margin-bottom: 5px;
+  .preview-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 20px;
+    }
+    .overlay {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      padding: 12px;
+      text-align: center;
+      font-weight: 600;
+    }
+  }
+
+  .upload-placeholder {
+    text-align: center;
+    color: #64748b;
+    p {
+      font-weight: 700;
+      margin-top: 12px;
+      color: #475569;
+    }
   }
 `;
 
 export const ButtonGroup = styled.div`
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  margin-top: 30px;
+  gap: 14px;
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid #f1f5f9;
 `;
 
 export const Button = styled.button`
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
+  padding: 12px 32px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
   cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.2s;
-
-  background-color: ${(props) => (props.$primary ? "#6B4CE6" : "#ccc")};
-  color: ${(props) => (props.$primary ? "#ffffff" : "#333")};
-
+  transition: all 0.2s;
+  background-color: ${(props) => (props.$primary ? "#6366f1" : "white")};
+  color: ${(props) => (props.$primary ? "white" : "#64748b")};
+  border: ${(props) => (props.$primary ? "none" : "1px solid #e2e8f0")};
   &:hover {
-    background-color: ${(props) => (props.$primary ? "#5a3aba" : "#bbb")};
+    opacity: 0.9;
+    transform: translateY(-1px);
   }
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
+export const LoadingWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60vh;
+  font-size: 18px;
+  font-weight: 700;
+  color: #6366f1;
 `;

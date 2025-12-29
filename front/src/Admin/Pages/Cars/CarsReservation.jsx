@@ -1,197 +1,135 @@
 import React, { useState, useEffect, useContext } from "react";
-import axios from "axios";
-import { AuthContext } from "../../../context/AuthContext"; // ⚠️ 경로 확인
+import { AuthContext } from "../../../context/AuthContext";
 import * as S from "./CarsReservation.styles";
+import { axiosAuth } from "../../../api/reqService";
+import { useNavigate } from "react-router-dom";
+import {
+  FaSearch,
+  FaCalendarAlt,
+  FaPhoneAlt,
+  FaUser,
+  FaCarSide,
+} from "react-icons/fa";
+
+const STATUS_COLORS = {
+  이용중: { bg: "#ECFDF5", text: "#10B981", border: "#10B981" },
+  연체중: { bg: "#FEF2F2", text: "#EF4444", border: "#EF4444" },
+  예약완료: { bg: "#EFF6FF", text: "#3B82F6", border: "#3B82F6" },
+  반납완료: { bg: "#F3F4F6", text: "#6B7280", border: "#D1D5DB" },
+  취소됨: { bg: "#FFF7ED", text: "#F97316", border: "#FFEDD5" },
+  default: { bg: "#F9FAFB", text: "#9CA3AF", border: "#E5E7EB" },
+};
 
 const StatusBadge = ({ status }) => {
-  let bgColor = "#9CA3AF";
-
-  switch (status) {
-    case "이용중":
-      bgColor = "#10B981";
-      break;
-    case "연체중":
-      bgColor = "#EF4444";
-      break;
-    case "예약완료":
-      bgColor = "#3B82F6";
-      break;
-    case "반납완료":
-      bgColor = "#6B7280";
-      break;
-    case "취소됨":
-      bgColor = "#FCA5A5";
-      break;
-    default:
-      bgColor = "#9CA3AF";
-  }
-
-  const styles = {
-    padding: "4px 8px",
-    borderRadius: "12px",
-    fontSize: "12px",
-    fontWeight: "bold",
-    color: "#fff",
-    backgroundColor: bgColor,
-    minWidth: "60px",
-    display: "inline-block",
-    textAlign: "center",
-  };
-
-  return <span style={styles}>{status}</span>;
+  const style = STATUS_COLORS[status] || STATUS_COLORS.default;
+  return (
+    <S.Badge
+      $bgColor={style.bg}
+      $textColor={style.text}
+      $borderColor={style.border}
+    >
+      {status}
+    </S.Badge>
+  );
 };
 
 const CarsReservation = () => {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-
   const { auth } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchReservations = async () => {
-      if (!auth || !auth.accessToken) {
+      if (!auth?.accessToken) {
         setLoading(false);
         return;
       }
-
       try {
-        const response = await axios.get(
-          "http://localhost:8081/admin/api/settings/reservations",
-          { headers: { Authorization: `Bearer ${auth.accessToken}` } }
+        setLoading(true);
+        const response = await axiosAuth.getActual(
+          `/api/admin/settings/reservations`
         );
-        setReservations(response.data);
+        setReservations(Array.isArray(response) ? response : []);
       } catch (error) {
         console.error("예약 목록 로딩 실패:", error);
-        if (
-          error.response &&
-          (error.response.status === 401 || error.response.status === 403)
-        ) {
-          alert("세션이 만료되었습니다. 로그인 페이지로 이동합니다.");
+        if (error.response?.status === 401 || error.response?.status === 403) {
+          navigate("/members/login");
         } else {
-          alert(
-            "예약 목록을 불러오는 데 실패했습니다. 서버 상태를 확인해주세요."
-          );
           setReservations([]);
         }
       } finally {
         setLoading(false);
       }
     };
-
     fetchReservations();
-  }, [auth]);
+  }, [auth, navigate]);
 
   const filteredReservations = reservations.filter(
     (res) =>
-      res.customer.includes(searchTerm) ||
-      res.car.includes(searchTerm) ||
-      res.userId.includes(searchTerm)
+      res.customer?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      res.car?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      res.userId?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleCancel = async (reservationNo) => {
-    if (!reservationNo) {
-      alert("취소 요청 ID가 유효하지 않습니다.");
+    if (!reservationNo) return;
+    if (!window.confirm(`예약번호 ${reservationNo}를 정말 취소하시겠습니까?`))
       return;
-    }
-    if (!window.confirm(`예약번호 ${reservationNo}를 정말 취소하시겠습니까?`)) {
-      return;
-    }
-
-    const token = auth?.accessToken;
-    if (!token) {
-      alert("인증 토큰이 유효하지 않아 취소할 수 없습니다.");
-      return;
-    }
 
     try {
-      const apiUrl = `http://localhost:8081/admin/api/settings/reservations/${String(
-        reservationNo
-      )}/cancel`;
-      const response = await axios.put(
-        apiUrl,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+      await axiosAuth.put(
+        `/api/admin/settings/reservations/${reservationNo}/cancel`
       );
-
-      if (response.status === 200 || response.status === 204) {
-        setReservations((prevReservations) =>
-          prevReservations.map((res) =>
-            res.reservationNo === reservationNo
-              ? { ...res, status: "취소됨" }
-              : res
-          )
-        );
-        alert(`예약번호 ${reservationNo}가 성공적으로 취소되었습니다.`);
-      } else {
-        alert(`취소 요청은 성공했으나 상태 업데이트에 문제가 발생했습니다.`);
-      }
+      setReservations((prev) =>
+        prev.map((res) =>
+          res.reservationNo === reservationNo
+            ? { ...res, status: "취소됨" }
+            : res
+        )
+      );
+      alert(`예약번호 ${reservationNo}가 취소되었습니다.`);
     } catch (error) {
-      console.error("예약 취소 실패:", error);
-      if (error.response) {
-        const status = error.response.status;
-        const serverMsg =
-          error.response.data.message || error.response.data || "서버 오류";
-
-        if (status === 404) {
-          alert(`취소 실패: ${serverMsg}`);
-        } else if (status === 401 || status === 403) {
-          alert("권한이 없거나 세션이 만료되었습니다.");
-          navigate("/members/login");
-        } else if (status >= 500) {
-          // 서버 내부 오류 (500)
-          alert(
-            `취소 처리 중 치명적인 서버 오류가 발생했습니다. (관리자 문의)`
-          );
-        } else {
-          alert(`취소 처리 중 오류가 발생했습니다. (오류: ${serverMsg})`);
-        }
-      } else {
-        alert(`네트워크 오류로 취소 요청에 실패했습니다.`);
-      }
-      const errorMessage =
-        error.response?.data?.message || error.response?.data || error.message;
-      alert(`취소 처리 중 오류가 발생했습니다. (오류 메시지: ${errorMessage})`);
+      alert(`취소 실패: ${error.response?.data?.message || "오류 발생"}`);
     }
   };
 
   return (
-    <div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "20px",
-        }}
-      >
-        <h2 style={{ color: "#6B4CE6", margin: 0 }}>Reservation List</h2>
-
-        <input
-          type="text"
-          placeholder="고객명, 차량, ID 검색..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          style={{
-            padding: "8px",
-            borderRadius: "4px",
-            border: "1px solid #ddd",
-            width: "250px",
-          }}
-        />
-      </div>
+    <S.Container>
+      <S.HeaderSection>
+        <S.TitleGroup>
+          <h2>Reservation Management</h2>
+          <p>차량 예약 및 이용 현황을 통합 관리합니다.</p>
+        </S.TitleGroup>
+        <S.SearchWrapper>
+          <FaSearch className="search-icon" />
+          <input
+            type="text"
+            placeholder="고객명, 차량명, ID 검색..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </S.SearchWrapper>
+      </S.HeaderSection>
 
       <S.TableContainer>
-        <S.Table>
+        <S.StyledTable>
           <thead>
             <tr>
-              <th>Customer</th>
-              <th>Cars</th>
-              <th>UserId</th>
-              <th>Phone</th>
-              <th>Period</th>
+              <th>
+                <FaUser className="th-icon" />
+                Customer
+              </th>
+              <th>
+                <FaCarSide className="th-icon" />
+                Car Info
+              </th>
+              <th>Contact</th>
+              <th>
+                <FaCalendarAlt className="th-icon" />
+                Period
+              </th>
               <th>Status</th>
               <th>Action</th>
             </tr>
@@ -199,84 +137,65 @@ const CarsReservation = () => {
           <tbody>
             {loading ? (
               <tr>
-                <td
-                  colSpan="7"
-                  style={{
-                    textAlign: "center",
-                    padding: "40px",
-                    color: "#666",
-                  }}
-                >
-                  데이터를 불러오는 중입니다...
+                <td colSpan="6">
+                  <S.StateMessage>데이터 로딩 중...</S.StateMessage>
                 </td>
               </tr>
             ) : filteredReservations.length === 0 ? (
               <tr>
-                <td
-                  colSpan="7"
-                  style={{
-                    textAlign: "center",
-                    padding: "40px",
-                    color: "#888",
-                  }}
-                >
-                  {searchTerm
-                    ? "검색 결과가 없습니다."
-                    : "예약 내역이 없습니다."}
+                <td colSpan="6">
+                  <S.StateMessage>조회된 내역이 없습니다.</S.StateMessage>
                 </td>
               </tr>
             ) : (
-              filteredReservations.map((res, index) => (
-                <tr key={res.reservationNo || index}>
+              filteredReservations.map((res) => (
+                <tr key={res.reservationNo}>
                   <td>
-                    <S.CustomerName>{res.customer}</S.CustomerName>
-                    <S.CustomerSub>
-                      {res.affiliation || "khacademy"}
-                    </S.CustomerSub>
+                    <S.CustomerInfo>
+                      <span className="name">{res.customer}</span>
+                      <span className="id">{res.userId}</span>
+                    </S.CustomerInfo>
                   </td>
-                  <td>{res.car}</td>
-                  <td>{res.userId}</td>
-                  <td>{res.phone}</td>
                   <td>
-                    <div style={{ fontSize: "13px", fontWeight: "500" }}>
-                      {res.start}
-                    </div>
-                    <div style={{ fontSize: "12px", color: "#888" }}>
-                      ~ {res.end}
-                    </div>
+                    <S.CarInfo>
+                      <span className="car-name">{res.car}</span>
+                      <span className="tag">
+                        {res.affiliation || "khacademy"}
+                      </span>
+                    </S.CarInfo>
                   </td>
-
+                  <td>
+                    <S.ContactInfo>
+                      <FaPhoneAlt size={11} /> {res.phone}
+                    </S.ContactInfo>
+                  </td>
+                  <td>
+                    <S.PeriodInfo>
+                      <div className="start">{res.start}</div>
+                      <div className="end">~ {res.end}</div>
+                    </S.PeriodInfo>
+                  </td>
                   <td>
                     <StatusBadge status={res.status} />
                   </td>
-
                   <td>
-                    {res.status === "예약완료" ? (
-                      <button
+                    {["예약완료", "연체중"].includes(res.status) ? (
+                      <S.CancelButton
                         onClick={() => handleCancel(res.reservationNo)}
-                        style={{
-                          border: "1px solid #EF4444",
-                          color: "#EF4444",
-                          background: "white",
-                          borderRadius: "4px",
-                          padding: "4px 8px",
-                          cursor: "pointer",
-                          fontSize: "12px",
-                        }}
                       >
-                        취소
-                      </button>
+                        예약 취소
+                      </S.CancelButton>
                     ) : (
-                      <span style={{ color: "#ccc", fontSize: "12px" }}>-</span>
+                      <S.DisabledText>-</S.DisabledText>
                     )}
                   </td>
                 </tr>
               ))
             )}
           </tbody>
-        </S.Table>
+        </S.StyledTable>
       </S.TableContainer>
-    </div>
+    </S.Container>
   );
 };
 
