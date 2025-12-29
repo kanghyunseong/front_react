@@ -2,12 +2,12 @@ import axios from "axios";
 const API = window.ENV?.API_URL || "http://localhost:8081";
 // 1. 공통 인스턴스 설정
 const axiosAuthInstance = axios.create({
-  baseURL: API,
-  headers: { "Content-Type": "application/json" },
+  baseURL: API
 });
 axiosAuthInstance.interceptors.request.use(
   (config) => {
     const accessToken = localStorage.getItem("accessToken");
+    console.log(accessToken);
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
@@ -15,9 +15,9 @@ axiosAuthInstance.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
+
 const axiosPublicInstance = axios.create({
-  baseURL: API,
-  headers: { "Content-Type": "application/json" },
+  baseURL: API
 });
 /**
  * [알맹이 추출용 함수]
@@ -36,6 +36,12 @@ export const axiosAuth = {
   // 결과: [ ... ] 또는 { totalActiveUsers: 21, ... }
   getActual: (url) => axiosAuthInstance.get(url).then(unwrap),
   // 생성 (FormData 지원 + 전체 응답 반환)
+
+  createReserve: (url, obj) => {
+    return axiosAuthInstance.post(url, obj, {headers: { "Content-Type": "application/json" },})
+    .then((res) => ({...res.data}));
+  },
+
   create: (url, obj, file) => {
     const formData = new FormData();
     if (obj) Object.keys(obj).forEach((key) => formData.append(key, obj[key]));
@@ -49,6 +55,10 @@ export const axiosAuth = {
   // 수정 (PUT)
   put: (url, data = {}) =>
     axiosAuthInstance.put(url, data).then((res) => ({ ...res.data })),
+
+  putReserve: (url, data = {}) =>
+    axiosAuthInstance.put(url, data, {headers: { "Content-Type": "application/json" }}).then((res) => ({...res.data})),
+
   // 삭제 (DELETE)
   delete: (url, pk) =>
     axiosAuthInstance

@@ -17,6 +17,7 @@ import {
 } from "../Cars/CarsUsageHistory.style";
 import axios from "axios";
 import { AuthContext } from "../../context/AuthContext";
+import { axiosAuth } from "../../api/reqService";
 
 const CarsUsageHistory = () => {
   const { auth } = useContext(AuthContext);
@@ -24,13 +25,10 @@ const CarsUsageHistory = () => {
   const [reservation, setReservation] = useState([]);
   const [visibleCount, setVisibleCount] = useState(5);
   const [loading, setLoading] = useState(true);
-  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
+
   useEffect(() => {
     setLoading(true);
-    axios
-      .get(`${apiUrl}/reserve/history`, {
-        headers: { Authorization: `Bearer ${auth.accessToken}` },
-      })
+    axiosAuth.getList("/api/reserve/history")
       .then((result) => {
         console.log(result.data);
         setReservation(result.data);

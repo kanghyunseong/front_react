@@ -29,6 +29,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../../context/AuthContext";
 import ReviewChangeModal from "./ReviewChangeModal";
+import { axiosAuth, axiosPublic } from "../../api/reqService";
 
 const CarsDetail = () => {
   const { auth } = useContext(AuthContext);
@@ -40,29 +41,26 @@ const CarsDetail = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedReview, setSelectedReview] = useState(null);
   const [refresh, setRefresh] = useState(0);
-  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
+
   // 차량 정보 가져오기
   useEffect(() => {
-    axios
-      .get(`${apiUrl}/cars/${carId}`)
+    axiosPublic.getList(`/api/cars/${carId}`)
       .then((result) => {
-        console.log(result);
+
         setCar(result.data[0]);
         isLoad(true);
       })
       .catch((err) => {
         console.log(err);
-        alert(err.response.data["error-message"]);
-        navi("/cars/searchList");
+        alert(err.response.data.data["error-message"]);
+        navi("/api/cars/searchList");
       });
   }, [carId, refresh]);
 
   // 리뷰 가져오기
   useEffect(() => {
-    axios
-      .get(`${apiUrl}/reviews/${carId}`)
+    axiosPublic.getList(`/api/reviews/${carId}`)
       .then((result) => {
-        console.log(result);
         setReviews(result.data);
         isLoad(true);
       })
@@ -73,10 +71,7 @@ const CarsDetail = () => {
 
   // 리뷰 수정하기
   const reviewUpdate = (updatedData) => {
-    axios
-      .put(`${apiUrl}/reviews`, updatedData, {
-        headers: { Authorization: `Bearer ${auth.accessToken}` },
-      })
+    axiosAuth.putReserve("/api/reviews", updatedData)
       .then((result) => {
         console.log(result);
         alert("리뷰변경을 성공했습니다.");
@@ -92,10 +87,7 @@ const CarsDetail = () => {
   // 리뷰 삭제하기
   const reviewDelete = (reviewNo) => {
     if (!confirm("리뷰를 삭제하시겠습니까?")) return;
-    axios
-      .delete(`${apiUrl}/reviews/${reviewNo}`, {
-        headers: { Authorization: `Bearer ${auth.accessToken}` },
-      })
+    axiosAuth.delete(`/api/reviews/${reviewNo}`)
       .then((result) => {
         console.log(result);
         setRefresh((prev) => prev + 1);

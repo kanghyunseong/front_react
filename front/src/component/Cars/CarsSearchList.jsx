@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import SideBar from "../Common/Sidebar/Sidebar";
 import {
   MainContainer,
@@ -26,7 +25,7 @@ import {
   DetailButton,
   LoadMoreButton,
 } from "./CarsSearchList.style";
-import { axiosPublic } from "../../api/reqService";
+import { axiosAuth, axiosPublic } from "../../api/reqService";
 
 const CarsSearchList = () => {
   const navi = useNavigate();
@@ -37,19 +36,19 @@ const CarsSearchList = () => {
   const [mains, setMains] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [randomCar, setRandomCar] = useState(null);
-  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
+
   // 메인페이지 정보 가져오기
   useEffect(() => {
-    axios
-      .get(`${apiUrl}/main`)
+
+    axiosPublic.getList("/main")
       .then((res) => {
-        setMains(res.data.data);
+        setMains(res.data);
         // popularCars 배열에서 랜덤으로 하나 선택
         if (res.data.popularCars && res.data.popularCars.length > 0) {
           const randomIndex = Math.floor(
             Math.random() * res.data.popularCars.length
           );
-          setRandomCar(res.data.data.popularCars[randomIndex]);
+          setRandomCar(res.data.popularCars[randomIndex]);
         }
       })
       .catch((err) => {
@@ -60,15 +59,10 @@ const CarsSearchList = () => {
   // 차량 목록 가져오기
   useEffect(() => {
     setIsLoading(true);
-    // axios
-    //   .get(`${apiUrl}/cars?page=${currentPage}`)
-    axiosPublic.getList(`/cars?page=${currentPage}`)
+    axiosPublic.getList(`/api/cars?page=${currentPage}`)
       .then((response) => {
-        console.log(response);
-        
         const newCars = response.data;
       
-
         if (!newCars || newCars.length === 0) {
           setHasMore(false);
           return;

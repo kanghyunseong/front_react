@@ -21,6 +21,7 @@ import {
   CarDetailInfo,
   CarDetailItem,
 } from "./CarsReviewForm.style";
+import { axiosAuth, axiosPublic } from "../../api/reqService";
 
 const CarsReviewForm = () => {
   const { carId } = useParams();
@@ -31,11 +32,12 @@ const CarsReviewForm = () => {
   const maxLength = 500;
   const [searchParams] = useSearchParams();
   const reservationNo = searchParams.get("reservationNo");
-  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
+
   // 차량 정보 가져오기
   useEffect(() => {
-    axios
-      .get(`${apiUrl}/cars/${carId}`)
+    // axios
+    //   .get(`${apiUrl}/cars/${carId}`)
+    axiosPublic.getList(`/api/cars/${carId}`)
       .then((result) => {
         console.log(result);
         setCar(result.data[0]);
@@ -58,20 +60,27 @@ const CarsReviewForm = () => {
       return;
     }
 
-    axios
-      .post(
-        `${apiUrl}/reviews`,
-        {
-          refCarId: carId,
-          reservationNo: reservationNo,
-          reviewContent: reviewContent,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${auth.accessToken}`,
-          },
-        }
-      )
+    // axios
+    //   .post(
+    //     `${apiUrl}/reviews`,
+    //     {
+    //       refCarId: carId,
+    //       reservationNo: reservationNo,
+    //       reviewContent: reviewContent,
+    //     },
+    //     {
+    //       headers: {
+    //         Authorization: `Bearer ${auth.accessToken}`,
+    //       },
+    //     }
+    //   )
+    axiosAuth.createReserve("/api/reviews", 
+      {
+        refCarId: carId,
+        reservationNo: reservationNo,
+        reviewContent: reviewContent
+    },
+  )
       .then((result) => {
         console.log(result);
         alert("리뷰가 등록되었습니다.");
