@@ -90,7 +90,6 @@ const CarsSearchList = () => {
           setHasMore(false);
         } else {
           setErrMsg(errorMessage || "오류가 발생했습니다");
-          console.error("차량 목록 로드 실패:", err);
         }
       })
       .finally(() => {

@@ -60,15 +60,13 @@ const CarReservationForm = () => {
       return;
     }
 
-    axiosAuth.createReserve("/api/reserve",  {carId, startTime, endTime, destination})
+    axiosAuth.createJson("/api/reserve",  {carId, startTime, endTime, destination})
       .then((res) => {
-        console.log("전체 응답:", res.data);
         const reservationNo = res.data;
         navi(`/cars/reserve/${reservationNo}/confirm`);
       })
       .catch((err) => {
-        console.error(err);
-        alert("예약에 실패했습니다.");
+        alert((err.response?.data["error-message"]));
       });
   };
 

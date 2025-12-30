@@ -52,24 +52,19 @@ const CarsReservationChange = () => {
 
   const handleCancel = (reservationNo) => {
     if (!confirm("예약을 취소하시겠습니까?")) return;
-    axios
-      .delete(`${apiUrl}/reserve/${reservationNo}`, {
-        headers: { Authorization: `Bearer ${auth.accessToken}` },
-      })
+    axiosAuth.delete(`/api/reserve/${reservationNo}`)
       .then((result) => {
         console.log(result);
+        alert(result?.data);
         setRefresh((prev) => prev + 1);
       })
       .catch((err) => {
-        console.log(err);
+        alert(err?.response.data["error-message"]);
       });
   };
 
   const handleChange = (updatedData) => {
-    axios
-      .put(`${apiUrl}/reserve/change`, updatedData, {
-        headers: { Authorization: `Bearer ${auth.accessToken}` },
-      })
+    axiosAuth.putReserve("/api/reserve/change", updatedData)
       .then((result) => {
         console.log(result);
         alert("예약변경을 성공했습니다.");

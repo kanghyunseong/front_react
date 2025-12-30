@@ -37,7 +37,7 @@ export const axiosAuth = {
   getActual: (url) => axiosAuthInstance.get(url).then(unwrap),
   // 생성 (FormData 지원 + 전체 응답 반환)
 
-  createReserve: (url, obj) => {
+  createJson: (url, obj) => {
     return axiosAuthInstance.post(url, obj, {headers: { "Content-Type": "application/json" },})
     .then((res) => ({...res.data}));
   },
