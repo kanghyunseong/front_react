@@ -1,52 +1,90 @@
-import styled, { keyframes } from "styled-components";
+import styled, { keyframes, css } from "styled-components";
 
+// --- 애니메이션 정의 ---
 const fadeIn = keyframes`
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 `;
 
+const softPulse = keyframes`
+  0% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.05); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+`;
+
+const blink = keyframes`
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1); }
+`;
+
+const slideInRight = keyframes`
+  from { transform: translateX(30px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+`;
+
+const pulseRed = keyframes`
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+`;
+
+// --- 컨테이너 및 헤더 ---
 export const Container = styled.div`
   padding: 40px;
-  background-color: #f4f7fa;
+  background-color: #f8fafc;
   min-height: 100vh;
   font-family: "Pretendard", -apple-system, sans-serif;
-  animation: ${fadeIn} 0.5s ease-out;
+  animation: ${fadeIn} 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
 `;
 
 export const PageHeader = styled.div`
   margin-bottom: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
 `;
 
 export const PageTitle = styled.h2`
-  font-size: 26px;
-  font-weight: 800;
-  color: #1a202c;
+  font-size: 28px;
+  font-weight: 900;
+  color: #0f172a;
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 8px;
-
   &::before {
     content: "";
-    width: 5px;
-    height: 24px;
-    background: #6c5ce7;
-    border-radius: 4px;
+    width: 6px;
+    height: 28px;
+    background: linear-gradient(to bottom, #6366f1, #a855f7);
+    border-radius: 10px;
   }
 `;
 
-export const LastUpdated = styled.span`
+export const LastUpdated = styled.div`
   font-size: 13px;
-  color: #a0aec0;
-  font-weight: 500;
+  color: #94a3b8;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  &::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    background: #22c55e;
+    border-radius: 50%;
+    animation: ${blink} 1.5s infinite ease-in-out;
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+  }
 `;
 
+// --- 상단 통계 카드 섹션 ---
 export const StatRow = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
+  gap: 20px;
   margin-bottom: 32px;
-
   @media (max-width: 1200px) {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -56,66 +94,76 @@ export const StatRow = styled.div`
 `;
 
 export const StatCard = styled.div`
-  background: #ffffff;
+  background: white;
   padding: 24px;
   border-radius: 24px;
+  border: 1px solid #f1f5f9;
   display: flex;
   align-items: center;
-  gap: 18px;
-  border: 1px solid ${(props) => (props.$isWarning ? "#feb2b2" : "#edf2f7")};
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  gap: 20px;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  ${(props) =>
+    props.$isWarning &&
+    css`
+      border-color: #fecaca;
+      background: #fffafb;
+      animation: ${pulseRed} 2s infinite;
+    `}
 
   &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.08);
+    transform: translateY(-8px);
+    border-color: ${(props) => (props.$isWarning ? "#f56565" : "#6366f1")};
+    box-shadow: 0 20px 25px -5px ${(props) => (props.$isWarning ? "rgba(248, 113, 113, 0.15)" : "rgba(99, 102, 241, 0.15)")};
   }
 `;
 
 export const IconWrapper = styled.div`
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
+  width: 60px;
+  height: 60px;
+  border-radius: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
-  background: ${(props) => (props.$isWarning ? "#fff5f5" : "#f0f5ff")};
-  color: ${(props) => (props.$isWarning ? "#f56565" : "#6c5ce7")};
+  font-size: 26px;
+  background: ${(props) => (props.$isWarning ? "#fee2e2" : "#eef2ff")};
+  color: ${(props) => (props.$isWarning ? "#ef4444" : "#6366f1")};
+  transition: transform 0.3s;
+  ${StatCard}:hover & {
+    transform: scale(1.1) rotate(-5deg);
+  }
 `;
 
 export const StatContent = styled.div`
   .label {
-    font-size: 13px;
-    color: #718096;
+    font-size: 14px;
+    color: #64748b;
     font-weight: 600;
-    margin-bottom: 4px;
   }
   .value-group {
-    display: flex;
-    align-items: baseline;
-    gap: 4px;
+    margin: 4px 0;
     .value {
-      font-size: 24px;
+      font-size: 28px;
       font-weight: 800;
-      color: #1a202c;
+      color: #1e293b;
     }
     .unit {
       font-size: 14px;
-      font-weight: 600;
-      color: #718096;
+      margin-left: 4px;
+      color: #94a3b8;
+      font-weight: 700;
     }
   }
   .desc {
     font-size: 11px;
-    color: #a0aec0;
-    margin-top: 2px;
+    color: #cbd5e1;
   }
 `;
 
+// --- 메인 그리드 레이아웃 ---
 export const MainGrid = styled.div`
   display: grid;
-  grid-template-columns: 1.5fr 1fr;
+  grid-template-columns: 1.6fr 1fr;
   gap: 24px;
   @media (max-width: 1024px) {
     grid-template-columns: 1fr;
@@ -129,96 +177,104 @@ export const SideColumn = styled.div`
 `;
 
 export const Card = styled.div`
-  background: #ffffff;
-  padding: 30px;
-  border-radius: 28px;
-  border: 1px solid #edf2f7;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+  background: white;
+  padding: 32px;
+  border-radius: 32px;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
 `;
 
 export const CardHeader = styled.div`
   margin-bottom: 24px;
   h3 {
-    font-size: 18px;
-    font-weight: 700;
-    color: #2d3748;
+    font-size: 19px;
+    font-weight: 800;
+    color: #1e293b;
     display: flex;
     align-items: center;
     gap: 10px;
+    svg {
+      color: #6366f1;
+    }
     span {
-      font-size: 12px;
-      color: #cbd5e0;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      font-size: 11px;
+      color: #94a3b8;
+      background: #f1f5f9;
+      padding: 2px 8px;
+      border-radius: 20px;
     }
   }
 `;
 
+// --- 차트 및 도넛 중앙 ---
 export const ChartContainer = styled.div`
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: 10px 0;
+  position: relative;
 `;
 
 export const ChartWrapper = styled.div`
-  position: relative;
-  height: 280px;
+  height: 300px;
   width: 100%;
-  max-width: 400px;
+  max-width: 450px;
+  position: relative;
 `;
 
 export const DonutCenter = styled.div`
   position: absolute;
-  top: 42%; /* 범례가 아래로 갔으므로 중앙 조정 */
+  top: 43%; /* 도넛 높이에 맞춰 소폭 조정 */
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
+  animation: ${softPulse} 3s ease-in-out infinite;
   pointer-events: none;
-
   .num {
-    font-size: 38px;
+    font-size: 44px;
     font-weight: 900;
-    color: #1a202c;
+    background: linear-gradient(135deg, #1e293b 0%, #6366f1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     line-height: 1;
   }
   .label {
-    font-size: 12px;
-    color: #a0aec0;
-    font-weight: 700;
-    margin-top: 6px;
+    font-size: 11px;
+    color: #94a3b8;
+    font-weight: 800;
     text-transform: uppercase;
+    margin-top: 4px;
   }
 `;
 
+// --- 배터리 및 액션 카드 ---
 export const BatteryProgress = styled.div`
-  margin-bottom: 20px;
-  &:last-child {
-    margin-bottom: 0;
-  }
-
+  margin-bottom: 22px;
+  animation: ${slideInRight} 0.5s ease-out both;
+  animation-delay: ${(props) => props.$idx * 0.1}s;
   .label-group {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 8px;
+    align-items: center;
+    margin-bottom: 10px;
     .car-name {
       font-weight: 700;
       font-size: 14px;
-      color: #4a5568;
+      color: #334155;
     }
     .battery-val {
       font-weight: 800;
-      font-size: 14px;
-      color: #2d3748;
+      font-size: 12px;
+      color: #6366f1;
+      background: #f5f3ff;
+      padding: 2px 8px;
+      border-radius: 6px;
     }
   }
 `;
 
 export const ProgressBar = styled.div`
-  height: 8px;
-  background: #edf2f7;
-  border-radius: 10px;
+  height: 10px;
+  background: #f1f5f9;
+  border-radius: 20px;
   overflow: hidden;
 `;
 
@@ -226,31 +282,43 @@ export const ProgressFill = styled.div`
   height: 100%;
   width: ${(props) => props.$width}%;
   background: ${(props) =>
-    props.$width < 20
-      ? "linear-gradient(90deg, #f56565, #fc8181)"
+    props.$width < 25
+      ? "linear-gradient(90deg, #ef4444, #f87171)"
       : props.$width < 50
-      ? "linear-gradient(90deg, #ed8936, #f6ad55)"
-      : "linear-gradient(90deg, #48bb78, #68d391)"};
-  border-radius: 10px;
-  transition: width 1.5s cubic-bezier(0.1, 0, 0.2, 1);
+      ? "linear-gradient(90deg, #f59e0b, #fbbf24)"
+      : "linear-gradient(90deg, #10b981, #34d399)"};
+  border-radius: 20px;
+  transition: width 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 `;
 
 export const ActionCard = styled(Card)`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #ffffff;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  color: white;
   border: none;
+  overflow: hidden;
+  position: relative;
+  &::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 200px;
+    height: 200px;
+    background: rgba(99, 102, 241, 0.15);
+    filter: blur(50px);
+    border-radius: 50%;
+  }
   h3 {
-    color: #ffffff;
-    margin-bottom: 16px;
+    color: white;
   }
   p {
     font-size: 14px;
-    opacity: 0.9;
-    line-height: 1.6;
+    opacity: 0.8;
+    line-height: 1.7;
     margin-bottom: 24px;
     strong {
+      color: #818cf8;
       font-weight: 800;
-      text-decoration: underline;
     }
   }
 `;
@@ -258,41 +326,58 @@ export const ActionCard = styled(Card)`
 export const ActionButton = styled.button`
   width: 100%;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.15);
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(4px);
-  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 18px;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-
   &:hover {
-    background: #ffffff;
-    color: #667eea;
-    transform: scale(1.02);
+    background: white;
+    color: #1e293b;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  }
+`;
+
+export const LoadingWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  gap: 20px;
+  color: #6366f1;
+  font-weight: 800;
+  &::after {
+    content: "";
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f1f5f9;
+    border-top-color: #6366f1;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 `;
 
 export const EmptyState = styled.div`
   text-align: center;
-  padding: 40px;
+  padding: 40px 20px;
   color: #a0aec0;
-  font-weight: 500;
   font-size: 14px;
-`;
-
-export const LoadingWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  font-size: 18px;
-  font-weight: 700;
-  color: #6c5ce7;
-  letter-spacing: 1px;
+  background: #fcfcfd;
+  border: 1px dashed #e2e8f0;
+  border-radius: 20px;
+  margin-top: 10px;
 `;

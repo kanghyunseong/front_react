@@ -31,6 +31,7 @@ import {
   SectionTitle,
   RightInfo,
 } from "./UserChart.styles";
+import { ChartContainer } from "./UserStatsBarChart.styles";
 
 ChartJS.register(
   CategoryScale,
@@ -172,7 +173,7 @@ const UserChart = () => {
   );
 
   return (
-    <Container>
+    <ChartContainer>
       <InfoSection>
         <div>
           <ButtonContainer>
@@ -193,7 +194,7 @@ const UserChart = () => {
       <ChartSection>
         <Line data={data} options={options} />
       </ChartSection>
-    </Container>
+    </ChartContainer>
   );
 };
 

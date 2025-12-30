@@ -38,7 +38,7 @@ const CarsOverview = () => {
         console.error("Data loading failed", error);
         setCars([]);
       } finally {
-        setLoading(false);
+        setTimeout(() => setLoading(false), 600); // 부드러운 전환 효과
       }
     };
     fetchAllCars();
@@ -80,10 +80,10 @@ const CarsOverview = () => {
             ["N", "이용중"].includes(c.carStatus || c.CARSTATUS)
           ).length,
         ],
-        backgroundColor: ["#00d1b2", "#6c5ce7"],
-        hoverOffset: 12,
+        backgroundColor: ["#10b981", "#6366f1"],
+        hoverOffset: 20,
         borderWidth: 0,
-        cutout: "80%",
+        borderRadius: 5,
       },
     ],
   };
@@ -95,7 +95,8 @@ const CarsOverview = () => {
     )
     .slice(0, 4);
 
-  if (loading) return <S.LoadingWrapper>분석 중입니다...</S.LoadingWrapper>;
+  if (loading)
+    return <S.LoadingWrapper>운영 데이터를 분석 중입니다...</S.LoadingWrapper>;
 
   return (
     <S.Container>
@@ -124,14 +125,14 @@ const CarsOverview = () => {
           label="평균 전비"
           value={summary.avgEff}
           sub="km/kWh"
-          desc="성능 최적화 상태"
+          desc="최적 성능 기준"
         />
         <StatItem
           icon={<FaExclamationTriangle />}
           label="정비 필요"
           value={summary.maintenanceCount}
           sub="대"
-          desc="정비 필요 차량"
+          desc="즉시 점검 권고"
           isWarning={summary.maintenanceCount > 0}
         />
       </S.StatRow>
@@ -149,21 +150,29 @@ const CarsOverview = () => {
                 data={statusData}
                 options={{
                   maintainAspectRatio: false,
+                  cutout: "84%",
                   plugins: {
                     legend: {
                       position: "bottom",
                       labels: {
                         usePointStyle: true,
-                        font: { size: 13, weight: "600" },
-                        padding: 20,
+                        padding: 30,
+                        font: { size: 12, weight: "700", family: "Pretendard" },
                       },
+                    },
+                    tooltip: {
+                      backgroundColor: "#1e293b",
+                      padding: 12,
+                      cornerRadius: 10,
+                      titleFont: { size: 14 },
+                      bodyFont: { size: 13 },
                     },
                   },
                 }}
               />
               <S.DonutCenter>
                 <div className="num">{summary.total}</div>
-                <div className="label">Total Units</div>
+                <div className="label">Units</div>
               </S.DonutCenter>
             </S.ChartWrapper>
           </S.ChartContainer>
@@ -177,10 +186,13 @@ const CarsOverview = () => {
               </h3>
             </S.CardHeader>
             {lowBatteryCars.length === 0 ? (
-              <S.EmptyState>모든 차량의 충전 상태가 양호합니다.</S.EmptyState>
+              <S.EmptyState>
+                <div style={{ fontSize: "24px", marginBottom: "8px" }}>✅</div>
+                모든 차량의 충전 상태가 양호합니다.
+              </S.EmptyState>
             ) : (
               lowBatteryCars.map((car, idx) => (
-                <S.BatteryProgress key={idx}>
+                <S.BatteryProgress key={idx} $idx={idx}>
                   <div className="label-group">
                     <span className="car-name">
                       {car.carName || car.CARNAME}
@@ -198,11 +210,11 @@ const CarsOverview = () => {
           </S.Card>
 
           <S.ActionCard>
-            <h3>Quick Action</h3>
+            <h3>Operational Insights</h3>
             <p>
-              현재 <strong>{summary.maintenanceCount}대</strong>의 차량이 정비
-              상태로 확인됩니다. 운영 효율 향상을 위해 관리 센터에서 상세 상태를
-              확인하세요.
+              현재 <strong>{summary.maintenanceCount}대</strong>의 차량이 점검
+              대기 중입니다. 안정적인 셰어링 운영을 위해 상세 점검 이력을 확인해
+              주세요.
             </p>
             <S.ActionButton onClick={() => navigate("/admin/cars/settings")}>
               관리 센터 바로가기 <FaChevronRight />

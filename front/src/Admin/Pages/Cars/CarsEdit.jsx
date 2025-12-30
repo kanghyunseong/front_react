@@ -6,6 +6,7 @@ import {
   FaCar,
   FaBatteryFull,
   FaArrowLeft,
+  FaEdit,
 } from "react-icons/fa";
 import axios from "axios";
 import * as S from "./CarEdit.styles";
@@ -17,7 +18,6 @@ const CarsEdit = () => {
   const { auth } = useContext(AuthContext);
   const { carId } = useParams();
 
-  // Form States
   const [formData, setFormData] = useState({
     carName: "",
     km: "",
@@ -36,17 +36,14 @@ const CarsEdit = () => {
 
   const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
-  // 한글 포함 정확한 바이트 계산
-
   const getByteLength = useCallback((s) => {
     if (!s) return 0;
     return s.split("").reduce((acc, char) => {
       const code = char.charCodeAt(0);
-      return acc + (code >> 7 ? 3 : 1); // 한글 3바이트, 영문/숫자 1바이트 기준
+      return acc + (code >> 7 ? 3 : 1);
     }, 0);
   }, []);
 
-  // 초기 데이터 로딩
   useEffect(() => {
     if (!carId || !auth?.accessToken) return;
 
@@ -79,51 +76,40 @@ const CarsEdit = () => {
           );
         }
       } catch (err) {
-        console.error("❌ 상세 정보 로딩 실패:", err);
-        alert(
-          err.response?.status === 401
-            ? "세션이 만료되었습니다."
-            : "정보를 불러올 수 없습니다."
-        );
+        alert("정보를 불러올 수 없습니다.");
         navigate("/admin/cars/settings");
       } finally {
-        setLoading(false);
+        setTimeout(() => setLoading(false), 500); // 부드러운 전환을 위한 아주 짧은 지연
       }
     };
 
     fetchCarData();
   }, [carId, auth, navigate, apiUrl, getByteLength]);
 
-  // 주행 가능 거리 자동 계산
   useEffect(() => {
     const bat = parseFloat(formData.battery);
     const eff = parseFloat(formData.efficiency);
     if (!isNaN(bat) && !isNaN(eff) && bat > 0 && eff > 0) {
-      setRange(Math.round(bat * eff).toString());
+      setRange(Math.round(bat * eff).toLocaleString());
     } else {
       setRange("0");
     }
   }, [formData.battery, formData.efficiency]);
 
-  // 핸들러 함수들
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     if (name === "carContent") {
       const currentByte = getByteLength(value);
       if (currentByte > 4000) return;
       setByteCount(currentByte);
     }
-
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
-      // 메모리 누수 방지: 이전 프리뷰 URL 해제
       if (preview && preview.startsWith("blob:")) URL.revokeObjectURL(preview);
-
       setFile(selectedFile);
       setPreview(URL.createObjectURL(selectedFile));
     }
@@ -135,7 +121,6 @@ const CarsEdit = () => {
 
     const submitData = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
-      // 서버 필드명에 맞춰 변환 (예: km -> carDriving)
       const fieldName =
         key === "km"
           ? "carDriving"
@@ -159,18 +144,12 @@ const CarsEdit = () => {
       alert("차량 정보가 성공적으로 수정되었습니다.");
       navigate("/admin/cars/settings");
     } catch (err) {
-      alert(
-        err.response?.status === 401
-          ? "인증 오류가 발생했습니다."
-          : "수정에 실패했습니다."
-      );
+      alert("수정에 실패했습니다.");
     }
   };
 
   if (loading)
-    return (
-      <S.LoadingWrapper>차량 정보를 불러오는 중입니다...</S.LoadingWrapper>
-    );
+    return <S.LoadingWrapper>차량 정보를 불러오는 중입니다</S.LoadingWrapper>;
 
   return (
     <S.PageWrapper>
@@ -193,6 +172,7 @@ const CarsEdit = () => {
             <S.Label>Car Name</S.Label>
             <S.Input
               name="carName"
+              placeholder="예: 아이오닉 5"
               value={formData.carName}
               onChange={handleChange}
             />
@@ -202,6 +182,7 @@ const CarsEdit = () => {
             <S.Input
               type="number"
               name="km"
+              placeholder="누적 주행거리"
               value={formData.km}
               onChange={handleChange}
             />
@@ -258,31 +239,43 @@ const CarsEdit = () => {
           <S.RangeDisplay>
             <span className="val">{range}</span>
             <span className="unit">Km 주행 가능</span>
-            <FaInfoCircle className="info-icon" />
+            <FaInfoCircle
+              className="info-icon"
+              title="배터리 용량 × 전비로 계산된 수치입니다."
+            />
           </S.RangeDisplay>
         </S.FullWidthBox>
 
-        <S.FullWidthBox style={{ marginTop: "24px" }}>
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <S.Label>Car Description</S.Label>
-            <S.ByteInfo $error={byteCount > 4000}>
-              {byteCount} / 4000 Bytes
+        <S.FullWidthBox style={{ marginTop: "32px" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "8px",
+            }}
+          >
+            <S.Label>
+              <FaEdit style={{ marginRight: "6px" }} /> Car Description
+            </S.Label>
+            <S.ByteInfo $error={byteCount > 3800}>
+              <strong>{byteCount.toLocaleString()}</strong> / 4,000 Bytes
             </S.ByteInfo>
           </div>
           <S.TextArea
             name="carContent"
+            placeholder="차량의 상세 특징과 옵션 정보를 입력해주세요."
             value={formData.carContent}
             onChange={handleChange}
-            $error={byteCount > 4000}
+            $error={byteCount > 3800}
           />
         </S.FullWidthBox>
 
-        <S.SectionTitle style={{ marginTop: "32px" }}>
+        <S.SectionTitle style={{ marginTop: "40px" }}>
           <FaCloudUploadAlt /> 이미지 관리
         </S.SectionTitle>
         <S.UploadBox
           onClick={() => document.getElementById("carImgInput").click()}
-          $hasPreview={!!preview}
         >
           <input
             type="file"
@@ -294,12 +287,13 @@ const CarsEdit = () => {
           {preview ? (
             <div className="preview-container">
               <img src={preview} alt="preview" />
-              <div className="overlay">이미지 교체하기</div>
+              <div className="overlay">클릭하여 이미지 교체</div>
             </div>
           ) : (
             <div className="upload-placeholder">
-              <FaCloudUploadAlt size={40} />
-              <p>변경할 이미지를 업로드하세요</p>
+              <FaCloudUploadAlt />
+              <p>차량 이미지 업로드</p>
+              <span>권장 사이즈: 1200 x 800 (px)</span>
             </div>
           )}
         </S.UploadBox>

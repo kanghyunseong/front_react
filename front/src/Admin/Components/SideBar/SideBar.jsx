@@ -46,7 +46,12 @@ const SideBar = () => {
     }
   };
 
-  // 현재 경로가 특정 메뉴군에 속하는지 확인하는 함수
+  const handleNavi = () => {
+    if (window.confirm("관리자 페이지에서 메인 페이지로 이동하시겠습니까?")) {
+      navigate("/");
+    }
+  };
+
   const isParentActive = (pathPart) => location.pathname.includes(pathPart);
 
   return (
@@ -64,7 +69,6 @@ const SideBar = () => {
       </S.UserInfoArea>
 
       <S.Menu>
-        {/* Home */}
         <S.MenuItem
           $active={location.pathname === "/admin"}
           onClick={() => handleNavigation("/admin")}
@@ -74,7 +78,6 @@ const SideBar = () => {
           </div>
         </S.MenuItem>
 
-        {/* Cars */}
         <S.MenuItem
           $active={isParentActive("/cars")}
           onClick={() => toggleMenu("cars")}
@@ -105,7 +108,6 @@ const SideBar = () => {
           </S.SubMenu>
         )}
 
-        {/* Community */}
         <S.MenuItem
           $active={isParentActive("/community")}
           onClick={() => toggleMenu("community")}
@@ -139,7 +141,6 @@ const SideBar = () => {
           </S.SubMenu>
         )}
 
-        {/* Environments */}
         <S.MenuItem
           $active={isParentActive("/enviroments")}
           onClick={() => toggleMenu("environments")}
@@ -165,7 +166,6 @@ const SideBar = () => {
           </S.SubMenu>
         )}
 
-        {/* Users */}
         <S.MenuItem
           $active={isParentActive("/user")}
           onClick={() => toggleMenu("users")}
@@ -191,6 +191,10 @@ const SideBar = () => {
       <S.LogoutButton onClick={handleLogout}>
         <FaSignOutAlt />
         <span>Exit Admin Mode</span>
+      </S.LogoutButton>
+      <S.LogoutButton onClick={handleNavi}>
+        <FaSignOutAlt />
+        <span>Exit Admin Page</span>
       </S.LogoutButton>
     </S.SideBarContainer>
   );

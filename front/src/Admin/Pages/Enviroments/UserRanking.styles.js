@@ -1,61 +1,114 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
+
+const fadeInUp = keyframes`
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+`;
 
 export const Container = styled.div`
-  padding: 32px;
-  background-color: #fcfcfd;
+  padding: 40px;
+  background-color: #f8fafc;
   min-height: 100vh;
-  font-family: "Inter", -apple-system, sans-serif;
+  font-family: "Pretendard", -apple-system, sans-serif;
 `;
 
 export const TitleArea = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 40px;
+  margin-bottom: 32px;
   h2 {
-    font-size: 24px;
+    font-size: 26px;
     font-weight: 800;
-    color: #111827;
+    color: #1e293b;
+    margin-bottom: 8px;
+  }
+  p {
+    color: #64748b;
+    font-size: 14px;
   }
 `;
 
-export const HeaderStats = styled.div`
+export const TopCardsSection = styled.div`
   display: flex;
-  gap: 24px;
-  .stat-item {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    .label {
-      font-size: 12px;
-      color: #6b7280;
-      margin-bottom: 2px;
-    }
-    .value {
-      font-size: 14px;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 20px;
+  margin-bottom: 48px;
+  flex-wrap: wrap;
+`;
+
+export const RankingCard = styled.div`
+  background: white;
+  padding: 24px;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04);
+  width: 240px;
+  animation: ${fadeInUp} 0.5s ease-out;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08);
+  }
+
+  .rank-badge {
+    font-size: 24px;
+    margin-bottom: 12px;
+  }
+
+  .user-info {
+    text-align: center;
+    margin-top: 16px;
+    .name {
       font-weight: 700;
-      color: #6b4ce6;
+      font-size: 18px;
+      color: #1e293b;
+    }
+    .count {
+      color: #64748b;
+      font-size: 14px;
+      margin-top: 4px;
     }
   }
+
+  ${(props) =>
+    props.$rank === 1 &&
+    `
+    border: 2px solid #6366f1;
+    height: 300px;
+    background: linear-gradient(180deg, #ffffff 0%, #f5f7ff 100%);
+    order: 2; /* 시상대 중앙 */
+  `}
+  ${(props) => props.$rank === 2 && `order: 1; height: 260px;`}
+  ${(props) => props.$rank === 3 && `order: 3; height: 240px;`}
+`;
+
+export const UserAvatar = styled.div`
+  font-size: ${(props) => (props.$isTop ? "64px" : "52px")};
+  color: ${(props) => (props.$isTop ? "#6366f1" : "#cbd5e1")};
+  display: flex;
 `;
 
 export const MainContent = styled.div`
   background: white;
-  border: 1px solid #eaecf0;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.1);
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 `;
 
 export const ListHeader = styled.div`
   display: flex;
-  padding: 12px 24px;
-  background: #f9fafb;
-  border-bottom: 1px solid #eaecf0;
+  padding: 18px 30px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+
   .col {
-    font-size: 12px;
-    font-weight: 600;
-    color: #667085;
-    text-transform: uppercase;
+    font-size: 13px;
+    font-weight: 700;
+    color: #475569;
   }
   .rank {
     width: 80px;
@@ -77,116 +130,91 @@ export const ListHeader = styled.div`
 export const ListRow = styled.div`
   display: flex;
   align-items: center;
-  padding: 16px 24px;
-  border-bottom: 1px solid #eaecf0;
-  background: ${(props) => (props.$isTop ? "#fdfdff" : "transparent")};
+  padding: 16px 30px;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background 0.2s;
 
-  &:last-child {
-    border-bottom: none;
-  }
-
-  .col {
-    display: flex;
-    align-items: center;
+  &:hover {
+    background-color: #f1f5f9;
   }
   .rank {
     width: 80px;
+    display: flex;
     justify-content: center;
   }
   .user {
     flex: 2;
+    display: flex;
+    align-items: center;
     gap: 12px;
   }
   .data {
     flex: 1;
+    display: flex;
     justify-content: center;
+    align-items: center;
+    color: #334155;
+    font-weight: 500;
+    font-size: 14px;
+    .icon {
+      margin-right: 6px;
+      color: #94a3b8;
+    }
   }
   .rate {
     flex: 1.5;
+    display: flex;
     justify-content: flex-end;
   }
 `;
 
 export const RankNumber = styled.div`
+  font-size: 15px;
+  font-weight: 700;
+  color: ${(props) => (props.$rank <= 3 ? "#6366f1" : "#94a3b8")};
+  background: ${(props) => (props.$rank <= 3 ? "#eef2ff" : "transparent")};
   width: 28px;
   height: 28px;
-  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
-  font-weight: 700;
-  background: ${(props) =>
-    props.$rank === 1
-      ? "#6b4ce6"
-      : props.$rank === 2
-      ? "#818cf8"
-      : props.$rank === 3
-      ? "#a5b4fc"
-      : "#f2f4f7"};
-  color: ${(props) => (props.$rank <= 3 ? "white" : "#667085")};
+  border-radius: 50%;
 `;
 
-export const UserAvatar = styled.div`
+export const SmallAvatar = styled.div`
   font-size: 32px;
-  color: #d0d5dd;
-  display: flex;
-  align-items: center;
+  color: #e2e8f0;
 `;
 
 export const UserMeta = styled.div`
   display: flex;
   flex-direction: column;
   .name {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
-    color: #101828;
+    color: #1e293b;
   }
-  .top-badge {
-    font-size: 10px;
-    background: #ecfdf3;
-    color: #027a48;
-    padding: 2px 6px;
-    border-radius: 4px;
-    width: fit-content;
-    margin-top: 2px;
-  }
-`;
-
-export const DataValue = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #475467;
-  .icon {
-    color: #98a2b3;
+  .label {
     font-size: 12px;
+    color: #94a3b8;
   }
 `;
 
 export const ScoreBox = styled.div`
   width: 140px;
-  .score-header {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 4px;
-    font-size: 13px;
-    font-weight: 700;
+  .score-text {
+    text-align: right;
+    font-size: 12px;
+    font-weight: 800;
     margin-bottom: 6px;
-    color: ${(props) => (props.$score > 90 ? "#027a48" : "#344054")};
-    .icon {
-      font-size: 10px;
-    }
+    color: #475569;
   }
 `;
 
 export const ScoreTrack = styled.div`
   width: 100%;
-  height: 6px;
-  background: #f2f4f7;
+  height: 8px;
+  background: #f1f5f9;
   border-radius: 10px;
   overflow: hidden;
 `;
@@ -194,16 +222,39 @@ export const ScoreTrack = styled.div`
 export const ScoreBar = styled.div`
   height: 100%;
   width: ${(props) => props.$width}%;
-  background: ${(props) => (props.$width > 90 ? "#12b76a" : "#6b4ce6")};
+  background: ${(props) =>
+    props.$width >= 95
+      ? "#10b981"
+      : props.$width >= 80
+      ? "#6366f1"
+      : "#f43f5e"};
   border-radius: 10px;
+  transition: width 1s ease-in-out;
 `;
 
 export const StateWrapper = styled.div`
+  padding: 100px;
+  text-align: center;
+  color: #94a3b8;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  height: 50vh;
-  font-size: 15px;
-  font-weight: 600;
-  color: #6b4ce6;
+  gap: 16px;
+
+  .loader {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #6366f1;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
 `;
