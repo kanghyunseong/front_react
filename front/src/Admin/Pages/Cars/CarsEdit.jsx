@@ -120,17 +120,34 @@ const CarsEdit = () => {
       return alert("필수 항목을 모두 입력해주세요.");
 
     const submitData = new FormData();
+
+    // 데이터 정제 및 매핑
     Object.entries(formData).forEach(([key, value]) => {
-      const fieldName =
-        key === "km"
-          ? "carDriving"
-          : key === "seats"
-          ? "carSeet"
-          : key === "type"
-          ? "carSize"
-          : key;
-      submitData.append(fieldName, value || "0");
+      let fieldName = key;
+
+      // 서버 전달용 필드명 변환 로직
+      switch (key) {
+        case "km":
+          fieldName = "carDriving";
+          break;
+        case "seats":
+          fieldName = "carSeet";
+          break;
+        case "type":
+          fieldName = "carSize";
+          break;
+        case "efficiency":
+          fieldName = "carEfficiency";
+          break; // 이 부분이 핵심
+        default:
+          fieldName = key;
+      }
+
+      // null 값 방지 (기본값 0 처리)
+      const processedValue = value === "" || value === null ? "0" : value;
+      submitData.append(fieldName, processedValue);
     });
+
     submitData.append("carId", carId);
     if (file) submitData.append("file", file);
 
@@ -144,7 +161,8 @@ const CarsEdit = () => {
       alert("차량 정보가 성공적으로 수정되었습니다.");
       navigate("/admin/cars/settings");
     } catch (err) {
-      alert("수정에 실패했습니다.");
+      console.error("수정 중 오류 발생:", err);
+      alert(err.response?.data?.message || "수정에 실패했습니다.");
     }
   };
 

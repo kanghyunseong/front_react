@@ -232,7 +232,7 @@ export const DonutCenter = styled.div`
     font-size: 44px;
     font-weight: 900;
     background: linear-gradient(135deg, #1e293b 0%, #6366f1 100%);
-    -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     line-height: 1;
   }

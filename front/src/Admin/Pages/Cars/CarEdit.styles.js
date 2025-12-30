@@ -167,6 +167,7 @@ export const RangeDisplay = styled.div`
     font-size: 28px;
     font-weight: 900;
     background: linear-gradient(45deg, #4f46e5, #818cf8);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     transition: all 0.3s;
