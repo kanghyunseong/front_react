@@ -46,6 +46,7 @@ const KakaoJoin = () => {
     email: "",
     phone: "",
   });
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   useEffect(() => {
     if (userId === undefined) {
@@ -142,7 +143,7 @@ const KakaoJoin = () => {
     }
 
     axios
-      .post("http://localhost:8081/members/kakao", formData)
+      .post(`${apiUrl}/api/members/kakao`, formData)
       .then((result) => {
         console.log(result);
         if (result.status === 200) {

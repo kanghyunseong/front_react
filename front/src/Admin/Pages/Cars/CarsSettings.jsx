@@ -13,6 +13,7 @@ const CarsSettings = () => {
   const [pageInfo, setPageInfo] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   const fetchCars = async (page) => {
     if (!auth || !auth.accessToken) {
@@ -22,7 +23,7 @@ const CarsSettings = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `http://localhost:8081/admin/api/settings?page=${page}`,
+        `${apiUrl}/api/admin/api/settings?page=${page}`,
         {
           headers: {
             Authorization: `Bearer ${auth.accessToken}`,
@@ -70,7 +71,7 @@ const CarsSettings = () => {
       try {
         setLoading(true);
         await axios.delete(
-          `http://localhost:8081/admin/api/settings/${carId}`,
+          `${apiUrl}/api/admin/api/settings/${carId}`,
           {
             headers: {
               Authorization: `Bearer ${auth.accessToken}`,

@@ -24,11 +24,12 @@ const CarsUsageHistory = () => {
   const [reservation, setReservation] = useState([]);
   const [visibleCount, setVisibleCount] = useState(5);
   const [loading, setLoading] = useState(true);
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   useEffect(() => {
     setLoading(true);
     axios
-      .get("http://localhost:8081/reserve/history", {
+      .get(`${apiUrl}/api/reserve/history`, {
         headers: { Authorization: `Bearer ${auth.accessToken}` }
       })
       .then((result) => {

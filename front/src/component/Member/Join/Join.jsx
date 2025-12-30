@@ -43,6 +43,7 @@ const Join = () => {
     phone: "",
     confirmPwd: "",
   });
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   // 날짜용 const
 
@@ -137,7 +138,7 @@ const Join = () => {
     }
 
     axios
-      .post("http://localhost:8081/members", formData)
+      .post(`${apiUrl}/api/members`, formData)
       .then((result) => {
         console.log(result);
         if (result.status === 201) {

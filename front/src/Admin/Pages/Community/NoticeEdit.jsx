@@ -10,6 +10,7 @@ const NoticeEdit = () => {
   const { noticeNo } = useParams();
   const { auth } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   const [formData, setFormData] = useState({
     noticeNo: "",
@@ -46,7 +47,7 @@ const NoticeEdit = () => {
           return;
         }
         const response = await axios.get(
-          `http://localhost:8081/admin/api/notice/${noticeNo}`,
+          `${apiUrl}/api/admin/api/notice/${noticeNo}`,
           {
             headers: {
               Authorization: token ? `Bearer ${token}` : "",
@@ -110,7 +111,7 @@ const NoticeEdit = () => {
         return;
       }
       await axios.put(
-        `http://localhost:8081/admin/api/notice/modify`,
+        `${apiUrl}/api/admin/api/notice/modify`,
         formData,
         {
           headers: { Authorization: token ? `Bearer ${token}` : "" },

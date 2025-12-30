@@ -42,6 +42,7 @@ const UserStatsBarChart = ({ unit = "month" }) => {
     waitingLicenseCount: 0,
   });
   const [isLoading, setIsLoading] = useState(true); // 로딩 상태 추가
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   // 1. 차트 트렌드 데이터 로딩 및 프론트엔드 보정 로직
   useEffect(() => {
@@ -65,7 +66,7 @@ const UserStatsBarChart = ({ unit = "month" }) => {
       } else {
         try {
           const res = await axios.get(
-            `http://localhost:8081/admin/api/users/license/trend?unit=${unit}`,
+            `${apiUrl}/api/admin/api/users/license/trend?unit=${unit}`,
             { headers: { Authorization: `Bearer ${auth.accessToken}` } }
           );
           rawData = res.data;
@@ -133,7 +134,7 @@ const UserStatsBarChart = ({ unit = "month" }) => {
       }
       try {
         const res = await axios.get(
-          `http://localhost:8081/admin/api/users/kpi`,
+          `${apiUrl}/api/admin/api/users/kpi`,
           { headers: { Authorization: `Bearer ${auth.accessToken}` } }
         );
         setKpiStats(res.data);

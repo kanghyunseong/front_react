@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../Api";
+import { axiosPublic } from "../../../api/reqService.js";
 import {
   Container,
   Header,
@@ -34,20 +34,20 @@ const Notice = () => {
 
   // 공지사항 목록(전체 조회 or 검색 결과) 로딩
   const loadNotices = () => {
-    const baseUrl = "/notices";
+    const baseUrl = "/api/notices";
 
     // 검색 모드일 때는 /search 호출, 아니면 전체 조회
     const url = isSearchMode ? `${baseUrl}/search` : baseUrl;
 
-    const params = isSearchMode
-      ? { type: searchType, keyword: keyword.trim(), page }
-      : { page };
+    const query = new URLSearchParams(
+      isSearchMode
+        ? { type: searchType, keyword: keyword.trim(), page, }
+        : { page }
+      ).toString();
 
-    api
-      .get(url, { params })
-      .then((response) => {
-        const data = response.data;
-
+    axiosPublic
+      .getActual(`${url}?${ query }`)
+      .then((data) => {
         setNotices(data.content || []);
         setTotalPages(data.totalPages || 1);
         setTotalElements(data.totalElements || 0);

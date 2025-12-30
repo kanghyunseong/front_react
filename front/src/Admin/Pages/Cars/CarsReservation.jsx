@@ -45,6 +45,7 @@ const CarsReservation = () => {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   const { auth } = useContext(AuthContext);
 
@@ -57,7 +58,7 @@ const CarsReservation = () => {
 
       try {
         const response = await axios.get(
-          "http://localhost:8081/admin/api/settings/reservations",
+          `${apiUrl}/api/admin/api/settings/reservations`,
           { headers: { Authorization: `Bearer ${auth.accessToken}` } }
         );
         setReservations(response.data);
@@ -105,7 +106,7 @@ const CarsReservation = () => {
     }
 
     try {
-      const apiUrl = `http://localhost:8081/admin/api/settings/reservations/${String(
+      const apiUrl = `${apiUrl}/api/admin/api/settings/reservations/${String(
         reservationNo
       )}/cancel`;
       const response = await axios.put(

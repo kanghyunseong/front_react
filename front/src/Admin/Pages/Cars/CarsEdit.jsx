@@ -24,6 +24,7 @@ const CarsEdit = () => {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(true);
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   const getByteLength = (s) => {
     let b = 0;
@@ -54,7 +55,7 @@ const CarsEdit = () => {
     setLoading(true);
 
     axios
-      .get(`http://localhost:8081/admin/api/settings/${carId}`, {
+      .get(`${apiUrl}/api/admin/api/settings/${carId}`, {
         headers: { Authorization: `Bearer ${auth.accessToken}` },
       })
       .then((response) => {
@@ -82,17 +83,17 @@ const CarsEdit = () => {
 
         const dbImage = data.carImage || data.CARIMAGE;
         if (dbImage) {
-          setPreview(`http://localhost:8081/uploads/${dbImage}`);
+          setPreview(`${apiUrl}/uploads/${dbImage}`);
         }
       })
       .catch((err) => {
         console.error("❌ 상세 정보 로딩 실패:", err);
         if (err.response && err.response.status === 401) {
           alert("세션이 만료되었습니다. 다시 로그인 해주세요.");
-          navigate("/members/login");
+          navigate("/api/members/login");
         } else if (err.response && err.response.status === 404) {
           alert("요청한 차량 정보를 찾을 수 없습니다.");
-          navigate("/admin/cars/settings");
+          navigate("/api/admin/cars/settings");
         } else {
           alert("차량 정보를 불러올 수 없거나 권한이 없습니다.");
         }
@@ -156,7 +157,7 @@ const CarsEdit = () => {
     }
 
     axios
-      .put(`http://localhost:8081/admin/api/settings/update`, formData, {
+      .put(`${apiUrl}/api/admin/api/settings/update`, formData, {
         headers: {
           Authorization: `Bearer ${auth.accessToken}`,
           "Content-Type": "multipart/form-data",

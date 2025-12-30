@@ -15,6 +15,7 @@ const UserChangePwd = () => {
   const [changePwd, setchangePwd] = useState("");
   const { auth } = useContext(AuthContext);
   const navi = useNavigate();
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   useEffect(() => {
     if (auth && auth.isAuthenticated !== undefined) {
@@ -47,7 +48,7 @@ const UserChangePwd = () => {
 
     axios
       .put(
-        "http://localhost:8081/members",
+        `${apiUrl}/api/members`,
         {
           userPwd,
           changePwd,
