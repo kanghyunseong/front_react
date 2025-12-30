@@ -30,6 +30,7 @@ const ImgBoardDetail = () => {
   const [editTitle, setEditTitle] = useState("");
   const [editContent, setEditContent] = useState("");
   const [editFiles, setEditFiles] = useState([]); // 수정 시 선택한 이미지
+  const [previewUrls, setPreviewUrls] = useState([]);
 
   // 신고 기능
   const [reportOpen, setReportOpen] = useState(false);
@@ -59,7 +60,15 @@ const ImgBoardDetail = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, [id, navi, auth?.accessToken]);
+    }, [id, navi, auth?.accessToken]);
+
+    useEffect(() => {
+      return () => {
+        previewUrls.forEach((url) =>
+          URL.revokeObjectURL(url)
+        );
+      };
+    }, [previewUrls]);
 
   // 삭제
   const handleDelete = () => {
@@ -207,28 +216,50 @@ const ImgBoardDetail = () => {
                   ? Array.from(e.target.files)
                   : [];
                 setEditFiles(files);
+                const urls = files.map((file) => 
+                  URL.createObjectURL(file));
+                  setPreviewUrls(urls);
               }}
             />
           </div>
 
-          {imgBoard.attachments && imgBoard.attachments.length > 0 && (
+          {editMode && (
             <div style={{ textAlign: "center", marginBottom: "10px" }}>
-              <div style={{ marginBottom: "4px", fontSize: "14px" }}>
-                현재 등록된 이미지
+              <div style={{ marginBottom: "6px", fontSize: "14px" }}>
+                {editFiles.length > 0
+                  ? "선택한 이미지 미리보기"
+                  : "현재 등록된 이미지"}
               </div>
-              {imgBoard.attachments.map((att) => (
-                <img
-                  key={att.fileNo}
-                  src={att.filePath}
-                  alt={att.originName}
-                  style={{
-                    maxWidth: "100%",
-                    borderRadius: "8px",
-                    marginBottom: "10px",
-                    display: "block",
-                  }}
-                />
-              ))}
+
+              {editFiles.length > 0 ? (
+                previewUrls.map((url, idx) => (
+                  <img
+                    key={idx}
+                    src={url}
+                    alt="preview"
+                    style={{
+                      maxWidth: "100%",
+                      borderRadius: "8px",
+                      marginBottom: "10px",
+                      display: "block",
+                    }}
+                  />
+                ))
+              ) : (
+                imgBoard.attachments?.map((att) => (
+                  <img
+                    key={att.fileNo}
+                    src={att.filePath}
+                    alt={att.originName}
+                    style={{
+                      maxWidth: "100%",
+                      borderRadius: "8px",
+                      marginBottom: "10px",
+                      display: "block",
+                    }}
+                  />
+                ))
+              )}
             </div>
           )}
 
