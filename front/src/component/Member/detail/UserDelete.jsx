@@ -10,12 +10,14 @@ import {
 import axios from "axios";
 import { AuthContext } from "../../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { axiosAuth } from "../../../api/reqService";
+
 const UserDelete = () => {
   const [userPwd, setUserPwd] = useState("");
   const [agree, setAgree] = useState("");
   const { auth, logout } = useContext(AuthContext);
   const navi = useNavigate();
-  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
+
   useEffect(() => {
     if (auth && auth.isAuthenticated !== undefined) {
       if (!auth.isAuthenticated) {
@@ -29,23 +31,19 @@ const UserDelete = () => {
       alert("회원탈퇴를 원하신다면 동의합니다를 정확히 적어주세요.");
       return;
     }
-    axios
-      .delete(`${apiUrl}/members`, {
-        headers: {
-          Authorization: `Bearer ${auth.accessToken}`,
-        },
-        data: {
-          userPwd,
-        },
-      })
+    axiosAuth
+      .deleteUser(`/members`, { data: { userPwd } })
       .then((result) => {
-        alert("회원탈퇴를 성공했습니다.");
+        console.log(result);
+        alert(result.message);
         logout();
         navi("/");
       })
       .catch((err) => {
-        if (err.response?.status === 401) {
-          alert("비밀번호가 일치하지 않습니다.");
+        if (err.status === 403) {
+          alert("잘못된 유저입니다.");
+        } else {
+          alert(err.response.data.message);
         }
       });
   };

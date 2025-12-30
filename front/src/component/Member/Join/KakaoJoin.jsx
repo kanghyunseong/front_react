@@ -18,6 +18,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import defaultImg from "../../../assets/LoginFileImg.png";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
+import { axiosPublic } from "../../../api/reqService";
 const KakaoJoin = () => {
   const location = useLocation();
   const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
@@ -142,8 +143,10 @@ const KakaoJoin = () => {
       console.log(file);
     }
 
-    axios
-      .post(`${apiUrl}/members/kakao`, formData)
+    // axios
+    //   .post(`${apiUrl}/members/kakao`, formData)
+    axiosPublic
+      .post(`/members/kakao`, formData)
       .then((result) => {
         console.log(result);
         if (result.status === 200) {
