@@ -60,26 +60,31 @@ const ImgBoardForm = () => {
       return alert("이미지 파일을 하나 이상 선택해주세요!");
     }
 
+    // 1. FormData 생성 (이 부분은 잘 작성하셨습니다)
     const formData = new FormData();
     formData.append("imgBoardTitle", imgBoardTitle);
     formData.append("imgBoardContent", imgBoardContent);
 
     files.forEach((file) => {
-      formData.append("files", file);
+      formData.append("files", file); // 백엔드의 @RequestParam(name = "files")와 이름 일치 확인
     });
 
+    // 2. 수정된 전송 로직
+    // axiosAuth.create가 내부적으로 post를 수행한다면 두 번째 인자로 formData를 넘겨야 합니다.
+    // 만약 axiosAuth가 일반적인 axios 인스턴스라면 아래와 같이 post를 사용하세요.
     axiosAuth
-      .create("/api/imgBoards", {
-        imgBoardTitle,
-        imgBoardContent,
-      }, files)
+      .post("/api/imgBoards", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
       .then((res) => {
-          alert(res.data?.message || "갤러리 게시글이 등록되었습니다!");
-          navi("/imgBoards");
-        })
+        alert(res.data?.message || "갤러리 게시글이 등록되었습니다!");
+        navi("/imgBoards");
+      })
       .catch((err) => {
-        const msg =
-          err.response?.data?.message || "등록에 실패했습니다.";
+        console.error("등록 실패 상세:", err);
+        const msg = err.response?.data?.message || "등록에 실패했습니다.";
         alert(msg);
       });
   };
