@@ -6,6 +6,7 @@ import { AuthContext } from "../../../context/AuthContext"; // AuthContext impor
 const KakaoLoginCallback = () => {
   const { login } = useContext(AuthContext); // 로그인 함수 가져오기
   const navi = useNavigate(); // navigate hook 사용
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   useEffect(() => {
     // URL의 쿼리 파라미터에서 code와 state 추출
@@ -16,7 +17,7 @@ const KakaoLoginCallback = () => {
     if (code) {
       // 백엔드로 code와 state를 전달하는 요청
       axios
-        .get("http://localhost:8081/members/kakao/callback", {
+        .get(`${apiUrl}/api/members/kakao/callback`, {
           params: { code },
         })
         .then((response) => {

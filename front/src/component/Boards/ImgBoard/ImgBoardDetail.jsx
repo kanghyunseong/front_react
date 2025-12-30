@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import api from "../Api";
+import { axiosAuth } from "../../../api/reqService.js";
 import { AuthContext } from "../../../context/AuthContext.jsx";
 import ImgBoardComment from "./ImgBoardComment.jsx";
 import ReportModal from "../ReportModal.jsx";
@@ -42,12 +42,11 @@ const ImgBoardDetail = () => {
       navi("/members/login");
       return;
     }
-
     setLoading(true);
-    api
-      .get(`/imgBoards/${id}`)
-      .then((res) => {
-        const data = res.data;
+
+    axiosAuth
+      .getActual(`/api/imgBoards/${id}`)
+      .then((data) => {
         setImgBoard(data);
         setEditTitle(data.imgBoardTitle);
         setEditContent(data.imgBoardContent);
@@ -72,12 +71,12 @@ const ImgBoardDetail = () => {
 
     if (!window.confirm("정말 삭제할까요?")) return;
 
-    api
-      .delete(`/imgBoards/${id}`)
+    axiosAuth
+      .delete(`/api/imgBoards/${id}`)
       .then((res) => {
         const msg = res.data?.message || "삭제되었습니다!";
         alert(msg);
-        navi("/imgBoards");
+        navi(-1);
       })
       .catch((err) => {
         console.error("삭제 실패:", err);
@@ -112,13 +111,16 @@ const ImgBoardDetail = () => {
       });
     }
 
-    api
-      .put(`/imgBoards/${id}`, formData)
-      .then((res) => {
+    axiosAuth
+      .put(`/api/imgBoards/${id}`, formData)
+      .then(() => {
         alert("수정되었습니다!");
-
-        const data = res.data || imgBoard;
+        return axiosAuth.getActual(`/api/imgBoards/${id}`);
+      })
+      .then((data) => {
         setImgBoard(data);
+        setEditTitle(data.imgBoardTitle);
+        setEditContent(data.imgBoardContent);
 
         setEditFiles([]);
         setEditMode(false);
@@ -144,8 +146,8 @@ const ImgBoardDetail = () => {
       return;
     }
 
-    api
-      .post(`/imgBoards/${id}/report`, { reason })
+    axiosAuth
+      .post(`/api/imgBoards/${id}/report`, { reason })
       .then((res) => {
         const msg =
           res.data?.message ||
@@ -278,7 +280,7 @@ const ImgBoardDetail = () => {
       <BottomArea>
         <TopButtonRow>
           <div>
-            <Button onClick={() => navi("/imgBoards")}>목록보기</Button>
+            <Button onClick={() => navi(-1)}>목록보기</Button>
 
             {!isWriter && (
               <>

@@ -21,33 +21,33 @@ const AdminHome = () => {
     <Layout>
       <Routes>
         <Route path="/" element={<DashBoard />} />
-        <Route path="cars/overview" element={<CarsOverview />} />
-        <Route path="cars/reservation" element={<CarsReservation />} />
-        <Route path="cars/registration" element={<CarsRegistration />} />
-        <Route path="cars/edit/:carId" element={<CarsEdit />} />
-        <Route path="cars/settings" element={<CarsSettings />} />
+        <Route path="/cars/overview" element={<CarsOverview />} />
+        <Route path="/cars/reservation" element={<CarsReservation />} />
+        <Route path="/cars/registration" element={<CarsRegistration />} />
+        <Route path="/cars/edit/:carId" element={<CarsEdit />} />
+        <Route path="/cars/settings" element={<CarsSettings />} />
         <Route
-          path="community/declaration"
+          path="/community/declaration"
           element={<CommunityDeclaration />}
         />
         <Route
-          path="community/comment/declaration"
+          path="/community/comment/declaration"
           element={<CommentDeclaration />}
         />
-        <Route path="community/notice/noticeList" element={<NoticeList />} />
-        <Route path="community/notice/noticeWrite" element={<NoticeWrite />} />
+        <Route path="/community/notice/noticeList" element={<NoticeList />} />
+        <Route path="/community/notice/noticeWrite" element={<NoticeWrite />} />
         <Route
-          path="community/notice-edit"
+          path="/community/notice-edit"
           element={<NoticeWrite isEditMode={true} />}
         />
         <Route
-          path="enviroments/enviromentsUserRanking"
+          path="/enviroments/enviromentsUserRanking"
           element={<UserRanking />}
         />
-        <Route path="user/userOverview" element={<UserOverview />} />
-        <Route path="user/edit/:userNo" element={<UserEdit />} />
+        <Route path="/user/userOverview" element={<UserOverview />} />
+        <Route path="/user/edit/:userNo" element={<UserEdit />} />
         <Route
-          path="community/notice/edit/:noticeNo"
+          path="/community/notice/edit/:noticeNo"
           element={<NoticeEdit />}
         />
       </Routes>

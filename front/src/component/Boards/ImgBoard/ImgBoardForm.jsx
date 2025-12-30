@@ -1,7 +1,7 @@
 import { useEffect, useContext, useState } from "react";
 import { AuthContext } from "../../../context/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
-import api from "../Api";
+import { axiosAuth } from "../../../api/reqService.js";
 import {
   Container,
   Header,
@@ -68,16 +68,16 @@ const ImgBoardForm = () => {
       formData.append("files", file);
     });
 
-    api
-      .post("/imgBoards", formData)
+    axiosAuth
+      .create("/api/imgBoards", {
+        imgBoardTitle,
+        imgBoardContent,
+      }, files)
       .then((res) => {
-        if (res.status === 201 || res.status === 200) {
           alert(res.data?.message || "갤러리 게시글이 등록되었습니다!");
           navi("/imgBoards");
-        }
-      })
+        })
       .catch((err) => {
-        console.log(err);
         const msg =
           err.response?.data?.message || "등록에 실패했습니다.";
         alert(msg);

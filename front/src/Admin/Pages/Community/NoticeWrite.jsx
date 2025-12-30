@@ -8,6 +8,7 @@ const NoticeWrite = () => {
   const navigate = useNavigate();
   const { auth } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   const [formData, setFormData] = useState({
     noticeTitle: "",
@@ -68,7 +69,7 @@ const NoticeWrite = () => {
       const token = auth?.accessToken || localStorage.getItem("accessToken");
 
       await axios.post(
-        "http://localhost:8081/admin/api/notice/insert",
+        `${apiUrl}/api/admin/api/notice/insert`,
         submitData,
         {
           headers: {
@@ -89,7 +90,7 @@ const NoticeWrite = () => {
           alert(
             "권한이 없거나 세션이 만료되었습니다. 로그인 페이지로 이동합니다."
           );
-          navigate("/members/login");
+          navigate("/api/members/login");
         } else if (status === 400) {
           alert(`등록 실패: 입력 값이 올바르지 않습니다. (${serverMsg})`);
         } else {

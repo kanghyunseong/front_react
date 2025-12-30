@@ -31,11 +31,12 @@ const CarsReviewForm = () => {
     const maxLength = 500;
     const [searchParams] = useSearchParams();
     const reservationNo = searchParams.get("reservationNo");
+    const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
     // 차량 정보 가져오기
     useEffect(() => {
         axios
-            .get(`http://localhost:8081/cars/${carId}`)
+            .get(`${apiUrl}/api/cars/${carId}`)
             .then((result) => {
                 console.log(result);
                 setCar(result.data[0]);
@@ -60,7 +61,7 @@ const CarsReviewForm = () => {
 
         axios
             .post(
-                "http://localhost:8081/reviews",
+                `${apiUrl}/api/reviews`,
                 {
                     refCarId: carId,
                     reservationNo: reservationNo,

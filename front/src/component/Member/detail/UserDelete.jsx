@@ -15,6 +15,8 @@ const UserDelete = () => {
   const [agree, setAgree] = useState("");
   const { auth, logout } = useContext(AuthContext);
   const navi = useNavigate();
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
+
   useEffect(() => {
     if (auth && auth.isAuthenticated !== undefined) {
       if (!auth.isAuthenticated) {
@@ -29,7 +31,7 @@ const UserDelete = () => {
       return;
     }
     axios
-      .delete("http://localhost:8081/members", {
+      .delete(`${apiUrl}/api/members`, {
         headers: {
           Authorization: `Bearer ${auth.accessToken}`,
         },

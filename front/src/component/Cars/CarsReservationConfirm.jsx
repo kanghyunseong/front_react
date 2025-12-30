@@ -21,10 +21,11 @@ const CarsReservationConfirm = () => {
   const [reservationInfo, setReservationInfo] = useState(null);
   const { reservationNo  } = useParams();
   const navi = useNavigate();
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   
   useEffect(() => {
     axios
-      .get(`http://localhost:8081/reserve/${reservationNo}`)
+      .get(`${apiUrl}/api/reserve/${reservationNo}`)
       .then((res) => {
         console.log(res);
         

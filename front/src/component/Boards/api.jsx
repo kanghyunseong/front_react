@@ -1,9 +1,9 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:8081",
+  baseURL: window.ENV.API_URL,
 });
-
+  
 // 요청 인터셉터: 토큰 자동 첨부
 api.interceptors.request.use(
   (config) => {
@@ -11,7 +11,7 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    return config;
+    return config;  
   },
   (error) => {
     return Promise.reject(error);

@@ -33,6 +33,7 @@ const UserUpdate = () => {
     return img && img !== "null" ? img : null;
   });
   const [loading, setLoading] = useState(true);
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   // ✔ 로그인 여부 확인 및 초기값 세팅
   useEffect(() => {
@@ -74,7 +75,7 @@ const UserUpdate = () => {
     if (file) formData.append("licenseImg", file);
 
     axios
-      .put("http://localhost:8081/members/updateUser", formData, {
+      .put(`${apiUrl}/api/members/updateUser`, formData, {
         headers: {
           Authorization: `Bearer ${auth.accessToken}`,
           "Content-Type": "multipart/form-data",

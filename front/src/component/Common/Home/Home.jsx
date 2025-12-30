@@ -39,7 +39,7 @@ const Home = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get("http://localhost:8081/main");
+        const response = await axios.get("http://localhost:8081/api/main");
 
         // API 응답 구조에 맞게 수정하세요
         setCountMembers(response.data.countMembers);
