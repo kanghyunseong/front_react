@@ -24,7 +24,3 @@ dist-ssr
 *.sln
 *.sw?
 
-# build output
-front/assets/
-dist/
-build/
