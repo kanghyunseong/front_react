@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import api from "../Api";
+import { axiosAuth } from "../../../api/reqService.js";
 import { AuthContext } from "../../../context/AuthContext.jsx";
 import ImgBoardComment from "./ImgBoardComment.jsx";
 import ReportModal from "../ReportModal.jsx";
@@ -30,6 +30,7 @@ const ImgBoardDetail = () => {
   const [editTitle, setEditTitle] = useState("");
   const [editContent, setEditContent] = useState("");
   const [editFiles, setEditFiles] = useState([]); // 수정 시 선택한 이미지
+  const [previewUrls, setPreviewUrls] = useState([]);
 
   // 신고 기능
   const [reportOpen, setReportOpen] = useState(false);
@@ -42,12 +43,11 @@ const ImgBoardDetail = () => {
       navi("/members/login");
       return;
     }
-
     setLoading(true);
-    api
-      .get(`/imgBoards/${id}`)
-      .then((res) => {
-        const data = res.data;
+
+    axiosAuth
+      .getActual(`/api/imgBoards/${id}`)
+      .then((data) => {
         setImgBoard(data);
         setEditTitle(data.imgBoardTitle);
         setEditContent(data.imgBoardContent);
@@ -60,7 +60,15 @@ const ImgBoardDetail = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, [id, navi, auth?.accessToken]);
+    }, [id, navi, auth?.accessToken]);
+
+    useEffect(() => {
+      return () => {
+        previewUrls.forEach((url) =>
+          URL.revokeObjectURL(url)
+        );
+      };
+    }, [previewUrls]);
 
   // 삭제
   const handleDelete = () => {
@@ -72,12 +80,12 @@ const ImgBoardDetail = () => {
 
     if (!window.confirm("정말 삭제할까요?")) return;
 
-    api
-      .delete(`/imgBoards/${id}`)
+    axiosAuth
+      .delete(`/api/imgBoards/${id}`)
       .then((res) => {
         const msg = res.data?.message || "삭제되었습니다!";
         alert(msg);
-        navi("/imgBoards");
+        navi(-1);
       })
       .catch((err) => {
         console.error("삭제 실패:", err);
@@ -112,13 +120,16 @@ const ImgBoardDetail = () => {
       });
     }
 
-    api
-      .put(`/imgBoards/${id}`, formData)
-      .then((res) => {
+    axiosAuth
+      .put(`/api/imgBoards/${id}`, formData)
+      .then(() => {
         alert("수정되었습니다!");
-
-        const data = res.data || imgBoard;
+        return axiosAuth.getActual(`/api/imgBoards/${id}`);
+      })
+      .then((data) => {
         setImgBoard(data);
+        setEditTitle(data.imgBoardTitle);
+        setEditContent(data.imgBoardContent);
 
         setEditFiles([]);
         setEditMode(false);
@@ -144,8 +155,8 @@ const ImgBoardDetail = () => {
       return;
     }
 
-    api
-      .post(`/imgBoards/${id}/report`, { reason })
+    axiosAuth
+      .post(`/api/imgBoards/${id}/report`, { reason })
       .then((res) => {
         const msg =
           res.data?.message ||
@@ -205,28 +216,50 @@ const ImgBoardDetail = () => {
                   ? Array.from(e.target.files)
                   : [];
                 setEditFiles(files);
+                const urls = files.map((file) => 
+                  URL.createObjectURL(file));
+                  setPreviewUrls(urls);
               }}
             />
           </div>
 
-          {imgBoard.attachments && imgBoard.attachments.length > 0 && (
+          {editMode && (
             <div style={{ textAlign: "center", marginBottom: "10px" }}>
-              <div style={{ marginBottom: "4px", fontSize: "14px" }}>
-                현재 등록된 이미지
+              <div style={{ marginBottom: "6px", fontSize: "14px" }}>
+                {editFiles.length > 0
+                  ? "선택한 이미지 미리보기"
+                  : "현재 등록된 이미지"}
               </div>
-              {imgBoard.attachments.map((att) => (
-                <img
-                  key={att.fileNo}
-                  src={att.filePath}
-                  alt={att.originName}
-                  style={{
-                    maxWidth: "100%",
-                    borderRadius: "8px",
-                    marginBottom: "10px",
-                    display: "block",
-                  }}
-                />
-              ))}
+
+              {editFiles.length > 0 ? (
+                previewUrls.map((url, idx) => (
+                  <img
+                    key={idx}
+                    src={url}
+                    alt="preview"
+                    style={{
+                      maxWidth: "100%",
+                      borderRadius: "8px",
+                      marginBottom: "10px",
+                      display: "block",
+                    }}
+                  />
+                ))
+              ) : (
+                imgBoard.attachments?.map((att) => (
+                  <img
+                    key={att.fileNo}
+                    src={att.filePath}
+                    alt={att.originName}
+                    style={{
+                      maxWidth: "100%",
+                      borderRadius: "8px",
+                      marginBottom: "10px",
+                      display: "block",
+                    }}
+                  />
+                ))
+              )}
             </div>
           )}
 
@@ -278,7 +311,7 @@ const ImgBoardDetail = () => {
       <BottomArea>
         <TopButtonRow>
           <div>
-            <Button onClick={() => navi("/imgBoards")}>목록보기</Button>
+            <Button onClick={() => navi(-1)}>목록보기</Button>
 
             {!isWriter && (
               <>

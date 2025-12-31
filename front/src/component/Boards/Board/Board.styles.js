@@ -20,7 +20,7 @@ export const Header = styled.div`
 
   .title-overlay {
     position: absolute;
-    top: 50%;  
+    top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     font-size: 32px;
@@ -41,8 +41,8 @@ export const Tab = styled.button`
   border: none;
   background: transparent;
   font-weight: bold;
-  border-bottom: ${(props) => (props.$active ? '2px solid black' : 'none')};
-  color: ${(props) => (props.$active ? 'black' : '#888')};
+  border-bottom: ${(props) => (props.$active ? "2px solid black" : "none")};
+  color: ${(props) => (props.$active ? "black" : "#888")};
   cursor: pointer;
 `;
 
@@ -161,15 +161,14 @@ export const BoardContent = styled.p`
 `;
 
 export const BoardWriter = styled.span`
-  display: flex;        
+  display: flex;
   justify-content: flex-start;
   align-items: center;
-  gap: 80px; 
+  gap: 80px;
   font-size: 0.9em;
   color: #888888;
   margin-bottom: 12px;
 `;
-
 
 export const Title = styled.h2`
   font-size: 33px;

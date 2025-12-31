@@ -1,6 +1,5 @@
-
 import { useEffect, useContext, useState, useRef } from "react";
-import api from "../Api.jsx";
+import { axiosAuth, axiosPublic } from "../../../api/reqService.js";
 import { AuthContext } from "../../../context/AuthContext.jsx";
 import ReportModal from "../ReportModal.jsx";
 import {
@@ -38,13 +37,9 @@ const BoardComment = ({ boardNo }) => {
   const loadComments = () => {
     if (!boardNo) return;
 
-    api
-      .get("/comments", {
-        params: { boardNo },
-      })
-      .then((res) => {
-        setComments(res.data || []);
-      })
+    axiosPublic
+      .getActual(`/api/comments?boardNo=${boardNo}`)
+      .then(setComments)
       .catch((err) => {
         console.error("댓글 조회 실패:", err);
         // 401 등의 안내는 인터셉터에서
@@ -77,10 +72,10 @@ const BoardComment = ({ boardNo }) => {
       return;
     }
 
-    api
-      .post("/comments", {
+    axiosAuth
+      .post("/api/comments", {
         refBno: boardNo,
-        commentContent: commentContent,
+        commentContent,
       })
       .then((res) => {
         const msg = res.data?.message || "댓글이 등록되었습니다.";
@@ -90,8 +85,7 @@ const BoardComment = ({ boardNo }) => {
       })
       .catch((err) => {
         console.error("댓글 등록 실패:", err);
-        const msg =
-          err.response?.data?.message || "댓글 등록에 실패했습니다.";
+        const msg = err.response?.data?.message || "댓글 등록에 실패했습니다.";
         alert(msg);
       });
   };
@@ -115,8 +109,8 @@ const BoardComment = ({ boardNo }) => {
       return;
     }
 
-    api
-      .put(`/comments/${commentNo}`, {
+    axiosAuth
+      .put(`/api/comments/${commentNo}`, {
         commentContent: editingContent,
       })
       .then((res) => {
@@ -128,8 +122,7 @@ const BoardComment = ({ boardNo }) => {
       })
       .catch((err) => {
         console.error("댓글 수정 실패:", err);
-        const msg =
-          err.response?.data?.message || "댓글 수정에 실패했습니다.";
+        const msg = err.response?.data?.message || "댓글 수정에 실패했습니다.";
         alert(msg);
       });
   };
@@ -138,8 +131,8 @@ const BoardComment = ({ boardNo }) => {
   const handleDeleteComment = (commentNo) => {
     if (!window.confirm("정말 이 댓글을 삭제하시겠습니까?")) return;
 
-    api
-      .delete(`/comments/${commentNo}`)
+    axiosAuth
+      .delete(`/api/comments/${commentNo}`)
       .then((res) => {
         const msg = res.data?.message || "댓글이 삭제되었습니다.";
         alert(msg);
@@ -147,8 +140,7 @@ const BoardComment = ({ boardNo }) => {
       })
       .catch((err) => {
         console.error("댓글 삭제 실패:", err);
-        const msg =
-          err.response?.data?.message || "댓글 삭제에 실패했습니다.";
+        const msg = err.response?.data?.message || "댓글 삭제에 실패했습니다.";
         alert(msg);
       });
   };
@@ -165,8 +157,8 @@ const BoardComment = ({ boardNo }) => {
       return;
     }
 
-    api
-      .post(`/comments/${reportingCommentId}/report`, { reason })
+    axiosAuth
+      .post(`/api/comments/${reportingCommentId}/report`, { reason })
       .then((res) => {
         const msg = res.data?.message || "댓글 신고가 접수되었습니다.";
         alert(msg);
@@ -174,8 +166,7 @@ const BoardComment = ({ boardNo }) => {
       })
       .catch((err) => {
         console.error("댓글 신고 실패:", err);
-        const msg =
-          err.response?.data?.message || "신고에 실패했습니다.";
+        const msg = err.response?.data?.message || "신고에 실패했습니다.";
         alert(msg);
       });
   };
@@ -242,9 +233,7 @@ const BoardComment = ({ boardNo }) => {
                         as="textarea"
                         style={{ minHeight: "50px", marginTop: 0 }}
                         value={editingContent}
-                        onChange={(e) =>
-                          setEditingContent(e.target.value)
-                        }
+                        onChange={(e) => setEditingContent(e.target.value)}
                       />
                     ) : (
                       comment.commentContent
@@ -284,9 +273,7 @@ const BoardComment = ({ boardNo }) => {
                       )
                     ) : (
                       <CommentActionButton
-                        onClick={() =>
-                          openReportForComment(comment.commentNo)
-                        }
+                        onClick={() => openReportForComment(comment.commentNo)}
                       >
                         댓글신고
                       </CommentActionButton>
