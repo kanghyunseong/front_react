@@ -52,7 +52,9 @@ const Station = () => {
     if (el) el.style.background = "none";
 
     axios
-      .get(`${apiUrl}/api/station/search`, {
+
+      .get(`${apiUrl}/station/search`, {
+
         params: { keyword: keyword },
       })
       .then((response) => {
@@ -107,7 +109,7 @@ const Station = () => {
 
     // 상세정보 요청 (지도 이동 후)
     axios
-      .get(`${apiUrl}/api/station/searchDetail/${stationIdParam}`)
+      .get(`${apiUrl}/${stationIdParam}`)
       .then((res) => {
         const stationDetail = Array.isArray(res.data) ? res.data[0] : res.data;
         if (!stationDetail) {
@@ -148,7 +150,7 @@ const Station = () => {
   const register = () => {
     axios
       .post(
-        `${apiUrl}/api/station/insert`,
+        `${apiUrl}/station/insert`,
         {
           stationId: stationId,
           commentContent: comment,
@@ -187,7 +189,7 @@ const Station = () => {
 
   const elision = (reviewIdParam) => {
     axios
-      .delete(`${apiUrl}/api/station`, {
+      .delete(`${apiUrl}/station`, {
         headers: { Authorization: `Bearer ${auth?.accessToken}` },
         data: { reviewId: reviewIdParam },
       })
@@ -205,7 +207,7 @@ const Station = () => {
 
   const findAll = () => {
     axios
-      .get(`${apiUrl}/api/station/findAll`, {
+      .get(`${apiUrl}/station/findAll`, {
         params: { stationId: stationId },
       })
       .then((response) => {
@@ -247,7 +249,7 @@ const Station = () => {
         // 지도 생성 및 충전소 로드 함수 (로컬 lat/lng 사용)
         const stationCreate = async () => {
           try {
-            const stationData = await axios.get(`${apiUrl}/api/station`, {
+            const stationData = await axios.get(`${apiUrl}/station`, {
               params: {
                 lat: lat,
                 lng: lng,
