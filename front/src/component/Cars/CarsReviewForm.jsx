@@ -74,7 +74,7 @@ const CarsReviewForm = () => {
     //       },
     //     }
     //   )
-    axiosAuth.createReserve("/api/reviews", 
+    axiosAuth.createJson("/api/reviews", 
       {
         refCarId: carId,
         reservationNo: reservationNo,
