@@ -40,7 +40,7 @@ const CarsSearchList = () => {
   // 메인페이지 정보 가져오기
   useEffect(() => {
 
-    axiosPublic.getList("/main")
+    axiosPublic.getList("/api/main")
       .then((res) => {
         setMains(res.data);
         // popularCars 배열에서 랜덤으로 하나 선택

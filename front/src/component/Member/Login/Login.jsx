@@ -17,8 +17,6 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../context/AuthContext";
 import { axiosPublic } from "../../../api/reqService";
 
-import { axiosPublic } from "../../../api/reqService";
-
 const Login = () => {
   const CLIENT_API = window.ENV?.CLIENT_URL || "http://localhost:5173";
   const NAVER_REDIRECT_URI = `${CLIENT_API}/members/naver/callback`;
