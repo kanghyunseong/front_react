@@ -43,6 +43,7 @@ const Join = () => {
     phone: "",
     confirmPwd: "",
   });
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   // 날짜용 const
 
@@ -136,6 +137,7 @@ const Join = () => {
       console.log(file);
     }
 
+<<<<<<< HEAD
     // axios
     //   .post(`${apiUrl}/members`, formData)
     //   .then((result) => {
@@ -153,6 +155,14 @@ const Join = () => {
         console.log(res);
         if (res.message) {
           alert(res.message);
+=======
+    axios
+      .post(`${apiUrl}/api/members`, formData)
+      .then((result) => {
+        console.log(result);
+        if (result.status === 201) {
+          alert("회원 가입 성공");
+>>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
           setTimeout(() => {
             navi("/members/login");
           }, 1000);

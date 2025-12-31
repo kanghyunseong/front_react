@@ -15,6 +15,7 @@ const UserEdit = () => {
   const { userNo } = useParams(); // URL에서 userNo 가져오기
   const navigate = useNavigate();
   const { auth } = useContext(AuthContext);
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   const [user, setUser] = useState({
     userNo: "",
@@ -31,7 +32,7 @@ const UserEdit = () => {
     const fetchUser = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8081/admin/api/users/${userNo}`,
+          `${apiUrl}/admin/api/users/${userNo}`,
           {
             headers: { Authorization: `Bearer ${auth.accessToken}` },
           }
@@ -63,7 +64,7 @@ const UserEdit = () => {
   // 4. 저장 (수정 요청)
   const handleSubmit = async () => {
     try {
-      await axios.put(`http://localhost:8081/admin/api/users`, user, {
+      await axios.put(`${apiUrl}/admin/api/users`, user, {
         headers: { Authorization: `Bearer ${auth.accessToken}` },
       });
       alert("수정되었습니다.");

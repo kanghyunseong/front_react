@@ -25,6 +25,10 @@ const CarsEdit = () => {
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(true);
   const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
+<<<<<<< HEAD
+=======
+
+>>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
   const getByteLength = (s) => {
     let b = 0;
     if (!s) return 0;
@@ -54,7 +58,11 @@ const CarsEdit = () => {
     setLoading(true);
 
     axios
+<<<<<<< HEAD
       .get(`${apiUrl}/admin/api/settings/${carId}`, {
+=======
+      .get(`${apiUrl}/api/admin/api/settings/${carId}`, {
+>>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
         headers: { Authorization: `Bearer ${auth.accessToken}` },
       })
       .then((response) => {
@@ -89,10 +97,10 @@ const CarsEdit = () => {
         console.error("❌ 상세 정보 로딩 실패:", err);
         if (err.response && err.response.status === 401) {
           alert("세션이 만료되었습니다. 다시 로그인 해주세요.");
-          navigate("/members/login");
+          navigate("/api/members/login");
         } else if (err.response && err.response.status === 404) {
           alert("요청한 차량 정보를 찾을 수 없습니다.");
-          navigate("/admin/cars/settings");
+          navigate("/api/admin/cars/settings");
         } else {
           alert("차량 정보를 불러올 수 없거나 권한이 없습니다.");
         }
@@ -156,7 +164,11 @@ const CarsEdit = () => {
     }
 
     axios
+<<<<<<< HEAD
       .put(`${apiUrl}/admin/api/settings/update`, formData, {
+=======
+      .put(`${apiUrl}/api/admin/api/settings/update`, formData, {
+>>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
         headers: {
           Authorization: `Bearer ${auth.accessToken}`,
           "Content-Type": "multipart/form-data",

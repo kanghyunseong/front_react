@@ -7,7 +7,6 @@ import {
   Input,
   DeleteUserButton,
 } from "./UserDetail.styles";
-import axios from "axios";
 import { AuthContext } from "../../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { axiosAuth } from "../../../api/reqService";

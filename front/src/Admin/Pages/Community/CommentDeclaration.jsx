@@ -9,6 +9,10 @@ const CommentDeclaration = () => {
   const [reportList, setReportList] = useState([]);
   const [loading, setLoading] = useState(true);
   const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
+<<<<<<< HEAD
+=======
+
+>>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
   useEffect(() => {
     if (!auth || !auth.accessToken) {
       setLoading(false);
@@ -19,7 +23,11 @@ const CommentDeclaration = () => {
       try {
         setLoading(true);
         const response = await axios.get(
+<<<<<<< HEAD
           `${apiUrl}/admin/api/community/comment/declaration`,
+=======
+          `${apiUrl}/api/admin/api/community/comment/declaration`,
+>>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
           {
             headers: { Authorization: `Bearer ${auth.accessToken}` },
           }
@@ -47,7 +55,11 @@ const CommentDeclaration = () => {
 
     try {
       await axios.delete(
+<<<<<<< HEAD
         `${apiUrl}/admin/api/community/comment/declaration/delete/${reportNo}`,
+=======
+        `${apiUrl}/api/admin/api/community/comment/declaration/delete/${reportNo}`,
+>>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
         {
           headers: { Authorization: `Bearer ${auth.accessToken}` },
         }
@@ -87,7 +99,11 @@ const CommentDeclaration = () => {
 
     try {
       await axios.put(
+<<<<<<< HEAD
         `${apiUrl}/admin/api/community/comment/declaration/reject/${reportNo}`,
+=======
+        `${apiUrl}/api/admin/api/community/comment/declaration/reject/${reportNo}`,
+>>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
         {},
         {
           headers: { Authorization: `Bearer ${auth.accessToken}` },

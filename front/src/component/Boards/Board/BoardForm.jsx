@@ -1,8 +1,20 @@
 import { useEffect, useContext, useState } from "react";
 import { AuthContext } from "../../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+<<<<<<< HEAD
 import api from "../Api.jsx";
 import { Container, Header, Form, Input, Label, Button } from "./Board.styles";
+=======
+import { axiosAuth } from "../../../api/reqService.js";
+import {
+  Container,
+  Header,
+  Form,
+  Input,
+  Label,
+  Button,
+} from "./Board.styles";
+>>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
 import gasipan from "../../../assets/gasipan.png";
 
 const BoardForm = () => {
@@ -31,18 +43,23 @@ const BoardForm = () => {
     formData.append("boardTitle", boardTitle);
     formData.append("boardContent", boardContent);
 
+<<<<<<< HEAD
     api
       .post(`${apiUrl}/boards`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           // Authorization은 인터셉터에서 자동
         },
+=======
+    axiosAuth
+      .create("/api/boards", {
+        boardTitle,
+        boardContent,
+>>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
       })
       .then((res) => {
-        if (res.status === 201) {
-          alert(res.data?.message || "게시글이 등록되었습니다!");
-          navi("/boards");
-        }
+        alert(res.data?.message || "게시글이 등록되었습니다!");
+        navi("/boards");
       })
       .catch((err) => {
         console.error("게시글 등록 실패:", err);

@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import api from "../Api";
+import { axiosAuth } from "../../../api/reqService.js";
 import { AuthContext } from "../../../context/AuthContext.jsx";
 import {
   Container,
@@ -27,11 +27,17 @@ const NoticeDetail = () => {
       navi("/members/login");
       return;
     }
-
     setLoading(true);
+<<<<<<< HEAD
     api
       .get(`${apiUrl}/notices/${id}`)
       .then((res) => setNotice(res.data))
+=======
+
+    axiosAuth
+      .getActual(`/api/notices/${id}`)
+      .then((data) => setNotice(data))
+>>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
       .catch((err) => {
         console.error("공지 상세 조회 실패:", err);
         // 기본 에러 메시지는 인터셉터에서, 여긴 사용자용 추가 메시지
@@ -66,7 +72,13 @@ const NoticeDetail = () => {
 
       <Content>{notice.noticeContent}</Content>
 
+<<<<<<< HEAD
       <BackButton onClick={() => navi("/notices")}>목록보기</BackButton>
+=======
+      <BackButton onClick={() => navi(-1)}>
+        목록보기
+      </BackButton>
+>>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
     </Container>
   );
 };

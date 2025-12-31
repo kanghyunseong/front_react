@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import api from "../Api.jsx";
+import { axiosAuth } from "../../../api/reqService.js";
 import { AuthContext } from "../../../context/AuthContext.jsx";
 import BoardComment from "./BoardComment.jsx";
 import ReportModal from "../ReportModal.jsx";
@@ -39,17 +39,26 @@ const BoardDetail = () => {
     // 프론트에서 1차로 로그인 체크 (선택 사항)
     if (!auth?.accessToken) {
       alert("로그인이 필요합니다.");
-      navi("/members/login");
+      navi("/api/members/login");
       return;
     }
 
     setLoading(true);
+<<<<<<< HEAD
     api
       .get(`${apiUrl}/boards/${id}`)
       .then((res) => {
         setBoard(res.data);
         setEditTitle(res.data.boardTitle);
         setEditContent(res.data.boardContent);
+=======
+    axiosAuth
+      .getActual(`/api/boards/${id}`)
+      .then((data) => {
+        setBoard(data);
+        setEditTitle(data.boardTitle);
+        setEditContent(data.boardContent);
+>>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
       })
       .catch((err) => {
         console.error("상세보기 로딩 실패:", err);
@@ -66,12 +75,17 @@ const BoardDetail = () => {
   const handleDelete = () => {
     if (!window.confirm("정말 삭제할까요?")) return;
 
+<<<<<<< HEAD
     api
       .delete(`${apiUrl}/boards/${id}`)
+=======
+    axiosAuth
+      .delete(`/api/boards/${id}`)
+>>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
       .then((res) => {
         const msg = res.data?.message || "삭제되었습니다!";
         alert(msg);
-        navi("/boards");
+        navi(-1);
       })
       .catch((err) => {
         console.error("삭제 실패:", err);
@@ -89,8 +103,13 @@ const BoardDetail = () => {
 
     if (!window.confirm("수정 내용을 저장할까요?")) return;
 
+<<<<<<< HEAD
     api
       .put(`${apiUrl}/boards/${id}`, {
+=======
+    axiosAuth
+      .put(`/api/boards/${id}`, {
+>>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
         boardTitle: editTitle,
         boardContent: editContent,
       })
@@ -125,8 +144,13 @@ const BoardDetail = () => {
       return;
     }
 
+<<<<<<< HEAD
     api
       .post(`${apiUrl}/boards/${id}/report`, { reason })
+=======
+    axiosAuth
+      .post(`/api/boards/${id}/report`, { reason })
+>>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
       .then((res) => {
         const msg =
           res.data?.message ||
@@ -200,7 +224,7 @@ const BoardDetail = () => {
       <BottomArea>
         <TopButtonRow>
           <div>
-            <Button onClick={() => navi("/boards")}>목록보기</Button>
+            <Button onClick={() => navi(-1)}>목록보기</Button>
 
             {/* 자신 글이 아닐 때만 신고 버튼 노출 */}
             {!isWriter && (

@@ -43,6 +43,7 @@ const UserChart = () => {
   const [chartData, setChartData] = useState({ labels: [], values: [] });
   const [totalCount, setTotalCount] = useState(0);
   const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
+
   useEffect(() => {
     const fetchData = async () => {
       if (!auth.accessToken) {

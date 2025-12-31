@@ -13,6 +13,7 @@ const UserOverview = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   // [GET] 목록 조회
   const fetchUsers = (page) => {
@@ -21,7 +22,7 @@ const UserOverview = () => {
     console.log("API 요청 직전 currentPage 값:", page);
 
     axios
-      .get(`http://localhost:8081/admin/api/users?page=${page}`, {
+      .get(`${apiUrl}/admin/api/users?page=${page}`, {
         headers: {
           Authorization: `Bearer ${auth.accessToken}`,
         },
@@ -64,7 +65,7 @@ const UserOverview = () => {
     if (window.confirm("정말로 이 사용자를 삭제(혹은 비활성화)하시겠습니까?")) {
       axios
         // [수정] URL에서 '/delete' 제거 (RESTful 표준: DELETE /users/{id})
-        .delete(`http://localhost:8081/admin/api/users/${userNo}`, {
+        .delete(`${apiUrl}/admin/api/users/${userNo}`, {
           headers: {
             Authorization: `Bearer ${auth.accessToken}`,
           },

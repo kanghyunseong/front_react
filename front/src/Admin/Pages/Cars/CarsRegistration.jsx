@@ -24,6 +24,10 @@ const CarsRegistration = () => {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
+<<<<<<< HEAD
+=======
+
+>>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
   const getByteLength = (s) => {
     let b = 0;
     if (!s) return 0;
@@ -101,7 +105,11 @@ const CarsRegistration = () => {
       return;
     }
 
+<<<<<<< HEAD
     const url = `${apiUrl}/admin/api/settings`;
+=======
+    const url = `${apiUrl}/api/admin/api/settings`;
+>>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
     setLoading(true);
     try {
       await axios.post(url, formData, {

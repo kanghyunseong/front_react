@@ -1,5 +1,5 @@
 import { useEffect, useContext, useState, useRef } from "react";
-import api from "../Api.jsx";
+import { axiosAuth, axiosPublic } from "../../../api/reqService.js";
 import { AuthContext } from "../../../context/AuthContext.jsx";
 import ReportModal from "../ReportModal.jsx";
 import {
@@ -37,6 +37,7 @@ const ImgBoardComment = ({ imgBoardNo }) => {
   const loadComments = () => {
     if (!imgBoardNo) return;
 
+<<<<<<< HEAD
     api
       .get(`${apiUrl}/imgComments`, {
         params: { imgBoardNo },
@@ -47,6 +48,12 @@ const ImgBoardComment = ({ imgBoardNo }) => {
       .catch((err) => {
         console.error("갤러리 댓글 조회 실패:", err);
       });
+=======
+    axiosPublic
+      .getActual(`/api/imgComments?imgBoardNo=${imgBoardNo}`)
+      .then(setComments)
+      .catch((err) => console.error("갤러리 댓글 조회 실패:", err));
+>>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
   };
 
   useEffect(() => {
@@ -75,8 +82,8 @@ const ImgBoardComment = ({ imgBoardNo }) => {
       return;
     }
 
-    api
-      .post("/imgComments", {
+    axiosAuth
+      .post("/api/imgComments", {
         refIno: imgBoardNo,
         imgCommentContent: commentContent,
       })
@@ -111,8 +118,8 @@ const ImgBoardComment = ({ imgBoardNo }) => {
       return;
     }
 
-    api
-      .put(`/imgComments/${imgCommentNo}`, {
+    axiosAuth
+      .put(`/api/imgComments/${imgCommentNo}`, {
         imgCommentContent: editingContent,
       })
       .then((res) => {
@@ -134,8 +141,8 @@ const ImgBoardComment = ({ imgBoardNo }) => {
   const handleDeleteComment = (imgCommentNo) => {
     if (!window.confirm("정말 이 댓글을 삭제하시겠습니까?")) return;
 
-    api
-      .delete(`/imgComments/${imgCommentNo}`)
+    axiosAuth
+      .delete(`/api/imgComments/${imgCommentNo}`)
       .then((res) => {
         const msg = res.data?.message || "댓글이 삭제되었습니다.";
         alert(msg);
@@ -161,8 +168,8 @@ const ImgBoardComment = ({ imgBoardNo }) => {
       return;
     }
 
-    api
-      .post(`/imgComments/${reportingCommentId}/report`, { reason })
+    axiosAuth
+      .post(`/api/imgComments/${reportingCommentId}/report`, { reason })
       .then((res) => {
         const msg = res.data?.message || "댓글 신고가 접수되었습니다.";
         alert(msg);

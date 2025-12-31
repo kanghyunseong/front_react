@@ -32,6 +32,7 @@ const UserUpdate = () => {
     return img && img !== "null" ? img : null;
   });
   const [loading, setLoading] = useState(true);
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   // ✔ 로그인 여부 확인 및 초기값 세팅
   useEffect(() => {
@@ -74,8 +75,18 @@ const UserUpdate = () => {
     formData.append("phone", phone);
     if (file) formData.append("licenseImg", file);
 
+<<<<<<< HEAD
     axiosAuth
       .put(`/members/updateUser`, formData)
+=======
+    axios
+      .put(`${apiUrl}/api/members/updateUser`, formData, {
+        headers: {
+          Authorization: `Bearer ${auth.accessToken}`,
+          "Content-Type": "multipart/form-data",
+        },
+      })
+>>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
       .then((res) => {
         const data = res.data;
         //console.log(data);

@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../Api.jsx";
+import { axiosPublic } from "../../../api/reqService.js";
 import {
   Container,
   Header,
@@ -12,7 +12,7 @@ import {
   Th,
   Td,
   TitleTd,
-  Pagination,
+  Pagination,  
   ButtonWrapper,
   WriteButton,
   SelectBox,
@@ -45,20 +45,23 @@ const Board = () => {
 
     const isSearch = isSearchMode && searchParams;
 
+<<<<<<< HEAD
     const url = isSearch ? `${apiUrl}/boards/search` : `${apiUrl}/boards`;
+=======
+    const url = isSearch
+      ? "/api/boards/search"
+      : "/api/boards";
+>>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
 
-    const params = isSearch
-      ? {
-          type: searchParams.type,
-          keyword: searchParams.keyword,
-          page,
-        }
-      : { page };
+    const query = new URLSearchParams(
+      isSearch
+        ? { ...searchParams, page }
+        : { page }
+    ).toString();
 
-    api
-      .get(url, { params })
-      .then((res) => {
-        const data = res.data;
+    axiosPublic
+      .getActual(`${url}?${query}`)
+      .then((data) => {
         setBoards(data.content || []);
         setTotalPages(data.totalPages || 1);
         setTotalElements(data.totalElements || 0);

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const instance = axios.create({
-  baseURL: "http://localhost:8081",
+  baseURL: `http://localhost:8081`,
 });
 
 // 요청 인터셉터: 토큰 자동 설정

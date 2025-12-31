@@ -41,7 +41,6 @@ const Home = () => {
         setLoading(true);
         // const response = await axios.get(`${apiUrl}/main`);
         const response = await axiosPublic.getList("/main");
-
         console.log("이거맞음? : " + response);
         // API 응답 구조에 맞게 수정하세요
         setCountMembers(response.data.countMembers);

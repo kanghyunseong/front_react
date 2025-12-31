@@ -37,10 +37,18 @@ const CarsSearchList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [randomCar, setRandomCar] = useState(null);
   const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
+<<<<<<< HEAD
   // 메인페이지 정보 가져오기
   useEffect(() => {
     axios
       .get(`${apiUrl}/main`)
+=======
+
+  // 메인페이지 정보 가져오기
+  useEffect(() => {
+    axios
+      .get(`${apiUrl}/api/main`)
+>>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
       .then((res) => {
         setMains(res.data);
         // popularCars 배열에서 랜덤으로 하나 선택
@@ -60,7 +68,11 @@ const CarsSearchList = () => {
   useEffect(() => {
     setIsLoading(true);
     axios
+<<<<<<< HEAD
       .get(`${apiUrl}/cars?page=${currentPage}`)
+=======
+      .get(`${apiUrl}/api/cars?page=${currentPage}`)
+>>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
       .then((response) => {
         const newCars = response.data;
 

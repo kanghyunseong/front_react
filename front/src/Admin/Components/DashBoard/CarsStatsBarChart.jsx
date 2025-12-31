@@ -27,6 +27,7 @@ const CarsStatsBarChart = () => {
   const [chartData, setChartData] = useState({ labels: [], datasets: [] });
   const [loading, setLoading] = useState(true);
   const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
+
   useEffect(() => {
     const fetchData = async () => {
       if (!auth || !auth.accessToken) return;

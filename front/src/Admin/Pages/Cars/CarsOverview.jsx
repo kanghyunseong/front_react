@@ -32,12 +32,20 @@ const CarsOverview = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
+<<<<<<< HEAD
+=======
+
+>>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
   useEffect(() => {
     const fetchAllCars = async () => {
       if (!auth || !auth.accessToken) return;
       try {
         const response = await axios.get(
+<<<<<<< HEAD
           `${apiUrl}/admin/api/settings?page=1&limit=100`,
+=======
+          `${apiUrl}/api/admin/api/settings?page=1&limit=100`,
+>>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
           {
             headers: { Authorization: `Bearer ${auth.accessToken}` },
           }

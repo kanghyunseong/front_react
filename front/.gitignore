@@ -24,4 +24,7 @@ dist-ssr
 *.sln
 *.sw?
 
+<<<<<<< HEAD
 config.js
+=======
+>>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae

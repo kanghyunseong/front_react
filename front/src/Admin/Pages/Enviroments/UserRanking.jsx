@@ -3,8 +3,13 @@ import axios from "axios";
 import * as S from "./UserRanking.styles";
 import { AuthContext } from "../../../context/AuthContext";
 
+<<<<<<< HEAD
 
 const RANKING_API_URL = "http://localhost:8081/admin/api/ranking/users";
+=======
+const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
+const RANKING_API_URL = `${apiUrl}/api/admin/api/ranking/users`;
+>>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
 
 const UserRanking = () => {
   const { auth } = useContext(AuthContext);
