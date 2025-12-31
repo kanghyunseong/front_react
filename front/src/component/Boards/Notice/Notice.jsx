@@ -33,23 +33,19 @@ const Notice = () => {
   const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   // 공지사항 목록(전체 조회 or 검색 결과) 로딩
   const loadNotices = () => {
-<<<<<<< HEAD
-    const baseUrl = `${apiUrl}/notices`;
-=======
     const baseUrl = "/api/notices";
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
 
     // 검색 모드일 때는 /search 호출, 아니면 전체 조회
     const url = isSearchMode ? `${baseUrl}/search` : baseUrl;
 
     const query = new URLSearchParams(
       isSearchMode
-        ? { type: searchType, keyword: keyword.trim(), page, }
+        ? { type: searchType, keyword: keyword.trim(), page }
         : { page }
-      ).toString();
+    ).toString();
 
     axiosPublic
-      .getActual(`${url}?${ query }`)
+      .getActual(`${url}?${query}`)
       .then((data) => {
         setNotices(data.content || []);
         setTotalPages(data.totalPages || 1);

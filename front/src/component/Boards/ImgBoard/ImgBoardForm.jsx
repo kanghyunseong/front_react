@@ -69,10 +69,6 @@ const ImgBoardForm = () => {
       formData.append("files", file); // 백엔드의 @RequestParam(name = "files")와 이름 일치 확인
     });
 
-<<<<<<< HEAD
-    api
-      .post(`${apiUrl}/imgBoards`, formData)
-=======
     // 2. 수정된 전송 로직
     // axiosAuth.create가 내부적으로 post를 수행한다면 두 번째 인자로 formData를 넘겨야 합니다.
     // 만약 axiosAuth가 일반적인 axios 인스턴스라면 아래와 같이 post를 사용하세요.
@@ -82,17 +78,12 @@ const ImgBoardForm = () => {
           "Content-Type": "multipart/form-data",
         },
       })
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
       .then((res) => {
         alert(res.data?.message || "갤러리 게시글이 등록되었습니다!");
         navi("/imgBoards");
       })
       .catch((err) => {
-<<<<<<< HEAD
-        console.log(err);
-=======
         console.error("등록 실패 상세:", err);
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
         const msg = err.response?.data?.message || "등록에 실패했습니다.";
         alert(msg);
       });

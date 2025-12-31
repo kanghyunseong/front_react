@@ -12,7 +12,7 @@ import {
   Th,
   Td,
   TitleTd,
-  Pagination,  
+  Pagination,
   ButtonWrapper,
   WriteButton,
   SelectBox,
@@ -45,18 +45,10 @@ const Board = () => {
 
     const isSearch = isSearchMode && searchParams;
 
-<<<<<<< HEAD
-    const url = isSearch ? `${apiUrl}/boards/search` : `${apiUrl}/boards`;
-=======
-    const url = isSearch
-      ? "/api/boards/search"
-      : "/api/boards";
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
+    const url = isSearch ? "/api/boards/search" : "/api/boards";
 
     const query = new URLSearchParams(
-      isSearch
-        ? { ...searchParams, page }
-        : { page }
+      isSearch ? { ...searchParams, page } : { page }
     ).toString();
 
     axiosPublic

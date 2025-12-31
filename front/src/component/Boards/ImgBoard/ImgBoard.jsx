@@ -43,18 +43,10 @@ const ImgBoard = () => {
 
     const isSearch = isSearchMode && searchParams;
 
-<<<<<<< HEAD
-    const url = isSearch ? `${apiUrl}/imgBoards/search` : `${apiUrl}/imgBoards`;
-=======
-    const url = isSearch
-      ? "/api/imgBoards/search"
-      : "/api/imgBoards";
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
+    const url = isSearch ? "/api/imgBoards/search" : "/api/imgBoards";
 
     const query = new URLSearchParams(
-      isSearch
-        ? { ...searchParams, page }
-        : { page }
+      isSearch ? { ...searchParams, page } : { page }
     ).toString();
 
     axiosPublic

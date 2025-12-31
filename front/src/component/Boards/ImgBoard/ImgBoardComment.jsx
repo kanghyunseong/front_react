@@ -37,23 +37,10 @@ const ImgBoardComment = ({ imgBoardNo }) => {
   const loadComments = () => {
     if (!imgBoardNo) return;
 
-<<<<<<< HEAD
-    api
-      .get(`${apiUrl}/imgComments`, {
-        params: { imgBoardNo },
-      })
-      .then((res) => {
-        setComments(res.data || []);
-      })
-      .catch((err) => {
-        console.error("갤러리 댓글 조회 실패:", err);
-      });
-=======
     axiosPublic
       .getActual(`/api/imgComments?imgBoardNo=${imgBoardNo}`)
       .then(setComments)
       .catch((err) => console.error("갤러리 댓글 조회 실패:", err));
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
   };
 
   useEffect(() => {

@@ -14,7 +14,7 @@ const KakaoLoginCallback = () => {
     if (!code) return;
 
     axiosPublic
-      .getList(`/members/kakao/callback?code=${code}`)
+      .getList(`/api/members/kakao/callback?code=${code}`)
       .then((res) => {
         //  회원가입 필요
 
@@ -58,7 +58,7 @@ const KakaoLoginCallback = () => {
           provider
         );
 
-        alert("회원가입 성공");
+        alert("로그인 성공");
         navi("/");
       })
       .catch((err) => {

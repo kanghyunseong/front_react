@@ -21,9 +21,9 @@ import {
   CarDetailInfo,
   CarDetailItem,
 } from "./CarsReviewForm.style";
+import { axiosAuth, axiosPublic } from "../../api/reqService";
 
 const CarsReviewForm = () => {
-<<<<<<< HEAD
   const { carId } = useParams();
   const navi = useNavigate();
   const { auth } = useContext(AuthContext);
@@ -32,11 +32,13 @@ const CarsReviewForm = () => {
   const maxLength = 500;
   const [searchParams] = useSearchParams();
   const reservationNo = searchParams.get("reservationNo");
-  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
+
   // 차량 정보 가져오기
   useEffect(() => {
-    axios
-      .get(`${apiUrl}/cars/${carId}`)
+    // axios
+    //   .get(`${apiUrl}/cars/${carId}`)
+    axiosPublic
+      .getList(`/api/cars/${carId}`)
       .then((result) => {
         console.log(result);
         setCar(result.data[0]);
@@ -59,87 +61,26 @@ const CarsReviewForm = () => {
       return;
     }
 
-    axios
-      .post(
-        `${apiUrl}/reviews`,
-        {
-          refCarId: carId,
-          reservationNo: reservationNo,
-          reviewContent: reviewContent,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${auth.accessToken}`,
-          },
-=======
-    const { carId } = useParams();
-    const navi = useNavigate();
-    const { auth } = useContext(AuthContext);
-    const [car, setCar] = useState(null);
-    const [reviewContent, setReviewContent] = useState("");
-    const maxLength = 500;
-    const [searchParams] = useSearchParams();
-    const reservationNo = searchParams.get("reservationNo");
-    const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
-
-    // 차량 정보 가져오기
-    useEffect(() => {
-        axios
-            .get(`${apiUrl}/api/cars/${carId}`)
-            .then((result) => {
-                console.log(result);
-                setCar(result.data[0]);
-            })
-            .catch((err) => {
-                console.log(err);
-                alert("차량 정보를 불러오는데 실패했습니다.");
-            });
-    }, [carId]);
-
-    // 리뷰 제출
-    const handleSubmit = () => {
-        if (!reviewContent.trim()) {
-            alert("리뷰 내용을 입력해주세요.");
-            return;
-        }
-
-        if (reviewContent.length > maxLength) {
-            alert(`리뷰는 최대 ${maxLength}자까지 작성할 수 있습니다.`);
-            return;
-        }
-
-        axios
-            .post(
-                `${apiUrl}/api/reviews`,
-                {
-                    refCarId: carId,
-                    reservationNo: reservationNo,
-                    reviewContent: reviewContent,
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${auth.accessToken}`,
-                    },
-                }
-            )
-            .then((result) => {
-                console.log(result);
-                alert("리뷰가 등록되었습니다.");
-                navi(`/cars/${carId}`);
-            })
-            .catch((err) => {
-                console.log(err);
-                alert("리뷰 등록에 실패했습니다.");
-            });
-    };
-
-    // 취소
-    const handleCancel = () => {
-        if (reviewContent.trim() && !confirm("작성 중인 내용이 있습니다. 취소하시겠습니까?")) {
-            return;
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
-        }
-      )
+    // axios
+    //   .post(
+    //     `${apiUrl}/reviews`,
+    //     {
+    //       refCarId: carId,
+    //       reservationNo: reservationNo,
+    //       reviewContent: reviewContent,
+    //     },
+    //     {
+    //       headers: {
+    //         Authorization: `Bearer ${auth.accessToken}`,
+    //       },
+    //     }
+    //   )
+    axiosAuth
+      .createJson("/api/reviews", {
+        refCarId: carId,
+        reservationNo: reservationNo,
+        reviewContent: reviewContent,
+      })
       .then((result) => {
         console.log(result);
         alert("리뷰가 등록되었습니다.");

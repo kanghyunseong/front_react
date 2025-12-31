@@ -11,10 +11,6 @@ const NoticeEdit = () => {
   const { auth } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
   const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
-<<<<<<< HEAD
-=======
-
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
   const [formData, setFormData] = useState({
     noticeNo: "",
     noticeTitle: "",
@@ -50,11 +46,7 @@ const NoticeEdit = () => {
           return;
         }
         const response = await axios.get(
-<<<<<<< HEAD
-          `${apiUrl}/admin/api/notice/${noticeNo}`,
-=======
           `${apiUrl}/api/admin/api/notice/${noticeNo}`,
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
           {
             headers: {
               Authorization: token ? `Bearer ${token}` : "",
@@ -117,19 +109,9 @@ const NoticeEdit = () => {
         navigate("/members/login");
         return;
       }
-<<<<<<< HEAD
-      await axios.put(`${apiUrl}/admin/api/notice/modify`, formData, {
+      await axios.put(`${apiUrl}/api/admin/api/notice/modify`, formData, {
         headers: { Authorization: token ? `Bearer ${token}` : "" },
       });
-=======
-      await axios.put(
-        `${apiUrl}/api/admin/api/notice/modify`,
-        formData,
-        {
-          headers: { Authorization: token ? `Bearer ${token}` : "" },
-        }
-      );
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
 
       alert("수정이 완료되었습니다.");
       navigate("/admin/community/notice/noticeList");

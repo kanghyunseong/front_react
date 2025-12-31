@@ -28,22 +28,14 @@ const CarsReservationChange = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState(null);
   const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
-<<<<<<< HEAD
-  const handleReturn = (reservationNo, carId) => {
-=======
 
-const handleReturn = (reservationNo, carId) => {
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
+  const handleReturn = (reservationNo, carId) => {
     if (!confirm("반납하시겠습니까?")) return;
     const wantsReview = confirm("리뷰를 작성하시겠습니까?");
 
     // 차량 반납
     axios
-<<<<<<< HEAD
-      .put(`${apiUrl}/reserve/return`, reservationNo, {
-=======
       .put(`${apiUrl}/api/reserve/return`, reservationNo, {
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
         headers: {
           Authorization: `Bearer ${auth.accessToken}`,
           "Content-Type": "application/json",
@@ -68,11 +60,7 @@ const handleReturn = (reservationNo, carId) => {
   const handleCancel = (reservationNo) => {
     if (!confirm("예약을 취소하시겠습니까?")) return;
     axios
-<<<<<<< HEAD
-      .delete(`${apiUrl}/reserve/${reservationNo}`, {
-=======
       .delete(`${apiUrl}/api/reserve/${reservationNo}`, {
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
         headers: { Authorization: `Bearer ${auth.accessToken}` },
       })
       .then((result) => {
@@ -86,11 +74,7 @@ const handleReturn = (reservationNo, carId) => {
 
   const handleChange = (updatedData) => {
     axios
-<<<<<<< HEAD
-      .put(`${apiUrl}/reserve/change`, updatedData, {
-=======
       .put(`${apiUrl}/api/reserve/change`, updatedData, {
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
         headers: { Authorization: `Bearer ${auth.accessToken}` },
       })
       .then((result) => {
@@ -107,11 +91,7 @@ const handleReturn = (reservationNo, carId) => {
 
   useEffect(() => {
     axios
-<<<<<<< HEAD
-      .get(`${apiUrl}/reserve/searchList`, {
-=======
       .get(`${apiUrl}/api/reserve/searchList`, {
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
         headers: { Authorization: `Bearer ${auth.accessToken}` },
       })
       .then((result) => {

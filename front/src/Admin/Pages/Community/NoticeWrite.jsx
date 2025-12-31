@@ -8,7 +8,6 @@ const NoticeWrite = () => {
   const navigate = useNavigate();
   const { auth } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
-  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   const [formData, setFormData] = useState({
     noticeTitle: "",
@@ -68,23 +67,11 @@ const NoticeWrite = () => {
       setLoading(true);
       const token = auth?.accessToken || localStorage.getItem("accessToken");
 
-<<<<<<< HEAD
-      await axios.post(`${apiUrl}/admin/api/notice/insert`, submitData, {
+      await axios.post(`${apiUrl}/api/admin/api/notice/insert`, submitData, {
         headers: {
           Authorization: token ? `Bearer ${token}` : "",
         },
       });
-=======
-      await axios.post(
-        `${apiUrl}/api/admin/api/notice/insert`,
-        submitData,
-        {
-          headers: {
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-        }
-      );
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
 
       alert("등록되었습니다.");
       navigate("/admin/community/notice/noticeList");

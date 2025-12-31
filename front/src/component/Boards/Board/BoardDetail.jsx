@@ -44,21 +44,12 @@ const BoardDetail = () => {
     }
 
     setLoading(true);
-<<<<<<< HEAD
-    api
-      .get(`${apiUrl}/boards/${id}`)
-      .then((res) => {
-        setBoard(res.data);
-        setEditTitle(res.data.boardTitle);
-        setEditContent(res.data.boardContent);
-=======
     axiosAuth
       .getActual(`/api/boards/${id}`)
       .then((data) => {
         setBoard(data);
         setEditTitle(data.boardTitle);
         setEditContent(data.boardContent);
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
       })
       .catch((err) => {
         console.error("상세보기 로딩 실패:", err);
@@ -75,13 +66,8 @@ const BoardDetail = () => {
   const handleDelete = () => {
     if (!window.confirm("정말 삭제할까요?")) return;
 
-<<<<<<< HEAD
-    api
-      .delete(`${apiUrl}/boards/${id}`)
-=======
     axiosAuth
       .delete(`/api/boards/${id}`)
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
       .then((res) => {
         const msg = res.data?.message || "삭제되었습니다!";
         alert(msg);
@@ -103,13 +89,8 @@ const BoardDetail = () => {
 
     if (!window.confirm("수정 내용을 저장할까요?")) return;
 
-<<<<<<< HEAD
-    api
-      .put(`${apiUrl}/boards/${id}`, {
-=======
     axiosAuth
       .put(`/api/boards/${id}`, {
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
         boardTitle: editTitle,
         boardContent: editContent,
       })
@@ -144,13 +125,8 @@ const BoardDetail = () => {
       return;
     }
 
-<<<<<<< HEAD
-    api
-      .post(`${apiUrl}/boards/${id}/report`, { reason })
-=======
     axiosAuth
       .post(`/api/boards/${id}/report`, { reason })
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
       .then((res) => {
         const msg =
           res.data?.message ||

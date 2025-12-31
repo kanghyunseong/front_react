@@ -41,18 +41,11 @@ const CarsDetail = () => {
   const [selectedReview, setSelectedReview] = useState(null);
   const [refresh, setRefresh] = useState(0);
   const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
-<<<<<<< HEAD
-  // 차량 정보 가져오기
-  useEffect(() => {
-    axios
-      .get(`${apiUrl}/cars/${carId}`)
-=======
 
   // 차량 정보 가져오기
   useEffect(() => {
     axios
       .get(`${apiUrl}/api/cars/${carId}`)
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
       .then((result) => {
         console.log(result);
         setCar(result.data[0]);
@@ -68,11 +61,7 @@ const CarsDetail = () => {
   // 리뷰 가져오기
   useEffect(() => {
     axios
-<<<<<<< HEAD
-      .get(`${apiUrl}/reviews/${carId}`)
-=======
       .get(`${apiUrl}/api/reviews/${carId}`)
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
       .then((result) => {
         console.log(result);
         setReviews(result.data);
@@ -86,11 +75,7 @@ const CarsDetail = () => {
   // 리뷰 수정하기
   const reviewUpdate = (updatedData) => {
     axios
-<<<<<<< HEAD
-      .put(`${apiUrl}/reviews`, updatedData, {
-=======
       .put(`${apiUrl}/api/reviews`, updatedData, {
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
         headers: { Authorization: `Bearer ${auth.accessToken}` },
       })
       .then((result) => {
@@ -109,11 +94,7 @@ const CarsDetail = () => {
   const reviewDelete = (reviewNo) => {
     if (!confirm("리뷰를 삭제하시겠습니까?")) return;
     axios
-<<<<<<< HEAD
-      .delete(`${apiUrl}/reviews/${reviewNo}`, {
-=======
       .delete(`${apiUrl}/api/reviews/${reviewNo}`, {
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
         headers: { Authorization: `Bearer ${auth.accessToken}` },
       })
       .then((result) => {

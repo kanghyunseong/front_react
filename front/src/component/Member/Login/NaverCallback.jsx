@@ -7,7 +7,6 @@ const NaverLoginCallback = () => {
   const [msg, setMsg] = useState("");
   const { login } = useContext(AuthContext); // 로그인 함수 가져오기
   const navi = useNavigate(); // navigate hook 사용
-  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   useEffect(() => {
     // URL의 쿼리 파라미터에서 code와 state 추출
@@ -18,7 +17,7 @@ const NaverLoginCallback = () => {
     if (code && state) {
       // 백엔드로 code와 state를 전달하는 요청
       axiosPublic
-        .getList(`members/naver/callback?code=${code}&state=${state}`)
+        .getList(`/api/members/naver/callback?code=${code}&state=${state}`)
         .then((response) => {
           // 로그인 성공 후, AuthContext에 로그인 정보 저장
           const {

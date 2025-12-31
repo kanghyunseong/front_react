@@ -59,7 +59,7 @@ const UserChangePwd = () => {
     //     }
     //   )
     axiosAuth
-      .put(`members`, { userPwd, changePwd })
+      .put(`/api/members`, { userPwd, changePwd })
       .then((result) => {
         // console.log(result);
         if (result.success === "요청 성공") {

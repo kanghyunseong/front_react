@@ -31,7 +31,7 @@ const UserDelete = () => {
       return;
     }
     axiosAuth
-      .deleteUser(`/members`, { data: { userPwd } })
+      .deleteUser(`/api/members`, { userPwd })
       .then((result) => {
         console.log(result);
         alert(result.message);

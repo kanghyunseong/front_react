@@ -61,15 +61,13 @@ const ImgBoardDetail = () => {
       .finally(() => {
         setLoading(false);
       });
-    }, [id, navi, auth?.accessToken]);
+  }, [id, navi, auth?.accessToken]);
 
-    useEffect(() => {
-      return () => {
-        previewUrls.forEach((url) =>
-          URL.revokeObjectURL(url)
-        );
-      };
-    }, [previewUrls]);
+  useEffect(() => {
+    return () => {
+      previewUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [previewUrls]);
 
   // 삭제
   const handleDelete = () => {
@@ -81,13 +79,8 @@ const ImgBoardDetail = () => {
 
     if (!window.confirm("정말 삭제할까요?")) return;
 
-<<<<<<< HEAD
-    api
-      .delete(`${apiUrl}/imgBoards/${id}`)
-=======
     axiosAuth
       .delete(`/api/imgBoards/${id}`)
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
       .then((res) => {
         const msg = res.data?.message || "삭제되었습니다!";
         alert(msg);
@@ -125,15 +118,9 @@ const ImgBoardDetail = () => {
       });
     }
 
-<<<<<<< HEAD
-    api
-      .put(`${apiUrl}/imgBoards/${id}`, formData)
-      .then((res) => {
-=======
     axiosAuth
       .put(`/api/imgBoards/${id}`, formData)
       .then(() => {
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
         alert("수정되었습니다!");
         return axiosAuth.getActual(`/api/imgBoards/${id}`);
       })
@@ -165,13 +152,8 @@ const ImgBoardDetail = () => {
       return;
     }
 
-<<<<<<< HEAD
-    api
-      .post(`${apiUrl}/imgBoards/${id}/report`, { reason })
-=======
     axiosAuth
       .post(`/api/imgBoards/${id}/report`, { reason })
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
       .then((res) => {
         const msg =
           res.data?.message ||
@@ -228,9 +210,8 @@ const ImgBoardDetail = () => {
               onChange={(e) => {
                 const files = e.target.files ? Array.from(e.target.files) : [];
                 setEditFiles(files);
-                const urls = files.map((file) => 
-                  URL.createObjectURL(file));
-                  setPreviewUrls(urls);
+                const urls = files.map((file) => URL.createObjectURL(file));
+                setPreviewUrls(urls);
               }}
             />
           </div>
@@ -243,35 +224,33 @@ const ImgBoardDetail = () => {
                   : "현재 등록된 이미지"}
               </div>
 
-              {editFiles.length > 0 ? (
-                previewUrls.map((url, idx) => (
-                  <img
-                    key={idx}
-                    src={url}
-                    alt="preview"
-                    style={{
-                      maxWidth: "100%",
-                      borderRadius: "8px",
-                      marginBottom: "10px",
-                      display: "block",
-                    }}
-                  />
-                ))
-              ) : (
-                imgBoard.attachments?.map((att) => (
-                  <img
-                    key={att.fileNo}
-                    src={att.filePath}
-                    alt={att.originName}
-                    style={{
-                      maxWidth: "100%",
-                      borderRadius: "8px",
-                      marginBottom: "10px",
-                      display: "block",
-                    }}
-                  />
-                ))
-              )}
+              {editFiles.length > 0
+                ? previewUrls.map((url, idx) => (
+                    <img
+                      key={idx}
+                      src={url}
+                      alt="preview"
+                      style={{
+                        maxWidth: "100%",
+                        borderRadius: "8px",
+                        marginBottom: "10px",
+                        display: "block",
+                      }}
+                    />
+                  ))
+                : imgBoard.attachments?.map((att) => (
+                    <img
+                      key={att.fileNo}
+                      src={att.filePath}
+                      alt={att.originName}
+                      style={{
+                        maxWidth: "100%",
+                        borderRadius: "8px",
+                        marginBottom: "10px",
+                        display: "block",
+                      }}
+                    />
+                  ))}
             </div>
           )}
 

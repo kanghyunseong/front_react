@@ -75,18 +75,8 @@ const UserUpdate = () => {
     formData.append("phone", phone);
     if (file) formData.append("licenseImg", file);
 
-<<<<<<< HEAD
     axiosAuth
-      .put(`/members/updateUser`, formData)
-=======
-    axios
-      .put(`${apiUrl}/api/members/updateUser`, formData, {
-        headers: {
-          Authorization: `Bearer ${auth.accessToken}`,
-          "Content-Type": "multipart/form-data",
-        },
-      })
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
+      .put(`/api/members/updateUser`, formData)
       .then((res) => {
         const data = res.data;
         //console.log(data);

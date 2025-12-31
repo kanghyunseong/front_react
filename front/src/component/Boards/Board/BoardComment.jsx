@@ -37,19 +37,9 @@ const BoardComment = ({ boardNo }) => {
   const loadComments = () => {
     if (!boardNo) return;
 
-<<<<<<< HEAD
-    api
-      .get(`${apiUrl}/comments`, {
-        params: { boardNo },
-      })
-      .then((res) => {
-        setComments(res.data || []);
-      })
-=======
     axiosPublic
-    .getActual(`/api/comments?boardNo=${boardNo}`)
-    .then(setComments)
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
+      .getActual(`/api/comments?boardNo=${boardNo}`)
+      .then(setComments)
       .catch((err) => {
         console.error("댓글 조회 실패:", err);
         // 401 등의 안내는 인터셉터에서
@@ -82,13 +72,8 @@ const BoardComment = ({ boardNo }) => {
       return;
     }
 
-<<<<<<< HEAD
-    api
-      .post(`${apiUrl}/comments`, {
-=======
     axiosAuth
       .post("/api/comments", {
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
         refBno: boardNo,
         commentContent,
       })
@@ -124,13 +109,8 @@ const BoardComment = ({ boardNo }) => {
       return;
     }
 
-<<<<<<< HEAD
-    api
-      .put(`${apiUrl}/comments/${commentNo}`, {
-=======
     axiosAuth
       .put(`/api/comments/${commentNo}`, {
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
         commentContent: editingContent,
       })
       .then((res) => {
@@ -151,13 +131,8 @@ const BoardComment = ({ boardNo }) => {
   const handleDeleteComment = (commentNo) => {
     if (!window.confirm("정말 이 댓글을 삭제하시겠습니까?")) return;
 
-<<<<<<< HEAD
-    api
-      .delete(`${apiUrl}/comments/${commentNo}`)
-=======
     axiosAuth
       .delete(`/api/comments/${commentNo}`)
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
       .then((res) => {
         const msg = res.data?.message || "댓글이 삭제되었습니다.";
         alert(msg);
@@ -182,13 +157,8 @@ const BoardComment = ({ boardNo }) => {
       return;
     }
 
-<<<<<<< HEAD
-    api
-      .post(`${apiUrl}/comments/${reportingCommentId}/report`, { reason })
-=======
     axiosAuth
       .post(`/api/comments/${reportingCommentId}/report`, { reason })
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
       .then((res) => {
         const msg = res.data?.message || "댓글 신고가 접수되었습니다.";
         alert(msg);

@@ -67,10 +67,10 @@ const Input = styled.input`
   border-radius: 6px;
   font-size: 14px;
   box-sizing: border-box;
-  
+
   &:focus {
     outline: none;
-    border-color: #4CAF50;
+    border-color: #4caf50;
   }
 `;
 
@@ -83,14 +83,14 @@ const ButtonContainer = styled.div`
 
 const ConfirmButton = styled.button`
   padding: 10px 20px;
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
-  
+
   &:hover {
     background-color: #45a049;
   }
@@ -105,21 +105,23 @@ const CancelButtonStyled = styled.button`
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
-  
+
   &:hover {
     background-color: #e0e0e0;
   }
 `;
 
 const ReviewChangeModal = ({ isOpen, onClose, review, onConfirm }) => {
-  const [reviewContent, setReviewContent] = useState(review?.reviewContent || "");
+  const [reviewContent, setReviewContent] = useState(
+    review?.reviewContent || ""
+  );
 
   if (!isOpen) return null;
 
   const handleSubmit = () => {
     const updatedData = {
       reviewNo: review?.reviewNo,
-      reviewContent
+      reviewContent,
     };
     onConfirm(updatedData);
   };
@@ -134,11 +136,11 @@ const ReviewChangeModal = ({ isOpen, onClose, review, onConfirm }) => {
 
         <FormGroup>
           <Label>리뷰번호</Label>
-          <Input 
-            type="text" 
-            value={review.reviewNo || ""} 
-            disabled 
-            style={{ backgroundColor: '#f5f5f5' }}
+          <Input
+            type="text"
+            value={review.reviewNo || ""}
+            disabled
+            style={{ backgroundColor: "#f5f5f5" }}
           />
         </FormGroup>
 
@@ -152,12 +154,8 @@ const ReviewChangeModal = ({ isOpen, onClose, review, onConfirm }) => {
         </FormGroup>
 
         <ButtonContainer>
-          <CancelButtonStyled onClick={onClose}>
-            취소
-          </CancelButtonStyled>
-          <ConfirmButton onClick={handleSubmit}>
-            수정 완료
-          </ConfirmButton>
+          <CancelButtonStyled onClick={onClose}>취소</CancelButtonStyled>
+          <ConfirmButton onClick={handleSubmit}>수정 완료</ConfirmButton>
         </ButtonContainer>
       </ModalContent>
     </ModalOverlay>

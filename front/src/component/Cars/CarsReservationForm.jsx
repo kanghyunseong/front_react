@@ -60,20 +60,12 @@ const CarReservationForm = () => {
       return;
     }
 
-<<<<<<< HEAD
     axios
       .post(
-        `${apiUrl}/reserve`,
+        `${apiUrl}/api/reserve`,
         { carId, startTime, endTime, destination },
         { headers: { Authorization: `Bearer ${auth.accessToken}` } }
       )
-=======
-    axios.post(
-      `${apiUrl}/api/reserve`,
-      { carId, startTime, endTime, destination },
-      { headers: { Authorization: `Bearer ${auth.accessToken}` } }
-    )
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
       .then((res) => {
         console.log("전체 응답:", res.data);
         const reservationNo = res.data;

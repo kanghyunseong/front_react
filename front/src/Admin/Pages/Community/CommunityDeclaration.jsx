@@ -11,10 +11,6 @@ const CommunityDeclaration = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
-<<<<<<< HEAD
-=======
-
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
   useEffect(() => {
     if (!auth || !auth.accessToken) {
       setLoading(false);
@@ -25,11 +21,7 @@ const CommunityDeclaration = () => {
       setLoading(true);
       try {
         const response = await axios.get(
-<<<<<<< HEAD
-          `${apiUrl}/admin/api/community/declaration`,
-=======
           `${apiUrl}/api/admin/api/community/declaration`,
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
           {
             headers: { Authorization: `Bearer ${auth.accessToken}` },
           }
@@ -59,11 +51,7 @@ const CommunityDeclaration = () => {
 
     try {
       await axios.delete(
-<<<<<<< HEAD
-        `${apiUrl}/admin/api/community/declaration/delete/${reportNo}`,
-=======
         `${apiUrl}/api/admin/api/community/declaration/delete/${reportNo}`,
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
         {
           headers: { Authorization: `Bearer ${auth.accessToken}` },
         }
@@ -105,11 +93,7 @@ const CommunityDeclaration = () => {
     try {
       setLoading(true);
       await axios.put(
-<<<<<<< HEAD
-        `${apiUrl}/admin/api/community/declaration/reject/${reportNo}`,
-=======
         `${apiUrl}/api/admin/api/community/declaration/reject/${reportNo}`,
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
         {},
         {
           headers: { Authorization: `Bearer ${auth.accessToken}` },

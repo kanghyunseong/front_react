@@ -25,20 +25,12 @@ const CarsUsageHistory = () => {
   const [visibleCount, setVisibleCount] = useState(5);
   const [loading, setLoading] = useState(true);
   const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
-<<<<<<< HEAD
-  useEffect(() => {
-    setLoading(true);
-    axios
-      .get(`${apiUrl}/reserve/history`, {
-        headers: { Authorization: `Bearer ${auth.accessToken}` },
-=======
 
   useEffect(() => {
     setLoading(true);
     axios
       .get(`${apiUrl}/api/reserve/history`, {
-        headers: { Authorization: `Bearer ${auth.accessToken}` }
->>>>>>> 56355bf5bcecc4a203a44b67dda988ddc33893ae
+        headers: { Authorization: `Bearer ${auth.accessToken}` },
       })
       .then((result) => {
         console.log(result.data);
