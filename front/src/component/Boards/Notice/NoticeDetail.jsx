@@ -19,7 +19,7 @@ const NoticeDetail = () => {
 
   const [notice, setNotice] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   useEffect(() => {
     // 토큰 없으면 로그인 페이지로
     if (!auth?.accessToken) {

@@ -33,7 +33,7 @@ const BoardDetail = () => {
   // 신고 기능
   const [reportOpen, setReportOpen] = useState(false);
   const [reportTarget, setReportTarget] = useState(null);
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   // 게시글 상세 조회
   useEffect(() => {
     // 프론트에서 1차로 로그인 체크 (선택 사항)

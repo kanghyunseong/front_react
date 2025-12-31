@@ -37,7 +37,7 @@ const Board = () => {
 
   const navi = useNavigate();
   const { auth } = useContext(AuthContext);
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   // 공통 목록 로딩 (일반 / 검색 둘 다 여기서 처리)
   useEffect(() => {
     // 검색 모드인데 아직 검색 파라미터가 없으면 호출 X

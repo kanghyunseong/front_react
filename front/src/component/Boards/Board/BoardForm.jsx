@@ -11,7 +11,7 @@ const BoardForm = () => {
 
   const { auth } = useContext(AuthContext);
   const navi = useNavigate();
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   // 로그인 체크
   useEffect(() => {
     if (!auth.isAuthenticated) {

@@ -21,7 +21,7 @@ const CarsOverview = () => {
   const [cars, setCars] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   useEffect(() => {
     const fetchAllCars = async () => {
       try {

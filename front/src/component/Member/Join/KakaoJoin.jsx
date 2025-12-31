@@ -18,8 +18,10 @@ import "react-datepicker/dist/react-datepicker.css";
 import defaultImg from "../../../assets/LoginFileImg.png";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
+import { axiosPublic } from "../../../api/reqService";
 const KakaoJoin = () => {
   const location = useLocation();
+
   const { userId, refreshToken, accessToken, provider } = location.state || {};
   console.log(
     "카카오 회원가입 데이터:",
@@ -46,6 +48,7 @@ const KakaoJoin = () => {
     email: "",
     phone: "",
   });
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   useEffect(() => {
     if (userId === undefined) {
@@ -141,8 +144,11 @@ const KakaoJoin = () => {
       console.log(file);
     }
 
-    axios
-      .post("http://localhost:8081/members/kakao", formData)
+    // axios
+    //   .post(`${apiUrl}/members/kakao`, formData)
+    axiosPublic
+      .post(`/api/members/kakao`, formData)
+
       .then((result) => {
         console.log(result);
         if (result.status === 200) {

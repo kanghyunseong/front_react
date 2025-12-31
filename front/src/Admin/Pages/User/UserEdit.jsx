@@ -15,6 +15,7 @@ const UserEdit = () => {
   const { userNo } = useParams();
   const navigate = useNavigate();
   const { auth } = useContext(AuthContext);
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   const [user, setUser] = useState({
     userNo: "",

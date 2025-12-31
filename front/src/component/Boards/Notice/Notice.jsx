@@ -30,7 +30,7 @@ const Notice = () => {
   const [isSearchMode, setIsSearchMode] = useState(false); // 검색 모드 여부
 
   const navi = useNavigate();
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   // 공지사항 목록(전체 조회 or 검색 결과) 로딩
   const loadNotices = () => {
     const baseUrl = "/api/notices";

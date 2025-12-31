@@ -32,7 +32,7 @@ const BoardComment = ({ boardNo }) => {
   // 신고 기능
   const [reportOpen, setReportOpen] = useState(false);
   const [reportingCommentId, setReportingCommentId] = useState(null);
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   // 댓글 목록 불러오기
   const loadComments = () => {
     if (!boardNo) return;

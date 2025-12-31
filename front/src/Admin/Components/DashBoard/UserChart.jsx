@@ -33,6 +33,7 @@ import {
 } from "./UserChart.styles";
 import { ChartContainer } from "./UserStatsBarChart.styles";
 
+// Chart.js에 필요한 컴포넌트 등록 (사용하려면 필수!)
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -50,6 +51,7 @@ const UserChart = () => {
   const [unit, setUnit] = useState("month");
   const [chartData, setChartData] = useState({ labels: [], values: [] });
   const [totalCount, setTotalCount] = useState(0);
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   useEffect(() => {
     const fetchData = async () => {

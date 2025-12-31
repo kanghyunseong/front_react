@@ -21,6 +21,7 @@ const UserOverview = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   const fetchUsers = async (page) => {
     setLoading(true);

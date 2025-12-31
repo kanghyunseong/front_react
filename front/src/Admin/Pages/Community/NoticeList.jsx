@@ -17,7 +17,7 @@ const NoticeList = () => {
   const [loading, setLoading] = useState(true);
   const [notices, setNotices] = useState([]);
   const { auth } = useContext(AuthContext);
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   useEffect(() => {
     const fetchNotices = async () => {
       if (!auth || !auth.accessToken) {

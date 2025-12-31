@@ -26,7 +26,10 @@ const axiosPublicInstance = axios.create({
  * [알맹이 추출용 함수]
  * 서버 응답의 ResponseData 구조에서 실제 data 필드만 반환합니다.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cba368bb5db228e9ec38c9b872756846a88b2c56
 const unwrap = (res) =>
   res.data?.data !== undefined ? res.data.data : res.data;
 
@@ -34,6 +37,7 @@ const unwrap = (res) =>
 // 2. 인증 필요한 요청 (axiosAuth)
 // --------------------------------------------------------
 export const axiosAuth = {
+<<<<<<< HEAD
   // [구조 A] 전체 응답이 필요한 경우 (기존 방식 유지)
   // 결과: { message: "...", data: [...], success: "..." }
   getList: (url) => axiosAuthInstance.get(url).then((res) => ({ ...res.data })),
@@ -43,6 +47,12 @@ export const axiosAuth = {
   getActual: (url) => axiosAuthInstance.get(url).then(unwrap),
 
   // 생성 (FormData 지원 + 전체 응답 반환)
+=======
+  getList: (url) => axiosAuthInstance.get(url).then((res) => ({ ...res.data })),
+
+  getActual: (url) => axiosAuthInstance.get(url).then(unwrap),
+
+>>>>>>> cba368bb5db228e9ec38c9b872756846a88b2c56
   create: (url, obj, file) => {
     const formData = new FormData();
     if (obj) Object.keys(obj).forEach((key) => formData.append(key, obj[key]));
@@ -54,16 +64,28 @@ export const axiosAuth = {
       .then((res) => ({ ...res.data }));
   },
 
+<<<<<<< HEAD
   // 수정 (PUT)
   put: (url, data = {}) =>
     axiosAuthInstance.put(url, data).then((res) => ({ ...res.data })),
 
   // 삭제 (DELETE)
+=======
+  put: (url, data = {}) =>
+    axiosAuthInstance.put(url, data).then((res) => ({ ...res.data })),
+
+>>>>>>> cba368bb5db228e9ec38c9b872756846a88b2c56
   delete: (url, pk) =>
     axiosAuthInstance
       .delete(pk ? `${url}/${pk}` : url)
       .then((res) => ({ ...res.data })),
 
+<<<<<<< HEAD
+=======
+  deleteUser: (url, data) =>
+    axiosAuthInstance.delete(url, { data }).then((res) => ({ ...res.data })),
+
+>>>>>>> cba368bb5db228e9ec38c9b872756846a88b2c56
   post: (url, data = {}) =>
     axiosAuthInstance.post(url, data).then((res) => ({ ...res.data })),
 };
@@ -75,10 +97,15 @@ export const axiosPublic = {
   getList: (url) =>
     axiosPublicInstance.get(url).then((res) => ({ ...res.data })),
   getActual: (url) => axiosPublicInstance.get(url).then(unwrap),
+<<<<<<< HEAD
 
   post: (url, data) =>
     axiosPublicInstance.post(url, data).then((res) => ({ ...res.data })),
 
+=======
+  post: (url, data) =>
+    axiosPublicInstance.post(url, data).then((res) => ({ ...res.data })),
+>>>>>>> cba368bb5db228e9ec38c9b872756846a88b2c56
   create: (url, obj, file) => {
     const formData = new FormData();
     if (obj) Object.keys(obj).forEach((key) => formData.append(key, obj[key]));

@@ -11,7 +11,7 @@ const NoticeEdit = () => {
   const { noticeNo } = useParams();
   const { auth } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   const [formData, setFormData] = useState({
     noticeNo: "",
     noticeTitle: "",

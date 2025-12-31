@@ -24,12 +24,13 @@ const CarsUsageHistory = () => {
   const [reservation, setReservation] = useState([]);
   const [visibleCount, setVisibleCount] = useState(5);
   const [loading, setLoading] = useState(true);
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   useEffect(() => {
     setLoading(true);
     axios
-      .get("http://localhost:8081/reserve/history", {
-        headers: { Authorization: `Bearer ${auth.accessToken}` }
+      .get(`${apiUrl}/api/reserve/history`, {
+        headers: { Authorization: `Bearer ${auth.accessToken}` },
       })
       .then((result) => {
         console.log(result.data);
@@ -57,51 +58,51 @@ const CarsUsageHistory = () => {
 
   // 상태 표시 텍스트 변환
   const getStatusText = (reservationStatus, returnStatus) => {
-    if (returnStatus === 'Y') return '반납완료';
-    if (reservationStatus === 'Y') return '이용중';
-    if (reservationStatus === 'N') return '예약취소';
-    return '알 수 없음';
+    if (returnStatus === "Y") return "반납완료";
+    if (reservationStatus === "Y") return "이용중";
+    if (reservationStatus === "N") return "예약취소";
+    return "알 수 없음";
   };
 
   // 상태별 스타일 반환
   const getStatusStyle = (reservationStatus, returnStatus) => {
-    if (returnStatus === 'Y') {
+    if (returnStatus === "Y") {
       // 반납완료 - 초록색
       return {
-        color: '#27ae60',
-        backgroundColor: '#d4edda',
-        padding: '6px 12px',
-        borderRadius: '8px',
-        fontWeight: '600'
+        color: "#27ae60",
+        backgroundColor: "#d4edda",
+        padding: "6px 12px",
+        borderRadius: "8px",
+        fontWeight: "600",
       };
     }
-    if (reservationStatus === 'Y') {
+    if (reservationStatus === "Y") {
       // 이용중 - 파란색
       return {
-        color: '#3498db',
-        backgroundColor: '#d1ecf1',
-        padding: '6px 12px',
-        borderRadius: '8px',
-        fontWeight: '600'
+        color: "#3498db",
+        backgroundColor: "#d1ecf1",
+        padding: "6px 12px",
+        borderRadius: "8px",
+        fontWeight: "600",
       };
     }
-    if (reservationStatus === 'N') {
+    if (reservationStatus === "N") {
       // 예약취소 - 빨간색
       return {
-        color: '#e74c3c',
-        backgroundColor: '#f8d7da',
-        padding: '6px 12px',
-        borderRadius: '8px',
-        fontWeight: '600'
+        color: "#e74c3c",
+        backgroundColor: "#f8d7da",
+        padding: "6px 12px",
+        borderRadius: "8px",
+        fontWeight: "600",
       };
     }
     // 기본
     return {
-      color: '#1f1f13',
-      backgroundColor: '#e9ecef',
-      padding: '6px 12px',
-      borderRadius: '8px',
-      fontWeight: '600'
+      color: "#1f1f13",
+      backgroundColor: "#e9ecef",
+      padding: "6px 12px",
+      borderRadius: "8px",
+      fontWeight: "600",
     };
   };
 
@@ -112,9 +113,7 @@ const CarsUsageHistory = () => {
         <SideBar />
         <MainContainer>
           <PageTitle>차량 이용 기록 내역</PageTitle>
-          <div style={{ textAlign: 'center', padding: '50px' }}>
-            로딩중...
-          </div>
+          <div style={{ textAlign: "center", padding: "50px" }}>로딩중...</div>
         </MainContainer>
       </>
     );
@@ -131,7 +130,9 @@ const CarsUsageHistory = () => {
             <SectionTitle>지난 이용 목록 ({reservation.length}건)</SectionTitle>
 
             {reservation.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '50px', color: '#666' }}>
+              <div
+                style={{ textAlign: "center", padding: "50px", color: "#666" }}
+              >
                 이용 기록이 없습니다.
               </div>
             ) : (
@@ -141,26 +142,29 @@ const CarsUsageHistory = () => {
                     <RecordItem key={record.reservation.reservationNo}>
                       <RecordInfo>
                         <RecordDate>
-                          {record.reservation.startTime} ~ {record.reservation.endTime}
+                          {record.reservation.startTime} ~{" "}
+                          {record.reservation.endTime}
                         </RecordDate>
                         <RecordDetail>
-                          차량: {record.car.carName} ({record.car.carSize}) · 
+                          차량: {record.car.carName} ({record.car.carSize}) ·
                           목적지: {record.reservation.destination}
                         </RecordDetail>
-                        <RecordDetail style={{ fontSize: '0.9em', color: '#888' }}>
-                          주행거리: {record.car.carDriving}km · 
-                          배터리: {record.car.battery}kWh · 
-                          효율: {record.car.carEfficiency}km/kWh
+                        <RecordDetail
+                          style={{ fontSize: "0.9em", color: "#888" }}
+                        >
+                          주행거리: {record.car.carDriving}km · 배터리:{" "}
+                          {record.car.battery}kWh · 효율:{" "}
+                          {record.car.carEfficiency}km/kWh
                         </RecordDetail>
                       </RecordInfo>
-                      <RecordStatus 
+                      <RecordStatus
                         style={getStatusStyle(
                           record.reservation.reservationStatus,
                           record.reservation.returnStatus
                         )}
                       >
                         {getStatusText(
-                          record.reservation.reservationStatus, 
+                          record.reservation.reservationStatus,
                           record.reservation.returnStatus
                         )}
                       </RecordStatus>

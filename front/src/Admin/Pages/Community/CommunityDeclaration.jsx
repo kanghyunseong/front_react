@@ -10,7 +10,7 @@ const CommunityDeclaration = () => {
   const [reportList, setReportsList] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   useEffect(() => {
     if (!auth?.accessToken) {
       setLoading(false);
