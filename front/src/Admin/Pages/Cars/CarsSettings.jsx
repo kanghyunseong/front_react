@@ -14,7 +14,6 @@ const CarsSettings = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
-
   const fetchCars = async (page) => {
     if (!auth || !auth.accessToken) {
       setLoading(false);
@@ -70,14 +69,11 @@ const CarsSettings = () => {
     if (window.confirm("정말로 이 차량을 삭제하시겠습니까?")) {
       try {
         setLoading(true);
-        await axios.delete(
-          `${apiUrl}/api/admin/api/settings/${carId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${auth.accessToken}`,
-            },
-          }
-        );
+        await axios.delete(`${apiUrl}/api/admin/api/settings/${carId}`, {
+          headers: {
+            Authorization: `Bearer ${auth.accessToken}`,
+          },
+        });
 
         alert("차량이 삭제되었습니다.");
         fetchCars(currentPage);

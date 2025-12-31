@@ -8,14 +8,13 @@ import {
   ChangePwdButton,
 } from "./UserDetail.styles";
 import { AuthContext } from "../../../context/AuthContext";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { axiosAuth } from "../../../api/reqService";
 const UserChangePwd = () => {
   const [userPwd, setUserPwd] = useState("");
   const [changePwd, setchangePwd] = useState("");
   const { auth } = useContext(AuthContext);
   const navi = useNavigate();
-  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   useEffect(() => {
     if (auth && auth.isAuthenticated !== undefined) {
@@ -27,8 +26,8 @@ const UserChangePwd = () => {
   }, [auth, navi]);
   const handleUpdatePassword = (e) => {
     e.preventDefault();
-    console.log("현재 비밀번호:", userPwd);
-    console.log("변경 비밀번호:", changePwd);
+    // console.log("현재 비밀번호:", userPwd);
+    // console.log("변경 비밀번호:", changePwd);
 
     const regexpPwd = /^[a-zA-Z0-9]{5,20}$/;
 
@@ -46,28 +45,31 @@ const UserChangePwd = () => {
       return;
     }
 
-    axios
-      .put(
-        `${apiUrl}/api/members`,
-        {
-          userPwd,
-          changePwd,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${auth.accessToken}`,
-          },
-        }
-      )
+    // axios
+    //   .put(
+    //     `${apiUrl}/members`,
+    //     {
+    //       userPwd,
+    //       changePwd,
+    //     },
+    //     {
+    //       headers: {
+    //         Authorization: `Bearer ${auth.accessToken}`,
+    //       },
+    //     }
+    //   )
+    axiosAuth
+      .put(`/api/members`, { userPwd, changePwd })
       .then((result) => {
-        if (result.status === 201) {
-          alert("비밀번호 변경에 성공하셨습니다.");
+        // console.log(result);
+        if (result.success === "요청 성공") {
+          alert(result.message);
           navi("/members/detail");
         }
       })
       .catch((err) => {
         const errorMessage =
-          err?.response?.data["error-message"] || "비밀번호 변경 중 문제 발생";
+          err.response.data.message || "비밀번호 변경 중 문제 발생";
         alert(errorMessage);
       });
   };

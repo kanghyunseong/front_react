@@ -26,14 +26,14 @@ const CarsStatsBarChart = () => {
   const { auth } = useContext(AuthContext);
   const [chartData, setChartData] = useState({ labels: [], datasets: [] });
   const [loading, setLoading] = useState(true);
-  const apiUrl = window.ENV?.API_URL || "https://yoosh.store";
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   useEffect(() => {
     const fetchData = async () => {
       if (!auth || !auth.accessToken) return;
       try {
         const response = await axios.get(
-          `${apiUrl}/api/admin/api/settings/daily-stats`,
+          `${apiUrl}/admin/api/settings/daily-stats`,
           { headers: { Authorization: `Bearer ${auth.accessToken}` } }
         );
 

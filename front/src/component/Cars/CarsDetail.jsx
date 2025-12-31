@@ -53,8 +53,8 @@ const CarsDetail = () => {
       })
       .catch((err) => {
         console.log(err);
-         alert(err.response.data["error-message"]);
-         navi("/cars/searchList")
+        alert(err.response.data["error-message"]);
+        navi("/cars/searchList");
       });
   }, [carId, refresh]);
 
@@ -88,8 +88,7 @@ const CarsDetail = () => {
         console.log(err);
         alert("리뷰변경을 실패했습니다.");
       });
-  }
-
+  };
 
   // 리뷰 삭제하기
   const reviewDelete = (reviewNo) => {
@@ -104,8 +103,8 @@ const CarsDetail = () => {
       })
       .catch((err) => {
         console.log(err);
-      })
-  }
+      });
+  };
 
   if (car == null) return <div>빠이</div>;
 
@@ -171,13 +170,21 @@ const CarsDetail = () => {
                     {/* 로그인한 사용자와 리뷰 작성자가 같을 때만 버튼 표시 */}
                     {auth.userNo === String(review?.reviewWriter) && (
                       <ReviewActionButtons>
-                        <EditButton onClick={() => {
-                          setSelectedReview(review);
-                          setModalOpen(true);
-                        }}>수정</EditButton>
-                        <DeleteButton onClick={() => {
-                          reviewDelete(review?.reviewNo);
-                        }}>삭제</DeleteButton>
+                        <EditButton
+                          onClick={() => {
+                            setSelectedReview(review);
+                            setModalOpen(true);
+                          }}
+                        >
+                          수정
+                        </EditButton>
+                        <DeleteButton
+                          onClick={() => {
+                            reviewDelete(review?.reviewNo);
+                          }}
+                        >
+                          삭제
+                        </DeleteButton>
                       </ReviewActionButtons>
                     )}
                   </ReviewHeader>
@@ -185,7 +192,9 @@ const CarsDetail = () => {
                 </ReviewItem>
               ))
             ) : (
-              <EmptyReviewMessage>아직 작성된 리뷰가 없습니다.</EmptyReviewMessage>
+              <EmptyReviewMessage>
+                아직 작성된 리뷰가 없습니다.
+              </EmptyReviewMessage>
             )}
           </ReviewSection>
 

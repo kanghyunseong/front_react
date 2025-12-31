@@ -33,7 +33,7 @@ const BoardDetail = () => {
   // 신고 기능
   const [reportOpen, setReportOpen] = useState(false);
   const [reportTarget, setReportTarget] = useState(null);
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   // 게시글 상세 조회
   useEffect(() => {
     // 프론트에서 1차로 로그인 체크 (선택 사항)
@@ -136,8 +136,7 @@ const BoardDetail = () => {
       })
       .catch((err) => {
         console.error("게시글 신고 실패:", err);
-        const msg =
-          err.response?.data?.message || "신고 접수에 실패했습니다.";
+        const msg = err.response?.data?.message || "신고 접수에 실패했습니다.";
         alert(msg);
       });
   };

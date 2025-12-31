@@ -74,7 +74,7 @@ const UserChart = () => {
       // 로그인 했으면 실제 API 호출
       try {
         const res = await axios.get(
-          `${apiUrl}/api/admin/api/users/trend?unit=${unit}`,
+          `${apiUrl}/admin/api/users/trend?unit=${unit}`,
           {
             headers: { Authorization: `Bearer ${auth.accessToken}` },
           }

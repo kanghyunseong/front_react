@@ -16,7 +16,7 @@ import { useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import defaultImg from "../../../assets/LoginFileImg.png";
-import axios from "axios";
+import { axiosPublic } from "../../../api/reqService";
 
 const Join = () => {
   const navi = useNavigate();
@@ -43,7 +43,6 @@ const Join = () => {
     phone: "",
     confirmPwd: "",
   });
-  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   // 날짜용 const
 
@@ -137,22 +136,35 @@ const Join = () => {
       console.log(file);
     }
 
-    axios
-      .post(`${apiUrl}/api/members`, formData)
-      .then((result) => {
-        console.log(result);
-        if (result.status === 201) {
-          alert("회원 가입 성공");
+    // axios
+    //   .post(`${apiUrl}/members`, formData)
+    //   .then((result) => {
+    //     console.log(result);
+    //     if (result.status === 201) {
+    //       alert("회원 가입 성공");
+    //       setTimeout(() => {
+    //         navi("/members/login");
+    //       }, 1000);
+    //     }
+    //   })
+    axiosPublic
+      .post(`/api/members`, formData)
+      .then((res) => {
+        console.log(res);
+        if (res.message) {
+          alert(res.message);
+
           setTimeout(() => {
             navi("/members/login");
           }, 1000);
         }
       })
       .catch((error) => {
+        console.log(error);
         if (error.message === "Network Error") {
           alert("서버네트워크의 문제가 생겼습니다.");
         }
-        alert(error.response.data["error-message"]);
+        alert(error.response.data.message);
         isLoading(false);
       });
   };

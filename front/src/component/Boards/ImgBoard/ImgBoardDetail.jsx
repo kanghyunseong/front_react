@@ -17,6 +17,7 @@ import {
 import gasipan from "../../../assets/gasipan.png";
 
 const ImgBoardDetail = () => {
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   const { id } = useParams();
   const navi = useNavigate();
 
@@ -60,15 +61,13 @@ const ImgBoardDetail = () => {
       .finally(() => {
         setLoading(false);
       });
-    }, [id, navi, auth?.accessToken]);
+  }, [id, navi, auth?.accessToken]);
 
-    useEffect(() => {
-      return () => {
-        previewUrls.forEach((url) =>
-          URL.revokeObjectURL(url)
-        );
-      };
-    }, [previewUrls]);
+  useEffect(() => {
+    return () => {
+      previewUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [previewUrls]);
 
   // 삭제
   const handleDelete = () => {
@@ -89,8 +88,7 @@ const ImgBoardDetail = () => {
       })
       .catch((err) => {
         console.error("삭제 실패:", err);
-        const msg =
-          err.response?.data?.message || "삭제에 실패했습니다.";
+        const msg = err.response?.data?.message || "삭제에 실패했습니다.";
         alert(msg);
       });
   };
@@ -136,8 +134,7 @@ const ImgBoardDetail = () => {
       })
       .catch((err) => {
         console.error("수정 실패:", err);
-        const msg =
-          err.response?.data?.message || "수정에 실패했습니다.";
+        const msg = err.response?.data?.message || "수정에 실패했습니다.";
         alert(msg);
       });
   };
@@ -166,8 +163,7 @@ const ImgBoardDetail = () => {
       })
       .catch((err) => {
         console.error("게시글 신고 실패:", err);
-        const msg =
-          err.response?.data?.message || "신고 접수에 실패했습니다.";
+        const msg = err.response?.data?.message || "신고 접수에 실패했습니다.";
         alert(msg);
       });
   };
@@ -212,13 +208,10 @@ const ImgBoardDetail = () => {
               accept="image/*"
               multiple
               onChange={(e) => {
-                const files = e.target.files
-                  ? Array.from(e.target.files)
-                  : [];
+                const files = e.target.files ? Array.from(e.target.files) : [];
                 setEditFiles(files);
-                const urls = files.map((file) => 
-                  URL.createObjectURL(file));
-                  setPreviewUrls(urls);
+                const urls = files.map((file) => URL.createObjectURL(file));
+                setPreviewUrls(urls);
               }}
             />
           </div>
@@ -231,35 +224,33 @@ const ImgBoardDetail = () => {
                   : "현재 등록된 이미지"}
               </div>
 
-              {editFiles.length > 0 ? (
-                previewUrls.map((url, idx) => (
-                  <img
-                    key={idx}
-                    src={url}
-                    alt="preview"
-                    style={{
-                      maxWidth: "100%",
-                      borderRadius: "8px",
-                      marginBottom: "10px",
-                      display: "block",
-                    }}
-                  />
-                ))
-              ) : (
-                imgBoard.attachments?.map((att) => (
-                  <img
-                    key={att.fileNo}
-                    src={att.filePath}
-                    alt={att.originName}
-                    style={{
-                      maxWidth: "100%",
-                      borderRadius: "8px",
-                      marginBottom: "10px",
-                      display: "block",
-                    }}
-                  />
-                ))
-              )}
+              {editFiles.length > 0
+                ? previewUrls.map((url, idx) => (
+                    <img
+                      key={idx}
+                      src={url}
+                      alt="preview"
+                      style={{
+                        maxWidth: "100%",
+                        borderRadius: "8px",
+                        marginBottom: "10px",
+                        display: "block",
+                      }}
+                    />
+                  ))
+                : imgBoard.attachments?.map((att) => (
+                    <img
+                      key={att.fileNo}
+                      src={att.filePath}
+                      alt={att.originName}
+                      style={{
+                        maxWidth: "100%",
+                        borderRadius: "8px",
+                        marginBottom: "10px",
+                        display: "block",
+                      }}
+                    />
+                  ))}
             </div>
           )}
 

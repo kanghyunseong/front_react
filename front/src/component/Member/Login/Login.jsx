@@ -14,24 +14,29 @@ import {
 } from "../styles/Styles";
 import logo from "../../../assets/HeaderLogo.png";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { AuthContext } from "../../../context/AuthContext";
+import { axiosPublic } from "../../../api/reqService";
 
 const Login = () => {
+  const CLIENT_API = window.ENV?.CLIENT_URL || "http://localhost:5173";
+  const NAVER_REDIRECT_URI = `${CLIENT_API}/members/naver/callback`;
   const navi = useNavigate();
   const [memberId, setUserId] = useState("");
   const [memberPwd, setUserPwd] = useState("");
   const [msg, setMsg] = useState("");
   const { login } = useContext(AuthContext);
-  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   const kakaoLogin = () => {
-    location.href =
-      "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=9ab6eed4ca0b2e40761693da623540b9&redirect_uri=http://52.79.239.42:5173/members/kakao/callback";
+    location.href = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=9ab6eed4ca0b2e40761693da623540b9&redirect_uri=${CLIENT_API}/members/kakao/callback`;
   };
   const naverLogin = () => {
     location.href =
-      "https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=Kki4fyVYcYf_zkU2HAq8&redirect_uri=http%3A%2F%2F52.79.239.42%3A5173%2Fmembers%2Fnaver%2Fcallback&state=state_1763619065972_14825";
+      "https://nid.naver.com/oauth2.0/authorize" +
+      "?response_type=code" +
+      "&client_id=Kki4fyVYcYf_zkU2HAq8" +
+      "&redirect_uri=" +
+      encodeURIComponent(NAVER_REDIRECT_URI) +
+      "&state=state_1763619065972_14825";
 
     //const barabam = await axios.get("http://localhost:8081/members/naver");
     /*
@@ -65,10 +70,15 @@ const Login = () => {
       setMsg("");
     }
 
-    axios
-      .post(`${apiUrl}/api/members/login`, {
-        memberId,
-        memberPwd,
+    // axios
+    //   .post("http://localhost:8081/members/login", {
+    //     memberId,
+    //     memberPwd,
+    //   })
+    axiosPublic
+      .post("/api/members/login", {
+        memberId: memberId,
+        memberPwd: memberPwd,
       })
       .then((result) => {
         console.log(result);
@@ -97,12 +107,11 @@ const Login = () => {
           birthDay,
           licenseUrl
         );
-        alert("로그인에 성공하셨습니다.");
+        alert(result.message);
         navi("/");
       })
       .catch((error) => {
-        console.error(error);
-        alert(error.response.data["error-message"]);
+        alert(error.response.data.message);
       });
   };
   return (

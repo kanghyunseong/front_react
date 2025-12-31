@@ -10,7 +10,6 @@ const NoticeList = () => {
   const [notices, setNotices] = useState([]);
   const { auth } = useContext(AuthContext);
   const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
-
   useEffect(() => {
     const fetchNotices = async () => {
       if (!auth || !auth.accessToken) {
@@ -64,10 +63,9 @@ const NoticeList = () => {
 
     try {
       setLoading(true);
-      await axios.delete(
-        `${apiUrl}/api/admin/api/notice/delete/${noticeNo}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axios.delete(`${apiUrl}/api/admin/api/notice/delete/${noticeNo}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setNotices((prevNotices) =>
         prevNotices.filter((notice) => notice.noticeNo !== noticeNo)
       );

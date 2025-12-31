@@ -66,7 +66,7 @@ const UserStatsBarChart = ({ unit = "month" }) => {
       } else {
         try {
           const res = await axios.get(
-            `${apiUrl}/api/admin/api/users/license/trend?unit=${unit}`,
+            `${apiUrl}/admin/api/users/license/trend?unit=${unit}`,
             { headers: { Authorization: `Bearer ${auth.accessToken}` } }
           );
           rawData = res.data;
@@ -133,10 +133,9 @@ const UserStatsBarChart = ({ unit = "month" }) => {
         return;
       }
       try {
-        const res = await axios.get(
-          `${apiUrl}/api/admin/api/users/kpi`,
-          { headers: { Authorization: `Bearer ${auth.accessToken}` } }
-        );
+        const res = await axios.get(`${apiUrl}/admin/api/users/kpi`, {
+          headers: { Authorization: `Bearer ${auth.accessToken}` },
+        });
         setKpiStats(res.data);
       } catch (err) {
         console.error("KPI 데이터 로딩 실패:", err);

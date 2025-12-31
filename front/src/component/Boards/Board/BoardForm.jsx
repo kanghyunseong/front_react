@@ -2,14 +2,7 @@ import { useEffect, useContext, useState } from "react";
 import { AuthContext } from "../../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { axiosAuth } from "../../../api/reqService.js";
-import {
-  Container,
-  Header,
-  Form,
-  Input,
-  Label,
-  Button,
-} from "./Board.styles";
+import { Container, Header, Form, Input, Label, Button } from "./Board.styles";
 import gasipan from "../../../assets/gasipan.png";
 
 const BoardForm = () => {
@@ -18,7 +11,7 @@ const BoardForm = () => {
 
   const { auth } = useContext(AuthContext);
   const navi = useNavigate();
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   // 로그인 체크
   useEffect(() => {
     if (!auth.isAuthenticated) {

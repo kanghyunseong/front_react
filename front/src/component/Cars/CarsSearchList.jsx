@@ -24,7 +24,7 @@ import {
   BatteryLabel,
   BatteryValue,
   DetailButton,
-  LoadMoreButton
+  LoadMoreButton,
 } from "./CarsSearchList.style";
 
 const CarsSearchList = () => {
@@ -46,12 +46,14 @@ const CarsSearchList = () => {
         setMains(res.data);
         // popularCars 배열에서 랜덤으로 하나 선택
         if (res.data.popularCars && res.data.popularCars.length > 0) {
-          const randomIndex = Math.floor(Math.random() * res.data.popularCars.length);
+          const randomIndex = Math.floor(
+            Math.random() * res.data.popularCars.length
+          );
           setRandomCar(res.data.popularCars[randomIndex]);
         }
       })
       .catch((err) => {
-        console.error('메인 정보 로드 실패:', err);
+        console.error("메인 정보 로드 실패:", err);
       });
   }, []);
 
@@ -69,8 +71,10 @@ const CarsSearchList = () => {
         }
 
         setCars((prevCars) => {
-          const existingIds = new Set(prevCars.map(car => car.carId));
-          const uniqueNewCars = newCars.filter(car => !existingIds.has(car.carId));
+          const existingIds = new Set(prevCars.map((car) => car.carId));
+          const uniqueNewCars = newCars.filter(
+            (car) => !existingIds.has(car.carId)
+          );
           return [...prevCars, ...uniqueNewCars];
         });
 
@@ -79,13 +83,16 @@ const CarsSearchList = () => {
         }
       })
       .catch((err) => {
-        const errorMessage = err.response?.data?.['error-message'];
+        const errorMessage = err.response?.data?.["error-message"];
 
-        if (errorMessage?.includes('조회된') || errorMessage?.includes('없습니다')) {
+        if (
+          errorMessage?.includes("조회된") ||
+          errorMessage?.includes("없습니다")
+        ) {
           setHasMore(false);
         } else {
-          setErrMsg(errorMessage || '오류가 발생했습니다');
-          console.error('차량 목록 로드 실패:', err);
+          setErrMsg(errorMessage || "오류가 발생했습니다");
+          console.error("차량 목록 로드 실패:", err);
         }
       })
       .finally(() => {
@@ -109,10 +116,10 @@ const CarsSearchList = () => {
                   src={randomCar.carImage}
                   alt={`${randomCar.carName} 이미지`}
                   style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    borderRadius: 'inherit'
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    borderRadius: "inherit",
                   }}
                 />
               ) : null}
@@ -157,13 +164,13 @@ const CarsSearchList = () => {
           {errMsg ? (
             <div
               style={{
-                padding: '20px',
-                textAlign: 'center',
-                color: '#d32f2f',
-                backgroundColor: '#ffebee',
-                borderRadius: '8px',
-                marginTop: '20px',
-                fontWeight: 'bold'
+                padding: "20px",
+                textAlign: "center",
+                color: "#d32f2f",
+                backgroundColor: "#ffebee",
+                borderRadius: "8px",
+                marginTop: "20px",
+                fontWeight: "bold",
               }}
             >
               ⚠️ {errMsg}
@@ -179,10 +186,10 @@ const CarsSearchList = () => {
                           src={car.carImage}
                           alt={`${car.carName} 이미지`}
                           style={{
-                            width: '100%',
-                            height: '100%',
-                            borderRadius: '8px',
-                            objectFit: 'cover'
+                            width: "100%",
+                            height: "100%",
+                            borderRadius: "8px",
+                            objectFit: "cover",
                           }}
                         />
                       ) : (
@@ -205,15 +212,13 @@ const CarsSearchList = () => {
               </CarGrid>
 
               {isLoading && (
-                <div style={{ textAlign: 'center', padding: '20px' }}>
+                <div style={{ textAlign: "center", padding: "20px" }}>
                   로딩 중...
                 </div>
               )}
 
               {hasMore && !isLoading && (
-                <LoadMoreButton onClick={increasePage}>
-                  더보기
-                </LoadMoreButton>
+                <LoadMoreButton onClick={increasePage}>더보기</LoadMoreButton>
               )}
             </>
           )}

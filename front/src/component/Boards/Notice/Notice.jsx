@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { axiosPublic } from "../../../api/reqService.js";
@@ -31,7 +30,7 @@ const Notice = () => {
   const [isSearchMode, setIsSearchMode] = useState(false); // 검색 모드 여부
 
   const navi = useNavigate();
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   // 공지사항 목록(전체 조회 or 검색 결과) 로딩
   const loadNotices = () => {
     const baseUrl = "/api/notices";
@@ -41,12 +40,12 @@ const Notice = () => {
 
     const query = new URLSearchParams(
       isSearchMode
-        ? { type: searchType, keyword: keyword.trim(), page, }
+        ? { type: searchType, keyword: keyword.trim(), page }
         : { page }
-      ).toString();
+    ).toString();
 
     axiosPublic
-      .getActual(`${url}?${ query }`)
+      .getActual(`${url}?${query}`)
       .then((data) => {
         setNotices(data.content || []);
         setTotalPages(data.totalPages || 1);
@@ -76,7 +75,7 @@ const Notice = () => {
       alert("검색어를 입력하세요!");
       return;
     }
-    setPage(0);        // 검색 시 첫 페이지로
+    setPage(0); // 검색 시 첫 페이지로
     setIsSearchMode(true);
   };
 

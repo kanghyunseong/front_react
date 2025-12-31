@@ -45,10 +45,9 @@ const CarsReservation = () => {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   const { auth } = useContext(AuthContext);
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   useEffect(() => {
     const fetchReservations = async () => {
       if (!auth || !auth.accessToken) {

@@ -16,7 +16,7 @@ const ImgBoardForm = () => {
   const [imgBoardTitle, setImgBoardTitle] = useState("");
   const [imgBoardContent, setImgBoardContent] = useState("");
   const [files, setFiles] = useState([]); // 여러 개
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   const { auth } = useContext(AuthContext);
   const navi = useNavigate();
 
