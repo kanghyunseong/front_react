@@ -1,30 +1,20 @@
 import React, { useState, useEffect, useContext, useMemo } from "react";
-import { Doughnut, Bar, Pie } from "react-chartjs-2";
-import axios from "axios";
+import { Doughnut } from "react-chartjs-2";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import {
-  Chart as ChartJS,
-  ArcElement,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import { FaCar, FaChargingStation, FaRoad, FaTools } from "react-icons/fa";
+  FaCar,
+  FaChargingStation,
+  FaRoad,
+  FaExclamationTriangle,
+  FaChevronRight,
+  FaBatteryThreeQuarters,
+} from "react-icons/fa";
 import { AuthContext } from "../../../context/AuthContext";
 import * as S from "./CarsOverview.styles";
 import { useNavigate } from "react-router-dom";
+import { axiosAuth } from "../../../api/reqService";
 
-ChartJS.register(
-  ArcElement,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 const CarsOverview = () => {
   const { auth } = useContext(AuthContext);
@@ -34,293 +24,219 @@ const CarsOverview = () => {
   const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   useEffect(() => {
     const fetchAllCars = async () => {
-      if (!auth || !auth.accessToken) return;
       try {
-        const response = await axios.get(
-          `${apiUrl}/api/admin/api/settings?page=1&limit=100`,
-          {
-            headers: { Authorization: `Bearer ${auth.accessToken}` },
-          }
+        setLoading(true);
+        const response = await axiosAuth.getActual(
+          `/api/admin/settings?page=1&limit=100`
         );
-        setCars(response.data.cars || []);
+        const actualCars =
+          response?.cars ||
+          response?.carList ||
+          (Array.isArray(response) ? response : []);
+        setCars(actualCars);
       } catch (error) {
-        console.error("대시보드 데이터 로딩 실패:", error);
-        if (
-          error.response &&
-          (error.response.status === 401 || error.response.status === 403)
-        ) {
-          alert(
-            "세션이 만료되었거나 접근 권한이 없습니다. 로그인 페이지로 이동합니다."
-          );
-          navigate("/members/login");
-        } else {
-          alert("데이터를 불러오는 데 실패했습니다. 서버 상태를 확인해주세요.");
-          setCars([]);
-        }
+        console.error("Data loading failed", error);
+        setCars([]);
       } finally {
-        setLoading(false);
+        setTimeout(() => setLoading(false), 600); // 부드러운 전환 효과
       }
     };
     fetchAllCars();
-  }, [auth]);
+  }, []);
 
   const summary = useMemo(() => {
-    if (cars.length === 0)
+    if (!cars.length)
       return { total: 0, avgKm: 0, avgEff: 0, maintenanceCount: 0 };
     const total = cars.length;
     const totalKm = cars.reduce(
-      (acc, car) => acc + (parseFloat(car.carDriving) || 0),
+      (acc, car) => acc + (parseFloat(car.carDriving || car.CARDRIVING) || 0),
       0
     );
     const totalEff = cars.reduce(
-      (acc, car) => acc + Number(car.carEfficiency || 0),
+      (acc, car) =>
+        acc + (parseFloat(car.carEfficiency || car.CAREFFICIENCY) || 0),
       0
     );
-    const maint = cars.filter(
-      (c) => c.carStatus === "R" || c.carStatus === "정비중"
+    const maint = cars.filter((c) =>
+      ["R", "정비중"].includes(c.carStatus || c.CARSTATUS)
     ).length;
     return {
-      total: total,
+      total,
       avgKm: Math.round(totalKm / total).toLocaleString(),
       avgEff: (totalEff / total).toFixed(1),
       maintenanceCount: maint,
     };
   }, [cars]);
 
-  const statusChartData = useMemo(() => {
-    const statusCount = { Available: 0, Rented: 0, Maintenance: 0 };
-    cars.forEach((car) => {
-      if (car.carStatus === "Y" || car.carStatus === "대기중")
-        statusCount.Available++;
-      else if (car.carStatus === "N" || car.carStatus === "이용중")
-        statusCount.Rented++;
-      else if (car.carStatus === "R" || car.carStatus === "정비중")
-        statusCount.Maintenance++;
-      else statusCount.Available++;
-    });
-    return {
-      labels: ["Available", "Rented"],
-      datasets: [
-        {
-          data: [statusCount.Available, statusCount.Rented],
-          backgroundColor: ["#10B981", "#6B4CE6"],
-          borderWidth: 0,
-          cutout: "75%",
-        },
-      ],
-    };
-  }, [cars]);
+  const statusData = {
+    labels: ["이용 가능", "이용 중"],
+    datasets: [
+      {
+        data: [
+          cars.filter((c) =>
+            ["Y", "대기중"].includes(c.carStatus || c.CARSTATUS)
+          ).length,
+          cars.filter((c) =>
+            ["N", "이용중"].includes(c.carStatus || c.CARSTATUS)
+          ).length,
+        ],
+        backgroundColor: ["#10b981", "#6366f1"],
+        hoverOffset: 20,
+        borderWidth: 0,
+        borderRadius: 5,
+      },
+    ],
+  };
 
-  const typeChartData = useMemo(() => {
-    const typeCount = { Small: 0, Medium: 0, Large: 0 };
-    cars.forEach((car) => {
-      const size = car.carSize || "";
-      if (size === "소형" || size === "Small") typeCount.Small++;
-      else if (size === "중형" || size === "Medium") typeCount.Medium++;
-      else if (size === "대형" || size === "Large") typeCount.Large++;
-    });
-    return {
-      labels: ["Small (소형)", "Medium (중형)", "Large (대형)"],
-      datasets: [
-        {
-          data: [typeCount.Small, typeCount.Medium, typeCount.Large],
-          backgroundColor: ["#A78BFA", "#8B5CF6", "#6B4CE6"],
-          borderWidth: 1,
-        },
-      ],
-    };
-  }, [cars]);
+  const lowBatteryCars = cars
+    .filter((c) => Number(c.battery || c.BATTERY) < 40)
+    .sort(
+      (a, b) => Number(a.battery || a.BATTERY) - Number(b.battery || b.BATTERY)
+    )
+    .slice(0, 4);
 
-  const mileageChartData = useMemo(() => {
-    const buckets = [0, 0, 0, 0, 0];
-    cars.forEach((car) => {
-      const km = Number(car.carDriving || 0);
-      if (km < 10000) buckets[0]++;
-      else if (km < 30000) buckets[1]++;
-      else if (km < 50000) buckets[2]++;
-      else if (km < 100000) buckets[3]++;
-      else buckets[4]++;
-    });
-    return {
-      labels: ["< 10k", "10k-30k", "30k-50k", "50k-100k", "100k+"],
-      datasets: [
-        {
-          label: "Vehicles",
-          data: buckets,
-          backgroundColor: "#6B4CE6",
-          borderRadius: 4,
-          barThickness: 20,
-        },
-      ],
-    };
-  }, [cars]);
-
-  const { efficiencyChartData, lowBatteryCars } = useMemo(() => {
-    const sortedByEff = [...cars]
-      .sort((a, b) => Number(b.carEfficiency) - Number(a.carEfficiency))
-      .slice(0, 5);
-    const effData = {
-      labels: sortedByEff.map((c) => c.carName),
-      datasets: [
-        {
-          label: "km/kWh",
-          data: sortedByEff.map((c) => c.carEfficiency),
-          backgroundColor: sortedByEff.map((_, i) =>
-            i === 0 ? "#10B981" : "#D1FAE5"
-          ),
-          borderRadius: 4,
-          barThickness: 15,
-          indexAxis: "y",
-        },
-      ],
-    };
-    const lowBat = cars.filter((c) => Number(c.battery) < 40).slice(0, 3);
-    return { efficiencyChartData: effData, lowBatteryCars: lowBat };
-  }, [cars]);
-
-  if (loading) return <S.NoData>대시보드 데이터를 분석 중입니다...</S.NoData>;
+  if (loading)
+    return <S.LoadingWrapper>운영 데이터를 분석 중입니다...</S.LoadingWrapper>;
 
   return (
-    <div>
-      <S.PageTitle>Cars / Overview</S.PageTitle>
+    <S.Container>
+      <S.PageHeader>
+        <S.PageTitle>운영 차량 종합 관제</S.PageTitle>
+        <S.LastUpdated>실시간 데이터 업데이트 됨</S.LastUpdated>
+      </S.PageHeader>
 
-      <S.Row>
-        <StatBox
+      <S.StatRow>
+        <StatItem
           icon={<FaCar />}
-          label="Total Cars"
+          label="전체 차량"
           value={summary.total}
-          sub="Registered"
+          sub="대"
+          desc="등록 차량 기준"
         />
-        <StatBox
+        <StatItem
           icon={<FaRoad />}
-          label="Avg. Mileage"
-          value={`${summary.avgKm} km`}
-          sub="Average"
+          label="평균 주행거리"
+          value={summary.avgKm}
+          sub="km"
+          desc="누적 평균 데이터"
         />
-        <StatBox
+        <StatItem
           icon={<FaChargingStation />}
-          label="Avg. Efficiency"
-          value={`${summary.avgEff} km/kWh`}
-          sub="Performance"
+          label="평균 전비"
+          value={summary.avgEff}
+          sub="km/kWh"
+          desc="최적 성능 기준"
         />
-      </S.Row>
+        <StatItem
+          icon={<FaExclamationTriangle />}
+          label="정비 필요"
+          value={summary.maintenanceCount}
+          sub="대"
+          desc="즉시 점검 권고"
+          isWarning={summary.maintenanceCount > 0}
+        />
+      </S.StatRow>
 
-      <S.Container>
-        <S.Column flex={2}>
-          <S.Row>
-            <S.Card>
-              <h3>Fleet Status</h3>
-              <S.ChartContainer height="200px">
-                {cars.length > 0 ? (
-                  <>
-                    <Doughnut
-                      data={statusChartData}
-                      options={{
-                        maintainAspectRatio: false,
-                        plugins: {
-                          legend: {
-                            position: "right",
-                            labels: { boxWidth: 10, font: { size: 24 } },
-                          },
-                        },
-                      }}
-                    />
-                    <S.DonutOverlay>
-                      <S.OverlayValue>{summary.total}</S.OverlayValue>
-                      <S.OverlayLabel>Total</S.OverlayLabel>
-                    </S.DonutOverlay>
-                  </>
-                ) : (
-                  <S.NoData>No Data</S.NoData>
-                )}
-              </S.ChartContainer>
-            </S.Card>
-
-            <S.Card>
-              <h3>Fleet Type (Size)</h3>
-              <S.ChartContainer height="200px">
-                {cars.length > 0 ? (
-                  <Pie
-                    data={typeChartData}
-                    options={{
-                      maintainAspectRatio: false,
-                      plugins: { legend: { position: "right" } },
-                    }}
-                  />
-                ) : (
-                  <S.NoData>No Data</S.NoData>
-                )}
-              </S.ChartContainer>
-            </S.Card>
-          </S.Row>
-
-          <S.Card>
-            <h3>Mileage Distribution</h3>
-            <S.ChartContainer height="200px">
-              <Bar
-                data={mileageChartData}
+      <S.MainGrid>
+        <S.Card>
+          <S.CardHeader>
+            <h3>
+              차량 이용 통계 <span>Status Overview</span>
+            </h3>
+          </S.CardHeader>
+          <S.ChartContainer>
+            <S.ChartWrapper>
+              <Doughnut
+                data={statusData}
                 options={{
                   maintainAspectRatio: false,
-                  plugins: { legend: { display: false } },
-                  scales: {
-                    y: { grid: { borderDash: [5, 5] } },
-                    x: { grid: { display: false } },
+                  cutout: "84%",
+                  plugins: {
+                    legend: {
+                      position: "bottom",
+                      labels: {
+                        usePointStyle: true,
+                        padding: 30,
+                        font: { size: 12, weight: "700", family: "Pretendard" },
+                      },
+                    },
+                    tooltip: {
+                      backgroundColor: "#1e293b",
+                      padding: 12,
+                      cornerRadius: 10,
+                      titleFont: { size: 14 },
+                      bodyFont: { size: 13 },
+                    },
                   },
                 }}
               />
-            </S.ChartContainer>
-          </S.Card>
-        </S.Column>
+              <S.DonutCenter>
+                <div className="num">{summary.total}</div>
+                <div className="label">Units</div>
+              </S.DonutCenter>
+            </S.ChartWrapper>
+          </S.ChartContainer>
+        </S.Card>
 
-        <S.Column flex={1}>
+        <S.SideColumn>
           <S.Card>
-            <h3>Top Efficiency Models</h3>
-            <S.SubText>km per kWh (Higher is better)</S.SubText>
-            <S.ChartContainer height="250px">
-              <Bar
-                data={efficiencyChartData}
-                options={{
-                  indexAxis: "y",
-                  maintainAspectRatio: false,
-                  plugins: { legend: { display: false } },
-                  scales: {
-                    x: { display: false },
-                    y: { grid: { display: false } },
-                  },
-                }}
-              />
-            </S.ChartContainer>
-          </S.Card>
-
-          <S.Card>
-            <h3>Low Battery Alert ⚠️</h3>
+            <S.CardHeader>
+              <h3>
+                배터리 관리 <FaBatteryThreeQuarters />
+              </h3>
+            </S.CardHeader>
             {lowBatteryCars.length === 0 ? (
-              <S.SafeMessage>모든 차량의 배터리가 충분합니다.</S.SafeMessage>
+              <S.EmptyState>
+                <div style={{ fontSize: "24px", marginBottom: "8px" }}>✅</div>
+                모든 차량의 충전 상태가 양호합니다.
+              </S.EmptyState>
             ) : (
-              <S.List>
-                {lowBatteryCars.map((car, idx) => (
-                  <S.ListItem key={idx}>
-                    <span>{car.carName}</span>
-                    <S.BatteryLevel>{car.battery}%</S.BatteryLevel>
-                  </S.ListItem>
-                ))}
-              </S.List>
+              lowBatteryCars.map((car, idx) => (
+                <S.BatteryProgress key={idx} $idx={idx}>
+                  <div className="label-group">
+                    <span className="car-name">
+                      {car.carName || car.CARNAME}
+                    </span>
+                    <span className="battery-val">
+                      {car.battery || car.BATTERY}%
+                    </span>
+                  </div>
+                  <S.ProgressBar>
+                    <S.ProgressFill $width={car.battery || car.BATTERY} />
+                  </S.ProgressBar>
+                </S.BatteryProgress>
+              ))
             )}
           </S.Card>
-        </S.Column>
-      </S.Container>
-    </div>
+
+          <S.ActionCard>
+            <h3>Operational Insights</h3>
+            <p>
+              현재 <strong>{summary.maintenanceCount}대</strong>의 차량이 점검
+              대기 중입니다. 안정적인 셰어링 운영을 위해 상세 점검 이력을 확인해
+              주세요.
+            </p>
+            <S.ActionButton onClick={() => navigate("/admin/cars/settings")}>
+              관리 센터 바로가기 <FaChevronRight />
+            </S.ActionButton>
+          </S.ActionCard>
+        </S.SideColumn>
+      </S.MainGrid>
+    </S.Container>
   );
 };
 
-const StatBox = ({ icon, label, value, sub, isWarning }) => (
-  <S.StatCard>
+const StatItem = ({ icon, label, value, sub, desc, isWarning }) => (
+  <S.StatCard $isWarning={isWarning}>
     <S.IconWrapper $isWarning={isWarning}>{icon}</S.IconWrapper>
-    <S.StatInfo>
-      <S.StatLabel>{label}</S.StatLabel>
-      <S.StatValue>{value}</S.StatValue>
-      <S.StatSub $isWarning={isWarning}>{sub}</S.StatSub>
-    </S.StatInfo>
+    <S.StatContent>
+      <div className="label">{label}</div>
+      <div className="value-group">
+        <span className="value">{value}</span>
+        <span className="unit">{sub}</span>
+      </div>
+      <div className="desc">{desc}</div>
+    </S.StatContent>
   </S.StatCard>
 );
 

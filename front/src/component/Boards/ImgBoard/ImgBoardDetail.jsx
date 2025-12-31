@@ -69,6 +69,12 @@ const ImgBoardDetail = () => {
     };
   }, [previewUrls]);
 
+  useEffect(() => {
+    return () => {
+      previewUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [previewUrls]);
+
   // 삭제
   const handleDelete = () => {
     if (!auth?.accessToken) {

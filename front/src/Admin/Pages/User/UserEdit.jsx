@@ -1,18 +1,18 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
-import styled from "styled-components";
 import { AuthContext } from "../../../context/AuthContext";
+import * as S from "./UserEdit.styles";
+import { axiosAuth } from "../../../api/reqService";
 import {
-  ApproveButton,
-  ButtonGroup,
-  Container,
-  FormGroup,
-  LicenseSection,
-} from "./UserEdit.styles";
+  FaUser,
+  FaEnvelope,
+  FaIdCard,
+  FaCheckCircle,
+  FaArrowLeft,
+} from "react-icons/fa";
 
 const UserEdit = () => {
-  const { userNo } = useParams(); // URL에서 userNo 가져오기
+  const { userNo } = useParams();
   const navigate = useNavigate();
   const { auth } = useContext(AuthContext);
   const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
@@ -23,109 +23,160 @@ const UserEdit = () => {
     email: "",
     phone: "",
     licenseImg: "",
-    licenseStatus: "N", // 기본값
+    licenseStatus: "N",
   });
   const [loading, setLoading] = useState(true);
 
-  // 1. 유저 정보 불러오기
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axios.get(
-          `${apiUrl}/admin/api/users/${userNo}`,
-          {
-            headers: { Authorization: `Bearer ${auth.accessToken}` },
-          }
-        );
+        setLoading(true);
+        const response = await axiosAuth.getList(`/api/admin/users/${userNo}`);
         setUser(response.data);
       } catch (err) {
         console.error("유저 정보 조회 실패:", err);
         alert("유저 정보를 불러오는데 실패했습니다.");
+        navigate(-1);
       } finally {
         setLoading(false);
       }
     };
     fetchUser();
-  }, [userNo, auth.accessToken]);
+  }, [userNo, auth.accessToken, navigate]);
 
-  // 2. 입력값 변경 핸들러
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUser({ ...user, [name]: value });
   };
 
-  // 3. 면허 승인 (N -> Y) 핸들러
   const handleApprove = () => {
-    if (window.confirm("면허증을 확인하였으며, 승인하시겠습니까?")) {
+    if (window.confirm("면허증 정보를 확인했으며, 승인하시겠습니까?")) {
       setUser({ ...user, licenseStatus: "Y" });
     }
   };
 
-  // 4. 저장 (수정 요청)
   const handleSubmit = async () => {
     try {
-      await axios.put(`${apiUrl}/admin/api/users`, user, {
-        headers: { Authorization: `Bearer ${auth.accessToken}` },
-      });
-      alert("수정되었습니다.");
-      navigate("/admin/user/userOverview"); // 목록으로 복귀
+      await axiosAuth.put(`/api/admin/users`, user);
+      alert("정보가 성공적으로 수정되었습니다.");
+      navigate("/admin/user/userOverview");
     } catch (err) {
       console.error("수정 실패:", err);
-      alert("수정에 실패했습니다.");
+      alert("정보 수정에 실패했습니다.");
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading)
+    return (
+      <S.LoadingWrapper>사용자 데이터를 불러오는 중입니다...</S.LoadingWrapper>
+    );
 
   return (
-    <Container>
-      <h2>User Edit / Approval</h2>
-
-      <FormGroup>
-        <label>이름</label>
-        <input name="userName" value={user.userName} onChange={handleChange} />
-      </FormGroup>
-
-      <FormGroup>
-        <label>이메일</label>
-        <input name="email" value={user.email} onChange={handleChange} />
-      </FormGroup>
-
-      <LicenseSection>
-        <h3>운전면허증 확인</h3>
-        <div className="img-box">
-          {user.licenseImg ? (
-            <img src={user.licenseImg} alt="면허증" />
-          ) : (
-            <div className="no-img">등록된 면허증이 없습니다.</div>
-          )}
+    <S.PageWrapper>
+      <S.TitleSection>
+        <div className="back-nav" onClick={() => navigate(-1)}>
+          <FaArrowLeft /> 돌아가기
         </div>
+        <h2>
+          User Management <span>Edit & Approval</span>
+        </h2>
+        <p>
+          사용자의 개인정보 수정 및 면허증 진위 여부를 확인하여 가입을
+          승인합니다.
+        </p>
+      </S.TitleSection>
 
-        <div className="status-box">
-          <span>
-            현재 상태: <strong>{user.licenseStatus}</strong>
-          </span>
+      <S.Container>
+        <S.MainGrid>
+          {/* 왼쪽: 기본 정보 수정 섹션 */}
+          <S.FormSection>
+            <S.SectionHeader>
+              <FaUser /> 기본 정보
+            </S.SectionHeader>
+            <S.FormGroup>
+              <label>이름</label>
+              <div className="input-wrapper">
+                <FaUser className="input-icon" />
+                <input
+                  name="userName"
+                  value={user.userName}
+                  onChange={handleChange}
+                  placeholder="이름을 입력하세요"
+                />
+              </div>
+            </S.FormGroup>
 
-          {user.licenseStatus === "N" && (
-            <ApproveButton onClick={handleApprove}>
-              승인하기 (Y로 변경)
-            </ApproveButton>
-          )}
-          {user.licenseStatus === "Y" && (
-            <span style={{ color: "green", marginLeft: "10px" }}>
-              ✅ 승인 완료됨
-            </span>
-          )}
-        </div>
-      </LicenseSection>
+            <S.FormGroup>
+              <label>이메일 계정</label>
+              <div className="input-wrapper">
+                <FaEnvelope className="input-icon" />
+                <input
+                  name="email"
+                  value={user.email}
+                  onChange={handleChange}
+                  placeholder="example@email.com"
+                />
+              </div>
+            </S.FormGroup>
 
-      <ButtonGroup>
-        <button onClick={() => navigate(-1)}>취소</button>
-        <button className="save" onClick={handleSubmit}>
-          저장
-        </button>
-      </ButtonGroup>
-    </Container>
+            <S.FormGroup>
+              <label>연락처</label>
+              <input
+                name="phone"
+                value={user.phone || ""}
+                onChange={handleChange}
+                placeholder="010-0000-0000"
+              />
+            </S.FormGroup>
+          </S.FormSection>
+
+          {/* 오른쪽: 면허 승인 섹션 */}
+          <S.LicenseSection>
+            <S.SectionHeader>
+              <FaIdCard /> 면허증 확인 및 승인
+            </S.SectionHeader>
+            <S.ImageContainer>
+              {user.licenseImg ? (
+                <img src={user.licenseImg} alt="Driver License" />
+              ) : (
+                <div className="no-img">
+                  <FaIdCard size={40} />
+                  <p>등록된 면허증 이미지가 없습니다.</p>
+                </div>
+              )}
+            </S.ImageContainer>
+
+            <S.StatusBox $isApproved={user.licenseStatus === "Y"}>
+              <div className="status-info">
+                <span className="label">현재 승인 상태</span>
+                <span className="value">
+                  {user.licenseStatus === "Y" ? "승인 완료" : "승인 대기"}
+                </span>
+              </div>
+
+              {user.licenseStatus === "N" ? (
+                <S.ApproveButton onClick={handleApprove}>
+                  면허 승인 처리
+                </S.ApproveButton>
+              ) : (
+                <div className="approved-badge">
+                  <FaCheckCircle /> 승인됨
+                </div>
+              )}
+            </S.StatusBox>
+          </S.LicenseSection>
+        </S.MainGrid>
+
+        <S.ButtonGroup>
+          <button className="cancel" onClick={() => navigate(-1)}>
+            취소
+          </button>
+          <button className="save" onClick={handleSubmit}>
+            변경사항 저장하기
+          </button>
+        </S.ButtonGroup>
+      </S.Container>
+    </S.PageWrapper>
   );
 };
 

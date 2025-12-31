@@ -20,18 +20,19 @@ const SideBar = () => {
   const location = useLocation();
   const { auth, logout } = useContext(AuthContext);
 
-  const currentUserName = auth?.userName || "Guest";
-  const currentUserRole = auth?.role || "USER";
+  const currentUserName = auth?.userName || "Guest Admin";
+  const currentUserRole = auth?.role || "ADMIN";
 
-  const [activeMenu, setActiveMenu] = useState({
-    cars: false,
-    community: false,
-    environments: false,
-    users: false,
+  // 메뉴 열림 상태 관리
+  const [openMenus, setOpenMenus] = useState({
+    cars: location.pathname.includes("/cars"),
+    community: location.pathname.includes("/community"),
+    environments: location.pathname.includes("/enviroments"),
+    users: location.pathname.includes("/user"),
   });
 
   const toggleMenu = (menu) => {
-    setActiveMenu({ ...activeMenu, [menu]: !activeMenu[menu] });
+    setOpenMenus((prev) => ({ ...prev, [menu]: !prev[menu] }));
   };
 
   const handleNavigation = (path) => {
@@ -39,100 +40,125 @@ const SideBar = () => {
   };
 
   const handleLogout = () => {
-    if (logout) {
-      logout();
+    if (window.confirm("관리자 페이지에서 로그아웃 하시겠습니까?")) {
+      if (logout) logout();
+      navigate("/");
     }
-    navigate("/");
   };
+
+  const handleNavi = () => {
+    if (window.confirm("관리자 페이지에서 메인 페이지로 이동하시겠습니까?")) {
+      navigate("/");
+    }
+  };
+
+  const isParentActive = (pathPart) => location.pathname.includes(pathPart);
 
   return (
     <S.SideBarContainer>
-      {/* 1. 로고 영역 */}
       <S.LogoArea>
         <h2>Share EV</h2>
       </S.LogoArea>
 
-      {/* 2. 사용자 정보 영역 추가 */}
       <S.UserInfoArea>
-        <FaUserCircle size={24} color="#fff" />
+        <FaUserCircle size={32} color="#4F46E5" />
         <div className="user-details">
-          <span className="user-name">Welcome, {currentUserName}</span>
-          <span className="user-role">({currentUserRole})</span>
+          <span className="user-name">{currentUserName}</span>
+          <span className="user-role">{currentUserRole}</span>
         </div>
       </S.UserInfoArea>
 
-      {/* 3. 메뉴 영역 */}
       <S.Menu>
         <S.MenuItem
           $active={location.pathname === "admin"}
-          onClick={() => handleNavigation("admin")}
+          onClick={() => handleNavigation("/admin")}
         >
-          <FaHome /> <span>Home</span>
+          <div className="title">
+            <FaHome /> <span>Dashboard</span>
+          </div>
         </S.MenuItem>
 
-        {/* Cars Menu */}
-        <S.MenuItem onClick={() => toggleMenu("cars")}>
+        <S.MenuItem
+          $active={isParentActive("/cars")}
+          onClick={() => toggleMenu("/cars")}
+        >
           <div className="title">
             <FaCar /> <span>Cars</span>
           </div>
-          {activeMenu.cars ? <FaChevronUp /> : <FaChevronDown />}
+          {openMenus.cars ? (
+            <FaChevronUp size={12} />
+          ) : (
+            <FaChevronDown size={12} />
+          )}
         </S.MenuItem>
-        {activeMenu.cars && (
+        {openMenus.cars && (
           <S.SubMenu>
-            <li onClick={() => handleNavigation("admin/cars/overview")}>
+            <li onClick={() => handleNavigation("/admin/cars/overview")}>
               Overview
             </li>
-            <li onClick={() => handleNavigation("admin/cars/reservation")}>
+            <li onClick={() => handleNavigation("/admin/cars/reservation")}>
               Reservation
             </li>
-            <li onClick={() => handleNavigation("admin/cars/registration")}>
+            <li onClick={() => handleNavigation("/admin/cars/registration")}>
               Registration
             </li>
-            <li onClick={() => handleNavigation("admin/cars/settings")}>
+            <li onClick={() => handleNavigation("/admin/cars/settings")}>
               Settings
             </li>
           </S.SubMenu>
         )}
 
-        {/* Community Menu */}
-        <S.MenuItem onClick={() => toggleMenu("community")}>
+        <S.MenuItem
+          $active={isParentActive("/community")}
+          onClick={() => toggleMenu("/community")}
+        >
           <div className="title">
             <FaComments /> <span>Community</span>
           </div>
-          {activeMenu.community ? <FaChevronUp /> : <FaChevronDown />}
+          {openMenus.community ? (
+            <FaChevronUp size={12} />
+          ) : (
+            <FaChevronDown size={12} />
+          )}
         </S.MenuItem>
-        {activeMenu.community && (
+        {openMenus.community && (
           <S.SubMenu>
             <li
-              onClick={() => handleNavigation("admin/community/declaration")}
+              onClick={() => handleNavigation("/admin/community/declaration")}
             >
-              Community Declaration
+              Declaration
             </li>
             <li
               onClick={() =>
-                handleNavigation("admin/community/comment/declaration")
+                handleNavigation("/admin/community/comment/declaration")
               }
             >
-              Comment Declaration
+              Comments
             </li>
-            <li onClick={() => navigate("admin/community/notice/noticeList")}>
-              Notice List
+            <li onClick={() => navigate("/admin/community/notice/noticeList")}>
+              Notice
             </li>
           </S.SubMenu>
         )}
 
-        {/* Environments Menu */}
-        <S.MenuItem onClick={() => toggleMenu("environments")}>
+        <S.MenuItem
+          $active={isParentActive("/enviroments")}
+          onClick={() => toggleMenu("environments")}
+        >
           <div className="title">
             <FaLeaf /> <span>Environments</span>
           </div>
-          {activeMenu.environments ? <FaChevronUp /> : <FaChevronDown />}
+          {openMenus.environments ? (
+            <FaChevronUp size={12} />
+          ) : (
+            <FaChevronDown size={12} />
+          )}
         </S.MenuItem>
-        {activeMenu.environments && (
+        {openMenus.environments && (
           <S.SubMenu>
             <li
               onClick={() =>
-                handleNavigation("admin/enviroments/enviromentsUserRanking")
+                handleNavigation("/admin/enviroments/enviromentsUserRanking")
               }
             >
               User Ranking
@@ -140,26 +166,35 @@ const SideBar = () => {
           </S.SubMenu>
         )}
 
-        {/* Users Menu */}
-        <S.MenuItem onClick={() => toggleMenu("users")}>
+        <S.MenuItem
+          $active={isParentActive("/user")}
+          onClick={() => toggleMenu("users")}
+        >
           <div className="title">
             <FaUsers /> <span>Users</span>
           </div>
-          {activeMenu.users ? <FaChevronUp /> : <FaChevronDown />}
+          {openMenus.users ? (
+            <FaChevronUp size={12} />
+          ) : (
+            <FaChevronDown size={12} />
+          )}
         </S.MenuItem>
-        {activeMenu.users && (
+        {openMenus.users && (
           <S.SubMenu>
-            <li onClick={() => handleNavigation("admin/user/userOverview")}>
-              Users Overviews
+            <li onClick={() => handleNavigation("/admin/user/userOverview")}>
+              User Overview
             </li>
           </S.SubMenu>
         )}
       </S.Menu>
 
-      {/* 4. 뒤로가기/로그아웃 버튼 추가 */}
       <S.LogoutButton onClick={handleLogout}>
         <FaSignOutAlt />
-        <span>관리자 페이지 나가기</span>
+        <span>Exit Admin Mode</span>
+      </S.LogoutButton>
+      <S.LogoutButton onClick={handleNavi}>
+        <FaSignOutAlt />
+        <span>Exit Admin Page</span>
       </S.LogoutButton>
     </S.SideBarContainer>
   );
