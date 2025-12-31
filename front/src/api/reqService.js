@@ -1,13 +1,15 @@
 import axios from "axios";
+
 const API = window.ENV?.API_URL || "http://localhost:8081";
+
 // 1. 공통 인스턴스 설정
 const axiosAuthInstance = axios.create({
-  baseURL: API
+  baseURL: API,
 });
+
 axiosAuthInstance.interceptors.request.use(
   (config) => {
     const accessToken = localStorage.getItem("accessToken");
-    console.log(accessToken);
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
@@ -17,8 +19,9 @@ axiosAuthInstance.interceptors.request.use(
 );
 
 const axiosPublicInstance = axios.create({
-  baseURL: API
+  baseURL: API,
 });
+
 /**
  * [알맹이 추출용 함수]
  * 서버 응답의 ResponseData 구조에서 실제 data 필드만 반환합니다.
@@ -64,7 +67,11 @@ export const axiosAuth = {
     axiosAuthInstance
       .delete(pk ? `${url}/${pk}` : url)
       .then((res) => ({ ...res.data })),
+
+  post: (url, data = {}) =>
+    axiosAuthInstance.post(url, data).then((res) => ({ ...res.data })),
 };
+
 // --------------------------------------------------------
 // 3. 인증 불필요 요청 (axiosPublic)
 // --------------------------------------------------------
@@ -72,8 +79,10 @@ export const axiosPublic = {
   getList: (url) =>
     axiosPublicInstance.get(url).then((res) => ({ ...res.data })),
   getActual: (url) => axiosPublicInstance.get(url).then(unwrap),
+
   post: (url, data) =>
     axiosPublicInstance.post(url, data).then((res) => ({ ...res.data })),
+
   create: (url, obj, file) => {
     const formData = new FormData();
     if (obj) Object.keys(obj).forEach((key) => formData.append(key, obj[key]));
@@ -84,4 +93,5 @@ export const axiosPublic = {
       })
       .then((res) => ({ ...res.data }));
   },
+
 };

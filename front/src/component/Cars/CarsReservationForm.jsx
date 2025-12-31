@@ -48,6 +48,7 @@ const CarReservationForm = () => {
 
     const start = new Date(startTime);
     const end = new Date(endTime);
+    const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
     if (end <= start) {
       alert("종료 시간은 시작 시간 이후여야 합니다.");
@@ -60,7 +61,16 @@ const CarReservationForm = () => {
       return;
     }
 
+<<<<<<< HEAD
     axiosAuth.createJson("/api/reserve",  {carId, startTime, endTime, destination})
+=======
+    axios
+      .post(
+        `${apiUrl}/api/reserve`,
+        { carId, startTime, endTime, destination },
+        { headers: { Authorization: `Bearer ${auth.accessToken}` } }
+      )
+>>>>>>> ce927ee8cad0750fed9964cb295866b5563d29e2
       .then((res) => {
         const reservationNo = res.data;
         navi(`/cars/reserve/${reservationNo}/confirm`);

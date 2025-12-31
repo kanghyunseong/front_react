@@ -1,325 +1,300 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { FaCloudUploadAlt } from "react-icons/fa";
+import {
+  FaCloudUploadAlt,
+  FaInfoCircle,
+  FaCar,
+  FaBatteryFull,
+  FaArrowLeft,
+  FaEdit,
+} from "react-icons/fa";
 import axios from "axios";
 import * as S from "./CarEdit.styles";
 import { AuthContext } from "../../../context/AuthContext";
+import { axiosAuth } from "../../../api/reqService";
 
 const CarsEdit = () => {
   const navigate = useNavigate();
   const { auth } = useContext(AuthContext);
   const { carId } = useParams();
 
-  const [carName, setCarName] = useState("");
-  const [km, setKm] = useState("");
-  const [type, setType] = useState("소형");
-  const [battery, setBattery] = useState("");
-  const [efficiency, setEfficiency] = useState("");
+  const [formData, setFormData] = useState({
+    carName: "",
+    km: "",
+    type: "소형",
+    battery: "",
+    efficiency: "",
+    seats: "",
+    carContent: "",
+  });
+
   const [range, setRange] = useState("0");
-  const [seats, setSeats] = useState("");
-
-  const [carContent, setCarContent] = useState("");
   const [byteCount, setByteCount] = useState(0);
-
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(true);
+
   const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
-  const getByteLength = (s) => {
-    let b = 0;
+
+  const getByteLength = useCallback((s) => {
     if (!s) return 0;
-    for (let i = 0; i < s.length; i++) {
-      const c = s.charCodeAt(i);
-      b += c >> 7 ? 3 : 1;
-    }
-    return b;
-  };
-
-  const handleContentChange = (e) => {
-    const val = e.target.value;
-    const currentByte = getByteLength(val);
-
-    if (currentByte > 4000) {
-      alert("작성 가능한 최대 글자 수(4000 Byte)를 초과했습니다.");
-      return; // 입력 막기
-    }
-    setCarContent(val);
-    setByteCount(currentByte);
-  };
+    return s.split("").reduce((acc, char) => {
+      const code = char.charCodeAt(0);
+      return acc + (code >> 7 ? 3 : 1);
+    }, 0);
+  }, []);
 
   useEffect(() => {
-    if (!carId) return;
-    if (!auth || !auth.accessToken) return;
+    if (!carId || !auth?.accessToken) return;
 
-    setLoading(true);
-
-    axios
-      .get(`${apiUrl}/admin/api/settings/${carId}`, {
-        headers: { Authorization: `Bearer ${auth.accessToken}` },
-      })
-      .then((response) => {
+    const fetchCarData = async () => {
+      try {
+        setLoading(true);
+        const response = await axiosAuth.getList(
+          `/api/admin/settings/${carId}`
+        );
         const data = response.data;
 
-        setCarName(data.carName || "");
-        setKm(data.carDriving != null ? String(data.carDriving) : "");
-        setType(data.carSize || "소형");
-        setBattery(data.battery != null ? String(data.battery) : "");
-        setEfficiency(
-          data.carEfficiency != null ? String(data.carEfficiency) : ""
-        );
-        setSeats(data.carSeet != null ? String(data.carSeet) : "");
-        const content = data.carContent || "";
-        setCarContent(content);
-        setByteCount(getByteLength(content));
-        const bat = data.battery != null ? parseFloat(data.battery) : 0;
-        const eff =
-          data.carEfficiency != null ? parseFloat(data.carEfficiency) : 0;
-        if (bat > 0 && eff > 0) {
-          setRange(String(Math.round(bat * eff)));
-        } else {
-          setRange("0");
-        }
+        setFormData({
+          carName: data.carName || "",
+          km: data.carDriving?.toString() || "",
+          type: data.carSize || "소형",
+          battery: data.battery?.toString() || "",
+          efficiency: data.carEfficiency?.toString() || "",
+          seats: data.carSeet?.toString() || "",
+          carContent: data.carContent || "",
+        });
+
+        setByteCount(getByteLength(data.carContent || ""));
 
         const dbImage = data.carImage || data.CARIMAGE;
         if (dbImage) {
-          setPreview(`${apiUrl}/uploads/${dbImage}`);
+          setPreview(
+            dbImage.startsWith("http")
+              ? dbImage
+              : `${apiUrl}/uploads/${dbImage}`
+          );
         }
-      })
-      .catch((err) => {
-        console.error("❌ 상세 정보 로딩 실패:", err);
-        if (err.response && err.response.status === 401) {
-          alert("세션이 만료되었습니다. 다시 로그인 해주세요.");
-          navigate("/members/login");
-        } else if (err.response && err.response.status === 404) {
-          alert("요청한 차량 정보를 찾을 수 없습니다.");
-          navigate("/admin/cars/settings");
-        } else {
-          alert("차량 정보를 불러올 수 없거나 권한이 없습니다.");
-        }
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [carId, auth]);
+      } catch (err) {
+        alert("정보를 불러올 수 없습니다.");
+        navigate("/admin/cars/settings");
+      } finally {
+        setTimeout(() => setLoading(false), 500); // 부드러운 전환을 위한 아주 짧은 지연
+      }
+    };
+
+    fetchCarData();
+  }, [carId, auth, navigate, apiUrl, getByteLength]);
 
   useEffect(() => {
-    const bat = parseFloat(battery);
-    const eff = parseFloat(efficiency);
+    const bat = parseFloat(formData.battery);
+    const eff = parseFloat(formData.efficiency);
     if (!isNaN(bat) && !isNaN(eff) && bat > 0 && eff > 0) {
-      setRange(Math.round(bat * eff).toString());
+      setRange(Math.round(bat * eff).toLocaleString());
     } else {
       setRange("0");
     }
-  }, [battery, efficiency]);
+  }, [formData.battery, formData.efficiency]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "carContent") {
+      const currentByte = getByteLength(value);
+      if (currentByte > 4000) return;
+      setByteCount(currentByte);
+    }
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
+      if (preview && preview.startsWith("blob:")) URL.revokeObjectURL(preview);
       setFile(selectedFile);
       setPreview(URL.createObjectURL(selectedFile));
     }
   };
 
-  const handleSave = () => {
-    if (!carName) {
-      alert("차량 이름은 필수입니다.");
-      return;
-    }
+  const handleSave = async () => {
+    if (!formData.carName || !formData.carContent)
+      return alert("필수 항목을 모두 입력해주세요.");
 
-    if (!carContent) {
-      alert("차량 설명을 입력해주세요.");
-      return;
-    }
+    const submitData = new FormData();
 
-    if (getByteLength(carContent) > 4000) {
-      alert("차량 설명이 너무 깁니다. 내용을 줄여주세요.");
-      return;
-    }
+    // 데이터 정제 및 매핑
+    Object.entries(formData).forEach(([key, value]) => {
+      let fieldName = key;
 
-    if (!carName || !carContent || getByteLength(carContent) > 4000) {
-      alert("입력값을 확인해주세요.");
-      return;
-    }
+      // 서버 전달용 필드명 변환 로직
+      switch (key) {
+        case "km":
+          fieldName = "carDriving";
+          break;
+        case "seats":
+          fieldName = "carSeet";
+          break;
+        case "type":
+          fieldName = "carSize";
+          break;
+        case "efficiency":
+          fieldName = "carEfficiency";
+          break; // 이 부분이 핵심
+        default:
+          fieldName = key;
+      }
 
-    const formData = new FormData();
-    formData.append("carName", carName);
-    formData.append("carDriving", km || "0");
-    formData.append("carSize", type || "소형");
-    formData.append("battery", battery || "0");
-    formData.append("carEfficiency", efficiency || "0");
-    formData.append("carSeet", seats || "0");
-    formData.append("carId", carId);
-    formData.append("carContent", carContent);
+      // null 값 방지 (기본값 0 처리)
+      const processedValue = value === "" || value === null ? "0" : value;
+      submitData.append(fieldName, processedValue);
+    });
 
-    if (file) {
-      formData.append("file", file);
-    }
+    submitData.append("carId", carId);
+    if (file) submitData.append("file", file);
 
-    axios
-      .put(`${apiUrl}/admin/api/settings/update`, formData, {
+    try {
+      await axios.put(`${apiUrl}/api/admin/settings/update`, submitData, {
         headers: {
           Authorization: `Bearer ${auth.accessToken}`,
           "Content-Type": "multipart/form-data",
         },
-      })
-      .then(() => {
-        alert("차량 정보가 수정되었습니다.");
-        navigate("/admin/cars/settings");
-      })
-      .catch((err) => {
-        console.error("수정 실패:", err);
-
-        if (err.response) {
-          const status = err.response.status;
-          if (status === 401 || status === 403) {
-            alert("권한이 없거나 세션이 만료되었습니다.");
-            navigate("/members/login");
-          } else if (status === 404) {
-            alert("수정할 차량 정보를 찾을 수 없습니다.");
-          } else {
-            alert("수정 중 오류가 발생!");
-          }
-        } else {
-          alert("수정에 실패했습니다.");
-        }
       });
+      alert("차량 정보가 성공적으로 수정되었습니다.");
+      navigate("/admin/cars/settings");
+    } catch (err) {
+      console.error("수정 중 오류 발생:", err);
+      alert(err.response?.data?.message || "수정에 실패했습니다.");
+    }
   };
 
-  const handleCancel = () => {
-    navigate(-1);
-  };
-
-  if (loading) {
-    return (
-      <div style={{ padding: "30px", textAlign: "center", color: "#6B4CE6" }}>
-        <p>차량 정보를 불러오는 중입니다...</p>
-        <p>잠시만 기다려주세요.</p>
-      </div>
-    );
-  }
+  if (loading)
+    return <S.LoadingWrapper>차량 정보를 불러오는 중입니다</S.LoadingWrapper>;
 
   return (
-    <div>
-      <h2 style={{ marginBottom: "20px", color: "#6B4CE6" }}>
-        Cars / Cars Edit
-      </h2>
+    <S.PageWrapper>
+      <S.TitleSection>
+        <div className="back-nav" onClick={() => navigate(-1)}>
+          <FaArrowLeft /> 돌아가기
+        </div>
+        <h2>
+          Edit Vehicle <span>(ID: {carId})</span>
+        </h2>
+        <p>차량 정보를 정확하게 수정하여 관리 효율을 높이세요.</p>
+      </S.TitleSection>
 
       <S.Container>
-        <h3 style={{ marginBottom: "5px" }}>Edit Page (ID: {carId})</h3>
-        <p style={{ color: "#999", marginBottom: "30px", fontSize: "14px" }}>
-          Edit Car name, Km, Battery, Efficiency information
-        </p>
-
+        <S.SectionTitle>
+          <FaCar /> 기본 정보
+        </S.SectionTitle>
         <S.FormGroup>
-          <div>
+          <S.InputBox>
             <S.Label>Car Name</S.Label>
             <S.Input
-              value={carName}
-              onChange={(e) => setCarName(e.target.value)}
-              placeholder="아이오닉 6"
+              name="carName"
+              placeholder="예: 아이오닉 5"
+              value={formData.carName}
+              onChange={handleChange}
             />
-          </div>
-          <div>
+          </S.InputBox>
+          <S.InputBox>
             <S.Label>Km (Driving)</S.Label>
             <S.Input
               type="number"
-              value={km}
-              onChange={(e) => setKm(e.target.value)}
+              name="km"
+              placeholder="누적 주행거리"
+              value={formData.km}
+              onChange={handleChange}
             />
-          </div>
+          </S.InputBox>
         </S.FormGroup>
 
         <S.FormGroup>
-          <div>
-            <S.Label>Type (Large/Small)</S.Label>
-            <S.Input
-              as="select"
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-              style={{ height: "42px" }}
-            >
+          <S.InputBox>
+            <S.Label>Type (Size)</S.Label>
+            <S.Select name="type" value={formData.type} onChange={handleChange}>
               <option value="소형">소형</option>
               <option value="중형">중형</option>
               <option value="대형">대형</option>
-            </S.Input>
-          </div>
-          <div>
+            </S.Select>
+          </S.InputBox>
+          <S.InputBox>
+            <S.Label>Seats (인승)</S.Label>
+            <S.Input
+              type="number"
+              name="seats"
+              value={formData.seats}
+              onChange={handleChange}
+            />
+          </S.InputBox>
+        </S.FormGroup>
+
+        <S.SectionTitle>
+          <FaBatteryFull /> 성능 및 상세 제원
+        </S.SectionTitle>
+        <S.FormGroup>
+          <S.InputBox>
             <S.Label>Battery (kWh)</S.Label>
             <S.Input
               type="number"
-              value={battery}
-              onChange={(e) => setBattery(e.target.value)}
+              name="battery"
+              value={formData.battery}
+              onChange={handleChange}
             />
-          </div>
-        </S.FormGroup>
-
-        <S.FormGroup>
-          <div>
+          </S.InputBox>
+          <S.InputBox>
             <S.Label>Efficiency (km/kWh)</S.Label>
             <S.Input
               type="number"
               step="0.1"
-              value={efficiency}
-              onChange={(e) => setEfficiency(e.target.value)}
+              name="efficiency"
+              value={formData.efficiency}
+              onChange={handleChange}
             />
-          </div>
-          <div>
-            <S.Label>Range (Auto Calculated)</S.Label>
-            <S.Input
-              value={`${range} Km`}
-              readOnly
-              style={{
-                backgroundColor: "#f5f5f5",
-                fontWeight: "bold",
-                color: "#6B4CE6",
-              }}
-            />
-          </div>
+          </S.InputBox>
         </S.FormGroup>
 
-        <S.FormGroup>
-          <div style={{ width: "100%" }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: "5px",
-              }}
-            >
-              <S.Label style={{ marginBottom: 0 }}>Car Description</S.Label>
-            </div>
-
-            <S.TextArea
-              value={carContent}
-              onChange={handleContentChange}
-              placeholder="차량에 대한 상세 설명을 입력하세요."
-              $error={byteCount > 4000}
+        <S.FullWidthBox>
+          <S.Label>Range (Auto Calculated)</S.Label>
+          <S.RangeDisplay>
+            <span className="val">{range}</span>
+            <span className="unit">Km 주행 가능</span>
+            <FaInfoCircle
+              className="info-icon"
+              title="배터리 용량 × 전비로 계산된 수치입니다."
             />
+          </S.RangeDisplay>
+        </S.FullWidthBox>
 
-            <S.ByteInfo $error={byteCount > 4000}>
-              {byteCount} / 4000 Bytes
+        <S.FullWidthBox style={{ marginTop: "32px" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "8px",
+            }}
+          >
+            <S.Label>
+              <FaEdit style={{ marginRight: "6px" }} /> Car Description
+            </S.Label>
+            <S.ByteInfo $error={byteCount > 3800}>
+              <strong>{byteCount.toLocaleString()}</strong> / 4,000 Bytes
             </S.ByteInfo>
-
-            {byteCount > 4000 && (
-              <p style={{ color: "red", fontSize: "12px", marginTop: "5px" }}>
-                작성 가능한 용량을 초과했습니다. 내용을 줄여주세요.
-              </p>
-            )}
           </div>
-        </S.FormGroup>
-
-        <div style={{ marginBottom: "20px" }}>
-          <S.Label>Seats (인승)</S.Label>
-          <S.Input
-            type="number"
-            value={seats}
-            onChange={(e) => setSeats(e.target.value)}
-            placeholder="5"
+          <S.TextArea
+            name="carContent"
+            placeholder="차량의 상세 특징과 옵션 정보를 입력해주세요."
+            value={formData.carContent}
+            onChange={handleChange}
+            $error={byteCount > 3800}
           />
-        </div>
+        </S.FullWidthBox>
 
-        <div style={{ marginBottom: "20px" }}>
-          <S.Label>Car Profile Image</S.Label>
+        <S.SectionTitle style={{ marginTop: "40px" }}>
+          <FaCloudUploadAlt /> 이미지 관리
+        </S.SectionTitle>
+        <S.UploadBox
+          onClick={() => document.getElementById("carImgInput").click()}
+        >
           <input
             type="file"
             id="carImgInput"
@@ -327,46 +302,28 @@ const CarsEdit = () => {
             onChange={handleFileChange}
             accept="image/*"
           />
-          <S.UploadBox
-            onClick={() => document.getElementById("carImgInput").click()}
-          >
-            {preview ? (
-              <div
-                style={{ position: "relative", width: "100%", height: "100%" }}
-              >
-                <img
-                  src={preview}
-                  alt="preview"
-                  style={{
-                    maxWidth: "100%",
-                    maxHeight: "200px",
-                    objectFit: "contain",
-                  }}
-                />
-                <div
-                  style={{ marginTop: "5px", fontSize: "12px", color: "#999" }}
-                >
-                  Click to change image
-                </div>
-              </div>
-            ) : (
-              <>
-                <FaCloudUploadAlt size={30} />
-                <div>Click to upload</div>
-                <p style={{ fontSize: "12px", color: "#ccc" }}>SVG, PNG, JPG</p>
-              </>
-            )}
-          </S.UploadBox>
-        </div>
+          {preview ? (
+            <div className="preview-container">
+              <img src={preview} alt="preview" />
+              <div className="overlay">클릭하여 이미지 교체</div>
+            </div>
+          ) : (
+            <div className="upload-placeholder">
+              <FaCloudUploadAlt />
+              <p>차량 이미지 업로드</p>
+              <span>권장 사이즈: 1200 x 800 (px)</span>
+            </div>
+          )}
+        </S.UploadBox>
 
         <S.ButtonGroup>
-          <S.Button onClick={handleCancel}>Cancel</S.Button>
+          <S.Button onClick={() => navigate(-1)}>Cancel</S.Button>
           <S.Button $primary onClick={handleSave}>
-            Save Change
+            Update Changes
           </S.Button>
         </S.ButtonGroup>
       </S.Container>
-    </div>
+    </S.PageWrapper>
   );
 };
 

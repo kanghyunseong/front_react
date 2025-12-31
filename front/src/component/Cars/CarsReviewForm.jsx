@@ -74,13 +74,12 @@ const CarsReviewForm = () => {
     //       },
     //     }
     //   )
-    axiosAuth.createJson("/api/reviews", 
-      {
+    axiosAuth
+      .createJson("/api/reviews", {
         refCarId: carId,
         reservationNo: reservationNo,
-        reviewContent: reviewContent
-    },
-  )
+        reviewContent: reviewContent,
+      })
       .then((result) => {
         console.log(result);
         alert("리뷰가 등록되었습니다.");

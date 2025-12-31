@@ -189,7 +189,7 @@ const CarsDetail = () => {
             )}
           </ReviewSection>
 
-          <ReservationButton onClick={() => navi(`/cars/${carId}/reserve`)}>
+          <ReservationButton onClick={() => navi(`/cars/$/api{carId}/reserve`)}>
             차량 예약하기
           </ReservationButton>
         </DetailCard>

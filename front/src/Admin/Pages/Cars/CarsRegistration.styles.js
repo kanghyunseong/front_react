@@ -1,121 +1,222 @@
 import styled from "styled-components";
 
+export const PageWrapper = styled.div`
+  padding: 40px;
+  background-color: #f8fafc;
+  min-height: 100vh;
+`;
+
+export const TitleSection = styled.div`
+  max-width: 850px;
+  margin: 0 auto 30px;
+  h2 {
+    color: #0f172a;
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+  p {
+    color: #64748b;
+    font-size: 15px;
+  }
+`;
+
 export const Container = styled.div`
   background: white;
-  padding: 40px;
-  border-radius: 15px;
-  max-width: 800px;
+  padding: 50px;
+  border-radius: 24px;
+  max-width: 850px;
   margin: 0 auto;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+`;
+
+export const SectionTitle = styled.h4`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #f1f5f9;
+
+  svg {
+    color: #6366f1;
+  }
 `;
 
 export const FormGroup = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 20px;
+  gap: 24px;
+  margin-bottom: 24px;
+`;
+
+export const InputBox = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+export const FullWidthBox = styled.div`
+  display: flex;
+  flex-direction: column;
 `;
 
 export const Label = styled.label`
-  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #475569;
   margin-bottom: 8px;
-  font-weight: 500;
-  color: #333;
 `;
 
 export const Input = styled.input`
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #eee;
-  border-radius: 8px;
-  background-color: #f9fafb;
-  box-sizing: border-box;
+  padding: 12px 16px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  background-color: #ffffff;
+  font-size: 15px;
+  transition: all 0.2s;
 
   &:focus {
     outline: none;
-    border-color: #6b4ce6;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.08);
   }
 `;
 
-// ✅ [추가] 설명 입력창 (에러 시 빨간 테두리)
+export const Select = styled.select`
+  padding: 12px 16px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  background-color: #ffffff;
+  font-size: 15px;
+  cursor: pointer;
+  &:focus {
+    outline: none;
+    border-color: #6366f1;
+  }
+`;
+
+export const RangeDisplay = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f5f3ff;
+  border: 1px solid #ddd6fe;
+  padding: 14px 20px;
+  border-radius: 14px;
+
+  .val {
+    font-size: 20px;
+    font-weight: 800;
+    color: #4f46e5;
+  }
+  .unit {
+    font-size: 14px;
+    font-weight: 600;
+    color: #6366f1;
+  }
+  .info-icon {
+    margin-left: auto;
+    color: #a5b4fc;
+  }
+`;
+
 export const TextArea = styled.textarea`
   width: 100%;
-  height: 150px;
-  padding: 12px;
-  border: 1px solid ${(props) => (props.$error ? "red" : "#eee")};
-  border-radius: 8px;
-  background-color: #f9fafb;
-  resize: vertical;
-  font-family: inherit;
+  height: 180px;
+  padding: 16px;
+  border: 1.5px solid ${(props) => (props.$error ? "#ef4444" : "#e2e8f0")};
+  border-radius: 14px;
+  resize: none;
   font-size: 14px;
-  line-height: 1.5;
-  outline: none;
-  box-sizing: border-box;
-  transition: border-color 0.2s;
-
+  line-height: 1.6;
   &:focus {
-    border-color: ${(props) => (props.$error ? "red" : "#6b4ce6")};
+    outline: none;
+    border-color: ${(props) => (props.$error ? "#ef4444" : "#6366f1")};
   }
 `;
 
-// ✅ [추가] 바이트 수 표시 텍스트
-export const ByteInfo = styled.div`
-  display: flex;
-  justify-content: flex-end;
+export const ByteInfo = styled.span`
   font-size: 12px;
-  color: ${(props) => (props.$error ? "red" : "#888")};
-  margin-top: 5px;
-  font-weight: 500;
+  font-weight: 600;
+  color: ${(props) => (props.$error ? "#ef4444" : "#94a3b8")};
 `;
 
 export const UploadBox = styled.div`
-  border: 2px dashed #6b4ce6;
-  border-radius: 10px;
-  padding: 40px;
-  text-align: center;
-  background-color: #f3f0ff;
-  color: #6b4ce6;
-  cursor: pointer;
-  margin-bottom: 30px;
-
-  /* 이미지 미리보기 시 높이 조절 */
-  height: 250px;
+  border: 2px dashed #cbd5e1;
+  border-radius: 16px;
+  height: 280px;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  background-color: #f8fafc;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.2s;
 
-  p {
-    margin-top: 10px;
-    font-size: 14px;
-    color: #666;
+  &:hover {
+    border-color: #6366f1;
+    background-color: #f0f9ff;
+  }
+
+  .upload-placeholder {
+    text-align: center;
+    color: #64748b;
+    p {
+      font-weight: 700;
+      font-size: 16px;
+      margin: 10px 0 4px;
+      color: #334155;
+    }
+    span {
+      font-size: 13px;
+      color: #94a3b8;
+    }
+    svg {
+      color: #6366f1;
+      opacity: 0.7;
+    }
   }
 
   img {
-    max-height: 100%;
-    max-width: 100%;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
+    padding: 20px;
   }
 `;
 
 export const ButtonGroup = styled.div`
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 14px;
+  margin-top: 40px;
+  padding-top: 30px;
+  border-top: 1px solid #f1f5f9;
 `;
 
 export const Button = styled.button`
-  padding: 10px 20px;
-  border-radius: 5px;
+  padding: 12px 28px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
   cursor: pointer;
-  font-weight: bold;
+  transition: all 0.2s;
 
-  /* props 통일: $primary 사용 */
-  background-color: ${(props) => (props.$primary ? "#6B4CE6" : "white")};
-  color: ${(props) => (props.$primary ? "white" : "#666")};
-  border: ${(props) => (props.$primary ? "none" : "1px solid #ccc")};
+  background-color: ${(props) => (props.$primary ? "#6366f1" : "white")};
+  color: ${(props) => (props.$primary ? "white" : "#64748b")};
+  border: ${(props) => (props.$primary ? "none" : "1px solid #e2e8f0")};
 
   &:hover {
-    opacity: 0.9;
+    filter: brightness(0.95);
+    background-color: ${(props) => (props.$primary ? "#4f46e5" : "#f8fafc")};
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 `;
