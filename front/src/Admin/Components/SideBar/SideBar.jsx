@@ -71,7 +71,7 @@ const SideBar = () => {
       <S.Menu>
         <S.MenuItem
           $active={location.pathname === "admin"}
-          onClick={() => handleNavigation("admin")}
+          onClick={() => handleNavigation("/admin")}
         >
           <div className="title">
             <FaHome /> <span>Dashboard</span>
@@ -80,7 +80,7 @@ const SideBar = () => {
 
         <S.MenuItem
           $active={isParentActive("/cars")}
-          onClick={() => toggleMenu("cars")}
+          onClick={() => toggleMenu("/cars")}
         >
           <div className="title">
             <FaCar /> <span>Cars</span>
@@ -93,16 +93,16 @@ const SideBar = () => {
         </S.MenuItem>
         {openMenus.cars && (
           <S.SubMenu>
-            <li onClick={() => handleNavigation("admin/cars/overview")}>
+            <li onClick={() => handleNavigation("/admin/cars/overview")}>
               Overview
             </li>
-            <li onClick={() => handleNavigation("admin/cars/reservation")}>
+            <li onClick={() => handleNavigation("/admin/cars/reservation")}>
               Reservation
             </li>
-            <li onClick={() => handleNavigation("admin/cars/registration")}>
+            <li onClick={() => handleNavigation("/admin/cars/registration")}>
               Registration
             </li>
-            <li onClick={() => handleNavigation("admin/cars/settings")}>
+            <li onClick={() => handleNavigation("/admin/cars/settings")}>
               Settings
             </li>
           </S.SubMenu>
@@ -110,7 +110,7 @@ const SideBar = () => {
 
         <S.MenuItem
           $active={isParentActive("/community")}
-          onClick={() => toggleMenu("community")}
+          onClick={() => toggleMenu("/community")}
         >
           <div className="title">
             <FaComments /> <span>Community</span>
@@ -123,12 +123,14 @@ const SideBar = () => {
         </S.MenuItem>
         {openMenus.community && (
           <S.SubMenu>
-            <li onClick={() => handleNavigation("admin/community/declaration")}>
+            <li
+              onClick={() => handleNavigation("/admin/community/declaration")}
+            >
               Declaration
             </li>
             <li
               onClick={() =>
-                handleNavigation("admin/community/comment/declaration")
+                handleNavigation("/admin/community/comment/declaration")
               }
             >
               Comments
@@ -156,7 +158,7 @@ const SideBar = () => {
           <S.SubMenu>
             <li
               onClick={() =>
-                handleNavigation("admin/enviroments/enviromentsUserRanking")
+                handleNavigation("/admin/enviroments/enviromentsUserRanking")
               }
             >
               User Ranking
