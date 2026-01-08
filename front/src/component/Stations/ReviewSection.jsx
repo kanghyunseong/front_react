@@ -1,11 +1,19 @@
+import React from "react";
 import {
-  Review,
-  Recomend,
-  Comment,
-  Registration,
-  Elision,
+  ReviewContainer,
+  ReviewHeader,
+  ReviewList,
+  ReviewItem,
+  RecommendBadge,
+  ReviewContent,
+  ReviewForm,
+  FormRow,
+  VoteButton,
+  CommentInput,
+  SubmitButton,
+  DeleteButton,
 } from "./ReviewSection.style";
-import { DetailButton } from "../Cars/CarsSearchList.style";
+import { DetailButton } from "../Cars/CarsSearchList.style"; // 기존 버튼 유지 혹은 ReviewHeader 내 버튼으로 대체 가능
 import { axiosAuth, axiosPublic } from "../../api/reqService";
 
 const ReviewSection = ({
@@ -19,170 +27,144 @@ const ReviewSection = ({
   setIsRecomend,
 }) => {
   const currentUserNo = auth?.userNo;
+
   const register = () => {
+    if (!stationId) {
+      alert("충전소를 먼저 선택해주세요.");
+      return;
+    }
     axiosAuth
-      .createJson("/api/station/insert", {
-        stationId: stationId,
-        commentContent: comment,
-        recommend: isRecomend,
-      })
-      .then((res) => {
-        res.data;
+      .create(
+        "/api/station/insert",
+        {
+          stationId: stationId,
+          commentContent: comment,
+          recommend: isRecomend,
+        },
+        null
+      )
+      .then(() => {
         findAll();
+        setIsRecomend("");
         setComment("");
-        setIsRecomend(null);
       })
       .catch((error) => {
-        if (error.response) {
-          if (error.response.status === 400) {
-            alert("추천,비추천 먼저 선텍해주세요!");
-          } else if (
-            error.response.data &&
-            error.response.data["error-message"]
-          ) {
-            alert(error.response.data["error-message"]);
-          } else {
-            alert("오류가 발생했습니다.");
-          }
-        } else if (error.request) {
-          alert("서버가 응답하지 않습니다.");
-        } else {
-          alert("오류: " + error.message);
-        }
+        const msg =
+          error.response?.data?.["error-message"] || "오류가 발생했습니다.";
+        alert(
+          error.response?.status === 400 ? "추천/비추천을 선택해주세요!" : msg
+        );
       });
   };
 
   const elision = (reviewId) => {
+    if (!window.confirm("정말 삭제하시겠습니까?")) return;
     axiosAuth
       .deleteReview("/api/station", { data: { reviewId } })
       .then((res) => {
-        if (res.status === 204) alert("삭제성공");
+        alert(res.data);
         findAll();
       })
-      .catch((error) => {
-        alert(error.response.data.message);
-      });
+      .catch((error) => alert(error.response.data.message));
   };
 
   const findAll = () => {
+    if (!stationId) return;
     axiosPublic
       .getList(`/api/station/findAll?stationId=${stationId}`)
-      .then((res) => {
-        setRefresh(res.data);
-      })
-      .catch((err) => {
-        setRefresh([]);
-        alert(err.response.data.message);
-      });
+      .then((res) => setRefresh(res.data))
+      .catch((err) => console.error(err));
   };
 
   return (
-    <>
-      {/* 리뷰 조회 버튼 */}
-      <DetailButton onClick={findAll} style={{ marginTop: "5%", width: "10%" }}>
-        조회하기
-      </DetailButton>
-
-      {/* 리뷰 목록 */}
-      {refresh.map((e) => (
-        <li
-          key={e.reviewId}
-          style={{
-            display: "flex",
-            gap: "20px",
-            listStylePosition: "inside",
-            marginTop: "20px",
-            alignItems: "center",
-          }}
+    <ReviewContainer>
+      <ReviewHeader>
+        <h3>이용자 리뷰 ({refresh.length})</h3>
+        <DetailButton
+          onClick={findAll}
+          style={{ margin: 0, padding: "5px 15px" }}
         >
-          {/* 추천/비추천 표시 */}
-          <div style={{ flex: "0.5", textAlign: "center" }}>
-            <p
-              style={{
-                background:
-                  e.recommend === "추천" || e.recommend === "Y"
-                    ? "#1abfb1"
-                    : "#992b2b",
-                color: "#fff",
-                padding: "6px 8px",
-                borderRadius: "6px",
-                display: "inline-block",
-              }}
-            >
-              {e.recommend === "Y"
-                ? "추천"
-                : e.recommend === "N"
-                ? "비추천"
-                : e.recommend}
-            </p>
-          </div>
+          새로고침
+        </DetailButton>
+      </ReviewHeader>
 
-          {/* 리뷰 내용 */}
-          <div style={{ flex: "4" }}>
-            <p> {e.commentContent}</p>
-          </div>
-
-          {/* 작성일 */}
-          <div style={{ flex: "4" }}>
-            <p> 작성일:{e.createdAt}</p>
-          </div>
-
-          {/* 삭제 버튼 (본인 리뷰만) */}
-          <div style={{ flex: "3" }}>
-            {currentUserNo && String(e.userNo) === String(currentUserNo) ? (
-              <Elision
-                onClick={() => elision(e.reviewId)}
-                style={{ marginTop: "0px" }}
+      <ReviewList>
+        {refresh.length > 0 ? (
+          refresh.map((e) => (
+            <ReviewItem key={e.reviewId}>
+              <RecommendBadge
+                type={e.recommend === "Y" || e.recommend === "추천" ? "Y" : "N"}
               >
-                삭제
-              </Elision>
-            ) : null}
+                {e.recommend === "Y" || e.recommend === "추천"
+                  ? "추천"
+                  : "비추천"}
+              </RecommendBadge>
+
+              <ReviewContent>
+                <p className="content">{e.commentContent}</p>
+                <p className="date">
+                  {e.createdAt}
+                  {currentUserNo &&
+                    String(e.userNo) === String(currentUserNo) && (
+                      <DeleteButton
+                        onClick={() => elision(e.reviewId)}
+                        style={{ marginLeft: "10px" }}
+                      >
+                        삭제
+                      </DeleteButton>
+                    )}
+                </p>
+              </ReviewContent>
+            </ReviewItem>
+          ))
+        ) : (
+          <div
+            style={{
+              textAlign: "center",
+              color: "#adb5bd",
+              padding: "40px 0",
+              fontSize: "14px",
+            }}
+          >
+            등록된 리뷰가 없습니다. 첫 리뷰를 작성해보세요!
           </div>
-        </li>
-      ))}
+        )}
+      </ReviewList>
 
-      {/* 리뷰 작성 영역 */}
-      <Review
-        style={{
-          marginTop: "18px",
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-        }}
-      >
-        {/* 추천 버튼 */}
-        <Recomend
-          onClick={() => setIsRecomend("Y")}
-          className={isRecomend === "Y" ? "active" : ""}
-          style={{ cursor: "pointer" }}
-        >
-          추천
-        </Recomend>
-
-        {/* 비추천 버튼 */}
-        <Recomend
-          onClick={() => setIsRecomend("N")}
-          className={isRecomend === "N" ? "dislike" : ""}
-          style={{ cursor: "pointer" }}
-        >
-          비추천
-        </Recomend>
-
-        {/* 리뷰 입력 */}
-        <Comment
-          value={comment}
-          placeholder="    남기고 싶은 리뷰를 입력하세요."
-          maxLength={80}
-          onChange={(e) => setComment(e.target.value)}
-          style={{ flex: 1 }}
-        />
-
-        {/* 등록 버튼 */}
-        <Registration onClick={register} style={{ marginLeft: "8px" }}>
-          등록
-        </Registration>
-      </Review>
-    </>
+      {/* 리뷰 작성 폼 */}
+      <ReviewForm>
+        <FormRow>
+          <VoteButton
+            className={isRecomend === "Y" ? "active-up" : ""}
+            onClick={() => setIsRecomend("Y")}
+          >
+            👍 추천해요
+          </VoteButton>
+          <VoteButton
+            className={isRecomend === "N" ? "active-down" : ""}
+            onClick={() => setIsRecomend("N")}
+          >
+            👎 아쉬워요
+          </VoteButton>
+        </FormRow>
+        <FormRow>
+          <CommentInput
+            value={comment}
+            placeholder={
+              auth
+                ? "리뷰 내용을 입력하세요 (최대 80자)"
+                : "로그인 후 이용 가능합니다."
+            }
+            maxLength={80}
+            disabled={!auth}
+            onChange={(e) => setComment(e.target.value)}
+          />
+          <SubmitButton onClick={register} disabled={!auth || !comment.trim()}>
+            등록
+          </SubmitButton>
+        </FormRow>
+      </ReviewForm>
+    </ReviewContainer>
   );
 };
 
