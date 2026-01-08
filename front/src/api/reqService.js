@@ -43,6 +43,11 @@ export const axiosAuth = {
   // 결과: [ ... ] 또는 { totalActiveUsers: 21, ... }
   getActual: (url) => axiosAuthInstance.get(url).then(unwrap),
 
+  createJson: (url, obj) => {
+    return axiosAuthInstance
+      .post(url, obj, { headers: { "Content-Type": "application/json" } })
+      .then((res) => ({ ...res.data }));
+  },
   // 생성 (FormData 지원 + 전체 응답 반환)
   create: (url, obj, file) => {
     const formData = new FormData();
@@ -64,6 +69,9 @@ export const axiosAuth = {
     axiosAuthInstance
       .delete(pk ? `${url}/${pk}` : url)
       .then((res) => ({ ...res.data })),
+
+  deleteReview: (url, data) =>
+    axiosAuthInstance.delete(url, data).then((res) => res),
 };
 
 // --------------------------------------------------------

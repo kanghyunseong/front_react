@@ -37,12 +37,8 @@ const Station = () => {
     }
     const el = document.querySelector("#searchResult");
     if (el) el.style.background = "none";
-
-    // axios.get("http://localhost:8081/station/search", {
-    //   params: { keyword: keyword },
-    // });
     axiosPublic
-      .getActual(`/station/search?keyword=${keyword}`)
+      .getActual(`/api/station/search?keyword=${keyword}`)
       .then((res) => {
         setSearchResult(res);
       })
@@ -69,8 +65,10 @@ const Station = () => {
       console.warn("지도 객체가 준비되지 않았거나 좌표가 유효하지 않습니다.");
     }
 
-    axios
-      .get(`http://localhost:8081/station/searchDetail/${stationIdParam}`)
+    // axios
+    //   .get(`http://localhost:8081/station/searchDetail/${stationIdParam}`)
+    axiosPublic
+      .getActual(`/api/station/searchDetail/${stationIdParam}`)
       .then((res) => {
         const stationDetail = Array.isArray(res.data) ? res.data[0] : res.data;
         if (!stationDetail) {
@@ -103,14 +101,11 @@ const Station = () => {
             useTime
         );
       })
-      .catch((err) => {
-        console.log(err);
+      .catch((error) => {
+        console.log(error.response.data.message);
       });
   };
 
-  // ===========================
-  // 위치 정보 + 지도 초기화
-  // ===========================
   useEffect(() => {
     setLoading(false);
 
@@ -136,20 +131,12 @@ const Station = () => {
           longitude: lng,
         });
 
-        const stationCreate = async () => {
+        const stationData = async () => {
           try {
-            const stationData = await axios.get(
-              "http://localhost:8081/station",
-              {
-                params: {
-                  lat: lat,
-                  lng: lng,
-                },
-              }
+            const res = await axiosPublic.getActual(
+              `/api/station?lat=${lat}&lng=${lng}`
             );
-
-            const data = stationData.data.data || [];
-            const mapping = data.map((e) => {
+            const mapping = res.map((e) => {
               const parsedLat = parseFloat(e.lat ?? e.latitude);
               const parsedLng = parseFloat(e.lng ?? e.longitude);
               return {
@@ -164,17 +151,22 @@ const Station = () => {
                 stationId: e.stationId,
               };
             });
-
-            setPositions([...mapping]);
-          } catch (err) {
-            console.error("지도/충전소 데이터 로드 실패:", err);
+            setPositions(mapping);
+          } catch (error) {
+            if (error?.message === "Network Error") {
+              alert("서버에 오류가 있습니다.");
+              setError("네트워크 오류");
+            } else {
+              alert(error.response.data.message);
+              setError(error.response.data.message);
+            }
           }
         };
-
-        stationCreate();
+        stationData();
       },
       (err) => {
-        setError(err.message || "위치 정보를 가져오지 못했습니다.");
+        setError(err.message);
+        alert(error);
         setLoading(false);
       },
       {
@@ -185,9 +177,6 @@ const Station = () => {
     );
   }, []);
 
-  // ===========================
-  // 로딩/에러 처리
-  // ===========================
   if (loading) {
     return (
       <MainContainer>

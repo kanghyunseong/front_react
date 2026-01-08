@@ -6,56 +6,31 @@ import {
   Elision,
 } from "./ReviewSection.style";
 import { DetailButton } from "../Cars/CarsSearchList.style";
-import axios from "axios";
+import { axiosAuth, axiosPublic } from "../../api/reqService";
 
-/**
- * ReviewSection - 리뷰 컴포넌트 (오른쪽 하단)
- *
- * Props:
- * - stationId: 선택된 충전소 ID (number)
- * - refresh: 리뷰 목록 배열 (array)
- * - comment: 리뷰 입력값 (string)
- * - isRecomend: 추천/비추천 선택값 ("Y" or "N")
- * - auth: 인증 정보 객체 {accessToken, userNo}
- * - setRefresh: 리뷰 목록 업데이트 함수
- * - setComment: 리뷰 입력값 업데이트 함수
- * - setIsRecomend: 추천/비추천 업데이트 함수
- */
 const ReviewSection = ({
-  stationId, // Props: 선택된 충전소 ID
-  refresh, // Props: 리뷰 목록 배열
-  comment, // Props: 리뷰 입력값
-  isRecomend, // Props: 추천/비추천 선택값
-  auth, // Props: 인증 정보
-  setRefresh, // Props: 리뷰 목록 업데이트 함수
-  setComment, // Props: 리뷰 입력값 업데이트 함수
-  setIsRecomend, // Props: 추천/비추천 업데이트 함수
+  stationId,
+  refresh,
+  comment,
+  isRecomend,
+  auth,
+  setRefresh,
+  setComment,
+  setIsRecomend,
 }) => {
-  // ===========================
-  // Local State
-  // ===========================
-  const currentUserNo = auth?.userNo; // Local: 현재 로그인한 사용자 번호
-
-  // ===========================
-  // 리뷰 등록 함수
-  // ===========================
+  const currentUserNo = auth?.userNo;
   const register = () => {
-    axios
-      .post(
-        "http://localhost:8081/station/insert",
-        {
-          stationId: stationId,
-          commentContent: comment,
-          recommend: isRecomend,
-        },
-        { headers: { Authorization: `Bearer ${auth?.accessToken}` } }
-      )
-      .then((response) => {
-        const result = response.data;
-        console.log(result);
+    axiosAuth
+      .createJson("/api/station/insert", {
+        stationId: stationId,
+        commentContent: comment,
+        recommend: isRecomend,
+      })
+      .then((res) => {
+        res.data;
         findAll();
-        setIsRecomend(null);
         setComment("");
+        setIsRecomend(null);
       })
       .catch((error) => {
         if (error.response) {
@@ -77,46 +52,30 @@ const ReviewSection = ({
       });
   };
 
-  // ===========================
-  // 리뷰 삭제 함수
-  // ===========================
-  const elision = (reviewIdParam) => {
-    axios
-      .delete("http://localhost:8081/station", {
-        headers: { Authorization: `Bearer ${auth?.accessToken}` },
-        data: { reviewId: reviewIdParam },
-      })
-      .then((response) => {
-        alert(response.data);
+  const elision = (reviewId) => {
+    axiosAuth
+      .deleteReview("/api/station", { data: { reviewId } })
+      .then((res) => {
+        if (res.status === 204) alert("삭제성공");
         findAll();
       })
       .catch((error) => {
-        const msg =
-          error?.response?.data?.["error-message"] ||
-          "삭제 중 오류가 발생했습니다.";
-        alert(msg);
+        alert(error.response.data.message);
       });
   };
 
-  // ===========================
-  // 리뷰 전체 조회 함수
-  // ===========================
   const findAll = () => {
-    axios
-      .get(`http://localhost:8081/station/findAll`, {
-        params: { stationId: stationId },
-      })
-      .then((response) => {
-        setRefresh(response.data || []);
+    axiosPublic
+      .getList(`/api/station/findAll?stationId=${stationId}`)
+      .then((res) => {
+        setRefresh(res.data);
       })
       .catch((err) => {
-        console.error("리뷰 조회 실패:", err);
+        setRefresh([]);
+        alert(err.response.data.message);
       });
   };
 
-  // ===========================
-  // 렌더링
-  // ===========================
   return (
     <>
       {/* 리뷰 조회 버튼 */}
