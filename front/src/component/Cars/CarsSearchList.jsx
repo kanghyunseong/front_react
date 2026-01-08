@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import SideBar from "../Common/Sidebar/Sidebar";
 import {
   MainContainer,
@@ -26,6 +25,7 @@ import {
   DetailButton,
   LoadMoreButton,
 } from "./CarsSearchList.style";
+import { axiosAuth, axiosPublic } from "../../api/reqService";
 
 const CarsSearchList = () => {
   const navi = useNavigate();
@@ -36,12 +36,11 @@ const CarsSearchList = () => {
   const [mains, setMains] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [randomCar, setRandomCar] = useState(null);
-  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   // 메인페이지 정보 가져오기
   useEffect(() => {
-    axios
-      .get(`${apiUrl}/api/main`)
+
+    axiosPublic.getList("/api/main")
       .then((res) => {
         setMains(res.data);
         // popularCars 배열에서 랜덤으로 하나 선택
@@ -60,11 +59,10 @@ const CarsSearchList = () => {
   // 차량 목록 가져오기
   useEffect(() => {
     setIsLoading(true);
-    axios
-      .get(`${apiUrl}/api/cars?page=${currentPage}`)
+    axiosPublic.getList(`/api/cars?page=${currentPage}`)
       .then((response) => {
         const newCars = response.data;
-
+      
         if (!newCars || newCars.length === 0) {
           setHasMore(false);
           return;
@@ -92,7 +90,6 @@ const CarsSearchList = () => {
           setHasMore(false);
         } else {
           setErrMsg(errorMessage || "오류가 발생했습니다");
-          console.error("차량 목록 로드 실패:", err);
         }
       })
       .finally(() => {

@@ -20,6 +20,7 @@ import {
 } from "../Cars/CarsReservationForm.style";
 import { AuthContext } from "../../context/AuthContext";
 import axios from "axios";
+import { axiosAuth } from "../../api/reqService";
 
 const CarReservationForm = () => {
   const navi = useNavigate();
@@ -28,7 +29,7 @@ const CarReservationForm = () => {
   const [destination, setDestination] = useState("");
   const { carId } = useParams();
   const { auth } = useContext(AuthContext);
-  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
+
   useEffect(() => {
     if (!auth.isAuthenticated) {
       alert("로그인하세요.");
@@ -38,7 +39,7 @@ const CarReservationForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
+   
     // 필수 입력 체크
     if (!startTime.trim() || !endTime.trim() || !destination.trim()) {
       alert("모든 항목을 입력해주세요.");
@@ -47,7 +48,6 @@ const CarReservationForm = () => {
 
     const start = new Date(startTime);
     const end = new Date(endTime);
-    const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
     if (end <= start) {
       alert("종료 시간은 시작 시간 이후여야 합니다.");
@@ -60,20 +60,13 @@ const CarReservationForm = () => {
       return;
     }
 
-    axios
-      .post(
-        `${apiUrl}/api/reserve`,
-        { carId, startTime, endTime, destination },
-        { headers: { Authorization: `Bearer ${auth.accessToken}` } }
-      )
+    axiosAuth.createJson("/api/reserve",  {carId, startTime, endTime, destination})
       .then((res) => {
-        console.log("전체 응답:", res.data);
         const reservationNo = res.data;
         navi(`/cars/reserve/${reservationNo}/confirm`);
       })
       .catch((err) => {
-        console.error(err);
-        alert("예약에 실패했습니다.");
+        alert((err.response?.data["error-message"]));
       });
   };
 

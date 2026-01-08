@@ -15,20 +15,16 @@ import {
   HomeButton,
 } from "../Cars/CarsReservationConfirm.style";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
+import { axiosPublic } from "../../api/reqService";
 
 const CarsReservationConfirm = () => {
   const [reservationInfo, setReservationInfo] = useState(null);
   const { reservationNo } = useParams();
   const navi = useNavigate();
-  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   useEffect(() => {
-    axios
-      .get(`${apiUrl}/api/reserve/${reservationNo}`)
+    axiosPublic.getList(`/api/reserve/${reservationNo}`)
       .then((res) => {
-        console.log(res);
-
         setReservationInfo(res.data);
       })
       .catch((err) => {

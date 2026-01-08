@@ -28,7 +28,6 @@ const axiosPublicInstance = axios.create({
  */
 const unwrap = (res) =>
   res.data?.data !== undefined ? res.data.data : res.data;
-
 // --------------------------------------------------------
 // 2. 인증 필요한 요청 (axiosAuth)
 // --------------------------------------------------------
@@ -36,12 +35,16 @@ export const axiosAuth = {
   // [구조 A] 전체 응답이 필요한 경우 (기존 방식 유지)
   // 결과: { message: "...", data: [...], success: "..." }
   getList: (url) => axiosAuthInstance.get(url).then((res) => ({ ...res.data })),
-
   // [구조 B] 데이터 알맹이만 바로 필요한 경우 (대시보드 KPI 등)
   // 결과: [ ... ] 또는 { totalActiveUsers: 21, ... }
   getActual: (url) => axiosAuthInstance.get(url).then(unwrap),
-
   // 생성 (FormData 지원 + 전체 응답 반환)
+
+  createJson: (url, obj) => {
+    return axiosAuthInstance.post(url, obj, {headers: { "Content-Type": "application/json" },})
+    .then((res) => ({...res.data}));
+  },
+
   create: (url, obj, file) => {
     const formData = new FormData();
     if (obj) Object.keys(obj).forEach((key) => formData.append(key, obj[key]));
@@ -52,10 +55,12 @@ export const axiosAuth = {
       })
       .then((res) => ({ ...res.data }));
   },
-
   // 수정 (PUT)
   put: (url, data = {}) =>
     axiosAuthInstance.put(url, data).then((res) => ({ ...res.data })),
+
+  putReserve: (url, data = {}) =>
+    axiosAuthInstance.put(url, data, {headers: { "Content-Type": "application/json" }}).then((res) => ({...res.data})),
 
   // 삭제 (DELETE)
   delete: (url, pk) =>
@@ -88,4 +93,5 @@ export const axiosPublic = {
       })
       .then((res) => ({ ...res.data }));
   },
+
 };

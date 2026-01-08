@@ -19,6 +19,7 @@ import ReservationChangeModal from "./ReservationChangeModal"; // 모달 import 
 import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
+import { axiosAuth, axiosPublic } from "../../api/reqService";
 
 const CarsReservationChange = () => {
   const [reservation, setReservation] = useState([]);
@@ -27,20 +28,12 @@ const CarsReservationChange = () => {
   const { auth } = useContext(AuthContext);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState(null);
-  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   const handleReturn = (reservationNo, carId) => {
     if (!confirm("반납하시겠습니까?")) return;
     const wantsReview = confirm("리뷰를 작성하시겠습니까?");
 
-    // 차량 반납
-    axios
-      .put(`${apiUrl}/api/reserve/return`, reservationNo, {
-        headers: {
-          Authorization: `Bearer ${auth.accessToken}`,
-          "Content-Type": "application/json",
-        },
-      })
+    axiosAuth.putReserve("/api/reserve/return", reservationNo)
       .then((result) => {
         console.log(result);
         alert("반납 처리가 완료되었습니다.");
@@ -59,24 +52,19 @@ const CarsReservationChange = () => {
 
   const handleCancel = (reservationNo) => {
     if (!confirm("예약을 취소하시겠습니까?")) return;
-    axios
-      .delete(`${apiUrl}/api/reserve/${reservationNo}`, {
-        headers: { Authorization: `Bearer ${auth.accessToken}` },
-      })
+    axiosAuth.delete(`/api/reserve/${reservationNo}`)
       .then((result) => {
         console.log(result);
+        alert(result?.data);
         setRefresh((prev) => prev + 1);
       })
       .catch((err) => {
-        console.log(err);
+        alert(err?.response.data["error-message"]);
       });
   };
 
   const handleChange = (updatedData) => {
-    axios
-      .put(`${apiUrl}/api/reserve/change`, updatedData, {
-        headers: { Authorization: `Bearer ${auth.accessToken}` },
-      })
+    axiosAuth.putReserve("/api/reserve/change", updatedData)
       .then((result) => {
         console.log(result);
         alert("예약변경을 성공했습니다.");
@@ -90,10 +78,7 @@ const CarsReservationChange = () => {
   };
 
   useEffect(() => {
-    axios
-      .get(`${apiUrl}/api/reserve/searchList`, {
-        headers: { Authorization: `Bearer ${auth.accessToken}` },
-      })
+    axiosAuth.getList("/api/reserve/searchList")
       .then((result) => {
         console.log(result.data);
         setReservation(result.data);

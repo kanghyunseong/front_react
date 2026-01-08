@@ -39,11 +39,11 @@ const Home = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-
         // const response = await axios.get(`${apiUrl}/main`);
         const response = await axiosPublic.getList("/api/main");
 
-        console.log("이거맞음? : " + response);
+        console.log(response.data);
+       
         // API 응답 구조에 맞게 수정하세요
         setCountMembers(response.data.countMembers);
         setCountCars(response.data.countCars);

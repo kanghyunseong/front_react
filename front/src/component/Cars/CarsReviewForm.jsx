@@ -37,8 +37,7 @@ const CarsReviewForm = () => {
   useEffect(() => {
     // axios
     //   .get(`${apiUrl}/cars/${carId}`)
-    axiosPublic
-      .getList(`/api/cars/${carId}`)
+    axiosPublic.getList(`/api/cars/${carId}`)
       .then((result) => {
         console.log(result);
         setCar(result.data[0]);
