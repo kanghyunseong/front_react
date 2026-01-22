@@ -29,6 +29,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../../context/AuthContext";
 import ReviewChangeModal from "./ReviewChangeModal";
+import { axiosAuth, axiosPublic } from "../../api/reqService";
 
 const CarsDetail = () => {
   const { auth } = useContext(AuthContext);
@@ -43,26 +44,23 @@ const CarsDetail = () => {
 
   // 차량 정보 가져오기
   useEffect(() => {
-    axios
-      .get(`http://localhost:8081/cars/${carId}`)
+    axiosPublic.getList(`/api/cars/${carId}`)
       .then((result) => {
-        console.log(result);
+
         setCar(result.data[0]);
         isLoad(true);
       })
       .catch((err) => {
         console.log(err);
-         alert(err.response.data["error-message"]);
-         navi("/cars/searchList")
+        alert(err.response.data.data["error-message"]);
+        navi("/api/cars/searchList");
       });
   }, [carId, refresh]);
 
   // 리뷰 가져오기
   useEffect(() => {
-    axios
-      .get(`http://localhost:8081/reviews/${carId}`)
+    axiosPublic.getList(`/api/reviews/${carId}`)
       .then((result) => {
-        console.log(result);
         setReviews(result.data);
         isLoad(true);
       })
@@ -73,10 +71,7 @@ const CarsDetail = () => {
 
   // 리뷰 수정하기
   const reviewUpdate = (updatedData) => {
-    axios
-      .put("http://localhost:8081/reviews", updatedData, {
-        headers: { Authorization: `Bearer ${auth.accessToken}` },
-      })
+    axiosAuth.putReserve("/api/reviews", updatedData)
       .then((result) => {
         console.log(result);
         alert("리뷰변경을 성공했습니다.");
@@ -87,24 +82,20 @@ const CarsDetail = () => {
         console.log(err);
         alert("리뷰변경을 실패했습니다.");
       });
-  }
-
+  };
 
   // 리뷰 삭제하기
   const reviewDelete = (reviewNo) => {
     if (!confirm("리뷰를 삭제하시겠습니까?")) return;
-    axios
-      .delete(`http://localhost:8081/reviews/${reviewNo}`, {
-        headers: { Authorization: `Bearer ${auth.accessToken}` },
-      })
+    axiosAuth.delete(`/api/reviews/${reviewNo}`)
       .then((result) => {
         console.log(result);
         setRefresh((prev) => prev + 1);
       })
       .catch((err) => {
         console.log(err);
-      })
-  }
+      });
+  };
 
   if (car == null) return <div>빠이</div>;
 
@@ -170,13 +161,21 @@ const CarsDetail = () => {
                     {/* 로그인한 사용자와 리뷰 작성자가 같을 때만 버튼 표시 */}
                     {auth.userNo === String(review?.reviewWriter) && (
                       <ReviewActionButtons>
-                        <EditButton onClick={() => {
-                          setSelectedReview(review);
-                          setModalOpen(true);
-                        }}>수정</EditButton>
-                        <DeleteButton onClick={() => {
-                          reviewDelete(review?.reviewNo);
-                        }}>삭제</DeleteButton>
+                        <EditButton
+                          onClick={() => {
+                            setSelectedReview(review);
+                            setModalOpen(true);
+                          }}
+                        >
+                          수정
+                        </EditButton>
+                        <DeleteButton
+                          onClick={() => {
+                            reviewDelete(review?.reviewNo);
+                          }}
+                        >
+                          삭제
+                        </DeleteButton>
                       </ReviewActionButtons>
                     )}
                   </ReviewHeader>
@@ -184,11 +183,13 @@ const CarsDetail = () => {
                 </ReviewItem>
               ))
             ) : (
-              <EmptyReviewMessage>아직 작성된 리뷰가 없습니다.</EmptyReviewMessage>
+              <EmptyReviewMessage>
+                아직 작성된 리뷰가 없습니다.
+              </EmptyReviewMessage>
             )}
           </ReviewSection>
 
-          <ReservationButton onClick={() => navi(`/cars/${carId}/reserve`)}>
+          <ReservationButton onClick={() => navi(`/cars/$/api{carId}/reserve`)}>
             차량 예약하기
           </ReservationButton>
         </DetailCard>

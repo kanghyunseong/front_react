@@ -1,8 +1,14 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import {
+  FaEdit,
+  FaUserCircle,
+  FaArrowLeft,
+  FaCloudUploadAlt,
+} from "react-icons/fa";
 import { AuthContext } from "../../../context/AuthContext";
 import * as S from "./NoticeWrite.styles";
+import { axiosAuth } from "../../../api/reqService";
 
 const NoticeWrite = () => {
   const navigate = useNavigate();
@@ -12,10 +18,9 @@ const NoticeWrite = () => {
   const [formData, setFormData] = useState({
     noticeTitle: "",
     noticeContent: "",
-    noticeWriter: 0,
   });
 
-  const [displayWriter, setDisplayWriter] = useState("로딩중...");
+  const [displayWriter, setDisplayWriter] = useState("관리자");
 
   useEffect(() => {
     const token = auth?.accessToken || localStorage.getItem("accessToken");
@@ -47,7 +52,7 @@ const NoticeWrite = () => {
     if (loading) return;
 
     if (!formData.noticeTitle || !formData.noticeContent) {
-      alert("제목과 내용을 입력해주세요.");
+      alert("공지사항 제목과 내용을 모두 입력해주세요.");
       return;
     }
 
@@ -65,91 +70,74 @@ const NoticeWrite = () => {
 
     try {
       setLoading(true);
-      const token = auth?.accessToken || localStorage.getItem("accessToken");
-
-      await axios.post(
-        "http://localhost:8081/admin/api/notice/insert",
-        submitData,
-        {
-          headers: {
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-        }
-      );
-
-      alert("등록되었습니다.");
+      await axiosAuth.post(`/api/admin/notice/insert`, submitData);
+      alert("공지사항이 성공적으로 등록되었습니다.");
       navigate("/admin/community/notice/noticeList");
     } catch (error) {
       console.error("등록 실패:", error);
-      if (error.response) {
-        const status = error.response.status;
-        const serverMsg = error.response.data.message || "서버 내부 오류";
-
-        if (status === 401 || status === 403) {
-          alert(
-            "권한이 없거나 세션이 만료되었습니다. 로그인 페이지로 이동합니다."
-          );
-          navigate("/members/login");
-        } else if (status === 400) {
-          alert(`등록 실패: 입력 값이 올바르지 않습니다. (${serverMsg})`);
-        } else {
-          alert(`등록 중 오류가 발생했습니다: ${serverMsg}`);
-        }
-      } else {
-        alert("네트워크 오류로 등록 요청에 실패했습니다.");
-      }
+      const serverMsg = error.response?.data?.message || "서버 내부 오류";
+      alert(`등록 중 오류가 발생했습니다: ${serverMsg}`);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div>
-      <S.Header>
-        <h2>Community / Notice Write</h2>
-      </S.Header>
+    <S.PageWrapper>
+      <S.TitleSection>
+        <div className="back-nav" onClick={() => navigate(-1)}>
+          <FaArrowLeft /> 돌아가기
+        </div>
+        <h2>Community Notice</h2>
+        <p>새로운 공지사항을 작성하여 사용자들에게 소식을 알리세요.</p>
+      </S.TitleSection>
 
       <S.Container>
-        <S.SectionTitle>Write Notice</S.SectionTitle>
+        <S.SectionHeader>
+          <FaEdit /> 공지사항 작성
+        </S.SectionHeader>
 
-        <S.FormGroup>
-          <div>
-            <S.Label>Notice title</S.Label>
-            <S.Input
-              name="noticeTitle"
-              value={formData.noticeTitle}
-              onChange={handleChange}
-              placeholder="제목 입력"
-            />
-          </div>
-          <div>
-            <S.Label>Writer</S.Label>
-            <S.Input
-              value={displayWriter}
-              readOnly
-              style={{ backgroundColor: "#f0f0f0", color: "#555" }}
-            />
-          </div>
-        </S.FormGroup>
+        <S.FormLayout>
+          <S.FormGroup>
+            <S.InputBox>
+              <S.Label>공지 제목</S.Label>
+              <S.Input
+                name="noticeTitle"
+                value={formData.noticeTitle}
+                onChange={handleChange}
+                placeholder="제목을 입력하세요"
+              />
+            </S.InputBox>
+            <S.InputBox>
+              <S.Label>작성자</S.Label>
+              <S.ReadOnlyField>
+                <FaUserCircle className="user-icon" />
+                {displayWriter}
+              </S.ReadOnlyField>
+            </S.InputBox>
+          </S.FormGroup>
 
-        <S.Label>작성 내용</S.Label>
-        <S.TextAreaBox>
-          <S.TextArea
-            name="noticeContent"
-            value={formData.noticeContent}
-            onChange={handleChange}
-            placeholder="내용 입력"
-          />
-        </S.TextAreaBox>
+          <S.FullWidthBox>
+            <S.Label>공지 내용</S.Label>
+            <S.TextAreaBox>
+              <S.TextArea
+                name="noticeContent"
+                value={formData.noticeContent}
+                onChange={handleChange}
+                placeholder="공지사항 상세 내용을 입력하세요."
+              />
+            </S.TextAreaBox>
+          </S.FullWidthBox>
 
-        <S.ButtonGroup>
-          <S.Button onClick={() => navigate(-1)}>Cancel</S.Button>
-          <S.Button $primary onClick={handleSubmit}>
-            {loading ? "등록 처리 중..." : "Create"}
-          </S.Button>
-        </S.ButtonGroup>
+          <S.ButtonGroup>
+            <S.Button onClick={() => navigate(-1)}>Cancel</S.Button>
+            <S.Button $primary onClick={handleSubmit} disabled={loading}>
+              {loading ? "등록 중..." : "Create Notice"}
+            </S.Button>
+          </S.ButtonGroup>
+        </S.FormLayout>
       </S.Container>
-    </div>
+    </S.PageWrapper>
   );
 };
 

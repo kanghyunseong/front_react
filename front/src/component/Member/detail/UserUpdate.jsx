@@ -15,9 +15,8 @@ import {
 } from "./UserDetail.styles";
 import { AuthContext } from "../../../context/AuthContext";
 import defaultImg from "../../../assets/LoginFileImg.png";
-import axios from "axios";
 import Nophoto from "../../../assets/Nophoto.png";
-
+import { axiosAuth } from "../../../api/reqService";
 const UserUpdate = () => {
   const { auth, login } = useContext(AuthContext);
   const navi = useNavigate();
@@ -33,6 +32,7 @@ const UserUpdate = () => {
     return img && img !== "null" ? img : null;
   });
   const [loading, setLoading] = useState(true);
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
 
   // ✔ 로그인 여부 확인 및 초기값 세팅
   useEffect(() => {
@@ -49,7 +49,9 @@ const UserUpdate = () => {
       setEmail(auth.email || "");
       setPhone(auth.phone || "");
       setFileImg(
-        auth.licenseUrl && auth.licenseUrl !== "null" ? auth.licenseUrl : null
+        auth.licenseUrl && auth.licenseUrl !== "null"
+          ? encodeURI(auth.licenseUrl)
+          : null
       );
     }
   }, [auth, navi]);
@@ -73,16 +75,11 @@ const UserUpdate = () => {
     formData.append("phone", phone);
     if (file) formData.append("licenseImg", file);
 
-    axios
-      .put("http://localhost:8081/members/updateUser", formData, {
-        headers: {
-          Authorization: `Bearer ${auth.accessToken}`,
-          "Content-Type": "multipart/form-data",
-        },
-      })
+    axiosAuth
+      .put(`/api/members/updateUser`, formData)
       .then((res) => {
         const data = res.data;
-
+        //console.log(data);
         // Context와 localStorage 동시에 업데이트
         login(
           auth.accessToken,
@@ -104,13 +101,15 @@ const UserUpdate = () => {
         setPhone(data.phone || "");
         setFileImg(data.licenseUrl || defaultImg);
 
-        alert("회원 정보가 수정되었습니다.");
+        alert(res.message);
         navi("/members/detail");
       })
       .catch((err) => {
+        //console.log(err.response.data.message);
         const msg =
-          err?.response?.data["error-message"] ||
+          err?.response?.data.message ||
           "회원 정보 수정 중 문제가 발생했습니다.";
+
         alert(msg);
       });
   };

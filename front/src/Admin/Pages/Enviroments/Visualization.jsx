@@ -127,7 +127,6 @@ const Visualization = () => {
           }}
         />
 
-        {/* 첫 번째 차트: 전체 절감량 */}
         <div style={{ marginBottom: "50px" }}>
           <h4 style={{ marginBottom: "20px" }}>전체 절감량</h4>
           <S.ChartContainer>
@@ -135,7 +134,6 @@ const Visualization = () => {
           </S.ChartContainer>
         </div>
 
-        {/* 두 번째 차트: 이용 지역별 통계 */}
         <div>
           <h4 style={{ marginBottom: "20px" }}>이용 지역별 통계</h4>
           <S.ChartContainer>

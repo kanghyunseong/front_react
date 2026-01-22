@@ -1,15 +1,23 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  FaPlus,
+  FaEdit,
+  FaTrashAlt,
+  FaRegFileAlt,
+  FaUserEdit,
+  FaCalendarAlt,
+} from "react-icons/fa";
 import * as S from "./NoticeList.styles";
 import { AuthContext } from "../../../context/AuthContext";
-import axios from "axios";
+import { axiosAuth } from "../../../api/reqService";
 
 const NoticeList = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [notices, setNotices] = useState([]);
   const { auth } = useContext(AuthContext);
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   useEffect(() => {
     const fetchNotices = async () => {
       if (!auth || !auth.accessToken) {
@@ -19,24 +27,17 @@ const NoticeList = () => {
 
       try {
         setLoading(true);
-        const response = await axios.get(
-          "http://localhost:8081/admin/api/notice/list",
-          { headers: { Authorization: `Bearer ${auth.accessToken}` } }
-        );
-        setNotices(response.data);
+        const response = await axiosAuth.getActual(`api/admin/notice/list`);
+        setNotices(Array.isArray(response) ? response : []);
       } catch (error) {
         console.log("공지사항 목록 로딩 실패: ", error);
-
         if (
           error.response &&
           (error.response.status === 401 || error.response.status === 403)
         ) {
-          alert(
-            "세션이 만료되었거나 접근 권한이 없습니다. 로그인 페이지로 이동합니다."
-          );
+          alert("세션이 만료되었습니다. 다시 로그인해주세요.");
           navigate("/members/login");
         } else {
-          alert("공지사항 목록을 불러오는 데 실패했습니다.");
           setNotices([]);
         }
       } finally {
@@ -47,113 +48,106 @@ const NoticeList = () => {
   }, [auth, navigate]);
 
   const handleDelete = async (noticeNo) => {
-    if (loading) return; // 👈 [개선 1] 로딩 중 중복 클릭 방지
-
-    if (!window.confirm("정말 이 공지사항을 삭제하시겠습니까?")) {
-      return;
-    }
-
-    // 토큰 체크 (필수)
-    const token = auth.accessToken;
-    if (!token) {
-      alert("인증 정보가 없습니다. 다시 로그인해주세요.");
-      navigate("/members/login");
-      return;
-    }
+    if (loading) return;
+    if (!window.confirm("정말 이 공지사항을 삭제하시겠습니까?")) return;
 
     try {
       setLoading(true);
-      await axios.delete(
-        `http://localhost:8081/admin/api/notice/delete/${noticeNo}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setNotices((prevNotices) =>
-        prevNotices.filter((notice) => notice.noticeNo !== noticeNo)
+      await axiosAuth.delete(`/api/admin/notice/delete/${noticeNo}`);
+      setNotices((prev) =>
+        prev.filter((notice) => notice.noticeNo !== noticeNo)
       );
       alert("삭제되었습니다.");
     } catch (error) {
-      console.error("삭제 실패:", error);
-
-      if (error.response) {
-        const status = error.response.status;
-        const serverMsg = error.response.data.message || "서버 내부 오류";
-
-        if (status === 404) {
-          alert(
-            `삭제 실패: ${serverMsg} (이미 삭제되었거나 번호를 찾을 수 없습니다.)`
-          );
-        } else if (status === 401 || status === 403) {
-          alert(
-            "권한이 없거나 세션이 만료되었습니다. 로그인 페이지로 이동합니다."
-          );
-          navigate("/members/login");
-        } else {
-          alert(`공지사항 삭제 중 오류가 발생했습니다: ${serverMsg}`);
-        }
-      } else {
-        alert("네트워크 오류로 삭제 요청에 실패했습니다.");
-      }
+      alert("삭제 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleWrite = () => {
-    navigate("/admin/community/notice/noticeWrite");
-  };
+  const handleWrite = () => navigate("/admin/community/notice/noticeWrite");
+  const handleEdit = (noticeNo) =>
+    navigate(`/admin/community/notice/noticeEdit/${noticeNo}`);
 
   if (loading && notices.length === 0) {
-    return (
-      <S.Container
-        style={{ textAlign: "center", padding: "40px", color: "#6B4CE6" }}
-      >
-        공지사항 목록을 불러오는 중입니다...
-      </S.Container>
-    );
+    return <S.LoadingWrapper>공지사항을 불러오는 중입니다...</S.LoadingWrapper>;
   }
 
   return (
-    <S.Container>
-      <S.Header>
-        <h2>Community / Notice List</h2>
-        <S.WriteBtn onClick={handleWrite}>+ New Notice</S.WriteBtn>
-      </S.Header>
+    <S.PageWrapper>
+      <S.TitleSection>
+        <div className="title-group">
+          <h2>Community Management</h2>
+          <p>공지사항을 작성하고 관리하는 공간입니다.</p>
+        </div>
+        <S.WriteBtn onClick={handleWrite}>
+          <FaPlus /> New Notice
+        </S.WriteBtn>
+      </S.TitleSection>
 
-      <S.Table>
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>Title</th>
-            <th>Writer</th>
-            <th>Content</th>
-            <th>Date</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {notices.map((notice) => (
-            <tr key={notice.noticeNo}>
-              <td>{notice.noticeNo}</td>
-              <td>{notice.noticeTitle}</td>
-              <td>{notice.noticeWriter}</td>
-              <td>{notice.noticeContent}</td>
-              <td>{notice.noticeDate}</td>
-              <td>
-                <S.ActionBtn onClick={() => handleEdit(notice)}>
-                  Edit
-                </S.ActionBtn>
-                <S.ActionBtn
-                  onClick={() => handleDelete(notice.noticeNo)}
-                  style={{ color: "red" }}
-                >
-                  Del
-                </S.ActionBtn>
-              </td>
+      <S.TableCard>
+        <S.StyledTable>
+          <thead>
+            <tr>
+              <th width="80px">No</th>
+              <th width="40%">
+                <FaRegFileAlt /> Title
+              </th>
+              <th>
+                <FaUserEdit /> Writer
+              </th>
+              <th>
+                <FaCalendarAlt /> Date
+              </th>
+              <th width="120px">Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </S.Table>
-    </S.Container>
+          </thead>
+          <tbody>
+            {notices.length > 0 ? (
+              notices.map((notice) => (
+                <tr key={notice.noticeNo}>
+                  <td className="no-cell">{notice.noticeNo}</td>
+                  <td className="title-cell">
+                    <div className="title-text">{notice.noticeTitle}</div>
+                    <div className="content-preview">
+                      {notice.noticeContent}
+                    </div>
+                  </td>
+                  <td className="writer-cell">
+                    <S.Badge>{notice.noticeWriter}</S.Badge>
+                  </td>
+                  <td className="date-cell">{notice.noticeDate}</td>
+                  <td>
+                    <S.ActionGroup>
+                      <S.IconButton
+                        className="edit"
+                        onClick={() => handleEdit(notice.noticeNo)}
+                        title="수정"
+                      >
+                        <FaEdit />
+                      </S.IconButton>
+                      <S.IconButton
+                        className="delete"
+                        onClick={() => handleDelete(notice.noticeNo)}
+                        title="삭제"
+                      >
+                        <FaTrashAlt />
+                      </S.IconButton>
+                    </S.ActionGroup>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5">
+                  <S.EmptyState>등록된 공지사항이 없습니다.</S.EmptyState>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </S.StyledTable>
+      </S.TableCard>
+    </S.PageWrapper>
   );
 };
 

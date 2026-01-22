@@ -1,15 +1,8 @@
 import { useEffect, useContext, useState } from "react";
 import { AuthContext } from "../../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import api from "../Api.jsx";
-import {
-  Container,
-  Header,
-  Form,
-  Input,
-  Label,
-  Button,
-} from "./Board.styles";
+import { axiosAuth } from "../../../api/reqService.js";
+import { Container, Header, Form, Input, Label, Button } from "./Board.styles";
 import gasipan from "../../../assets/gasipan.png";
 
 const BoardForm = () => {
@@ -18,7 +11,7 @@ const BoardForm = () => {
 
   const { auth } = useContext(AuthContext);
   const navi = useNavigate();
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8081";
   // 로그인 체크
   useEffect(() => {
     if (!auth.isAuthenticated) {
@@ -38,18 +31,14 @@ const BoardForm = () => {
     formData.append("boardTitle", boardTitle);
     formData.append("boardContent", boardContent);
 
-    api
-      .post("/boards", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          // Authorization은 인터셉터에서 자동
-        },
+    axiosAuth
+      .create("/api/boards", {
+        boardTitle,
+        boardContent,
       })
       .then((res) => {
-        if (res.status === 201) {
-          alert(res.data?.message || "게시글이 등록되었습니다!");
-          navi("/boards");
-        }
+        alert(res.data?.message || "게시글이 등록되었습니다!");
+        navi("/boards");
       })
       .catch((err) => {
         console.error("게시글 등록 실패:", err);

@@ -1,33 +1,29 @@
 import React, { useContext, useEffect, useState } from "react";
-import { FaFilePdf, FaTimes } from "react-icons/fa";
+import { FaCommentDots, FaTimes } from "react-icons/fa";
 import * as S from "./CommunityDeclaration.styles";
 import { AuthContext } from "../../../context/AuthContext";
-import axios from "axios";
+import { axiosAuth } from "../../../api/reqService";
+import { useNavigate } from "react-router-dom";
 
 const CommentDeclaration = () => {
   const { auth } = useContext(AuthContext);
   const [reportList, setReportList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (!auth || !auth.accessToken) {
+    if (!auth?.accessToken) {
       setLoading(false);
       return;
     }
-
     const fetchReports = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(
-          `http://localhost:8081/admin/api/community/comment/declaration`,
-          {
-            headers: { Authorization: `Bearer ${auth.accessToken}` },
-          }
+        const response = await axiosAuth.getActual(
+          `/api/admin/community/comment/declaration`
         );
-        setReportList(response.data);
+        setReportList(Array.isArray(response) ? response : []);
       } catch (error) {
-        cconsole.error("댓글 신고 목록 로딩 실패:", error);
-        alert("목록을 불러오는 데 실패했습니다. 관리자에게 문의하세요.");
         setReportList([]);
       } finally {
         setLoading(false);
@@ -37,269 +33,114 @@ const CommentDeclaration = () => {
   }, [auth]);
 
   const handleDelete = async (reportNo) => {
-    if (!window.confirm("정말 이 신고 내역을 삭제(승인) 하시겠습니까?")) return;
-
-    const token = auth?.accessToken;
-    if (!token) {
-      alert("인증 정보가 없습니다. 로그인해주세요.");
-      return;
-    }
-
+    if (!window.confirm("신고된 댓글을 삭제하시겠습니까?")) return;
     try {
-      await axios.delete(
-        `http://localhost:8081/admin/api/community/comment/declaration/delete/${reportNo}`,
-        {
-          headers: { Authorization: `Bearer ${auth.accessToken}` },
-        }
+      await axiosAuth.delete(
+        `/api/admin/community/comment/declaration/delete/${reportNo}`
       );
       setReportList((prev) =>
         prev.filter((item) => item.reportNo !== reportNo)
       );
-      alert("삭제(승인) 처리되었습니다.");
+      alert("삭제 처리가 완료되었습니다.");
     } catch (error) {
-      const status = error.response.status;
-      const serverMsg = error.response.data.message || "서버 내부 오류";
-
-      if (status === 404) {
-        alert(
-          `삭제 실패: ${serverMsg} (이미 처리되었거나 존재하지 않는 신고입니다.)`
-        );
-      } else if (status === 401 || status === 403) {
-        alert(
-          "권한이 없거나 세션이 만료되었습니다. 로그인 페이지로 이동하세요."
-        );
-      } else if (status === 401 || status === 403) {
-        alert(`삭제 처리 중 오류가 발생했습니다: ${serverMsg}`);
-      } else {
-        alert("네트워크 오류로 요청에 실패했습니다.");
-      }
+      alert("처리 중 오류가 발생했습니다.");
     }
   };
 
   const handleReject = async (reportNo) => {
-    if (!window.confirm("이 신고를 반려(취소) 처리 하시겠습니까?")) return;
-    const token = auth?.accessToken;
-
-    if (!token) {
-      alert("인증 정보가 없습니다. 로그인 해주세요.");
-      return;
-    }
-
+    if (!window.confirm("신고를 반려하시겠습니까?")) return;
     try {
-      await axios.put(
-        `http://localhost:8081/admin/api/community/comment/declaration/reject/${reportNo}`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${auth.accessToken}` },
-        }
+      await axiosAuth.put(
+        `/api/admin/community/comment/declaration/reject/${reportNo}`
       );
       setReportList((prev) =>
         prev.filter((item) => item.reportNo !== reportNo)
       );
-      alert("반려 처리되었습니다.");
+      alert("반려 처리가 완료되었습니다.");
     } catch (error) {
-      console.error("반려 실패:", error);
-      if (error.response) {
-        const status = error.response.status;
-        const serverMsg = error.response.data.message || "서버 내부 오류";
-
-        if (status === 404) {
-          alert(
-            `반려 실패: ${serverMsg} (이미 처리되었거나 존재하지 않는 신고입니다.)`
-          );
-        } else if (status === 401 || status === 403) {
-          alert(
-            "권한이 없거나 세션이 만료되었습니다. 로그인 페이지로 이동하세요."
-          );
-          Navigate("/members/login");
-        } else {
-          alert(`반려 처리 중 오류가 발생했습니다: ${serverMsg}`);
-        }
-      } else {
-        alert("반려 처리 중 오류가 발생했습니다.");
-      }
+      alert("처리 중 오류가 발생했습니다.");
     }
   };
-
-  if (loading) {
-    return (
-      <div style={{ textAlign: "center", padding: "40px", color: "#666" }}>
-        신고 내역을 불러오는 중입니다...
-      </div>
-    );
-  }
 
   return (
     <S.Container>
       <S.TitleArea>
-        <h2>Community / Comment declaration</h2>
-        <h3>Enumeration</h3>
-        <p>comment declaration</p>
+        <h2>Comment Management</h2>
+        <p>신고된 댓글 통합 관리</p>
       </S.TitleArea>
 
       <S.ListCard>
-        <div
-          style={{ padding: "0 0 20px 10px", borderBottom: "1px solid #eee" }}
-        >
-          <h3 style={{ margin: 0 }}>신고된 댓글</h3>
-          <span style={{ fontSize: "12px", color: "#999" }}>
-            자유 / 이미지 게시판 댓글 신고내역
-          </span>
-        </div>
+        <S.CardHeader>
+          <h3>신고된 댓글</h3>
+          <span className="sub-text">커뮤니티 내 부적절한 댓글 신고현황</span>
+        </S.CardHeader>
 
         <S.Header>
-          <S.Col
-            flex={2}
-            style={{
-              paddingLeft: "20px",
-              fontWeight: "bold",
-              color: "#555",
-              justifyContent: "flex-start",
-              display: "flex",
-            }}
-          >
+          <S.Col flex={2.5} align="flex-start" style={{ paddingLeft: "30px" }}>
             댓글 정보
           </S.Col>
-          <S.Col flex={2} style={{ fontWeight: "bold", color: "#555" }}>
-            신고 사유
-          </S.Col>
-          <S.Col flext={1} style={{ fontWeight: "bold", color: "#555" }}>
-            신고 일자
-          </S.Col>
-          <S.Col flex={1} style={{ fontWeight: "bold", color: "#555" }}>
-            피신고자 / 신고자
-          </S.Col>
-          <S.Col flex={1.5} style={{ fontWeight: "bold", color: "#555" }}>
-            관리
-          </S.Col>
+          <S.Col flex={2}>신고 사유</S.Col>
+          <S.Col flex={1.2}>신고 일자</S.Col>
+          <S.Col flex={1.2}>대상자 / 신고자</S.Col>
+          <S.Col flex={1}>관리</S.Col>
         </S.Header>
 
-        {reportList.map((item) => (
-          <S.Row key={item.reportNo}>
-            <S.Col
-              flex={2}
-              style={{
-                paddingLeft: "20px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "flex-start",
-              }}
-            >
-              <input type="checkbox" style={{ cursor: "pointer" }} />
-              <div className="icon-box" style={{ margin: "0 15px 0 10px" }}>
-                <FaFilePdf />
-              </div>
-
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "flex-start",
-                  textAlign: "left",
-                }}
+        {loading ? (
+          <S.LoadingState>데이터 로딩 중...</S.LoadingState>
+        ) : reportList.length > 0 ? (
+          reportList.map((item) => (
+            <S.Row key={item.reportNo}>
+              <S.Col
+                flex={2.5}
+                align="flex-start"
+                style={{ paddingLeft: "20px" }}
               >
-                <span
-                  style={{
-                    fontWeight: "bold",
-                    fontSize: "14px",
-                    color: "#333",
-                    marginBottom: "3px",
-                    lineHeight: "1.3",
-                  }}
-                >
-                  {item.targetTitle
-                    ? item.targetTitle.length > 20
-                      ? item.targetTitle.substring(0, 20) + "..."
-                      : item.targetTitle
-                    : "내용 없음 (삭제됨)"}
-                </span>
-                <span style={{ fontSize: "11px", color: "#999" }}>
-                  [{item.targetType}] #{item.targetNo}
-                </span>
-              </div>
-            </S.Col>
-
-            <S.Col
-              flex={2}
-              style={{
-                fontSize: "14px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              {item.reason}
-            </S.Col>
-            <S.Col
-              flext={1}
-              style={{
-                fontSize: "14px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              {item.reportDate}
-            </S.Col>
-
-            <S.Col
-              flex={1}
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <div>
-                <span style={{ fontWeight: "500" }}>
-                  {item.reportedUserName}
-                </span>
-                <div style={{ fontSize: "0.8rem", color: "#888" }}>
-                  (from: {item.reporterName})
+                <input type="checkbox" style={{ cursor: "pointer" }} />
+                <div className="icon-box">
+                  <FaCommentDots />
                 </div>
-              </div>
-            </S.Col>
-
-            <S.Col
-              flex={1.5}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-              }}
-            >
-              <S.DeleteBtn onClick={() => handleDelete(item.reportNo)}>
-                삭제
-              </S.DeleteBtn>
-              <S.CloseIcon
-                onClick={() => handleReject(item.reportNo)}
-                style={{
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  marginLeft: "5px",
-                }}
-              >
-                <FaTimes />
-              </S.CloseIcon>
-            </S.Col>
-          </S.Row>
-        ))}
-
-        {reportList.length === 0 && (
-          <div
-            style={{
-              padding: "40px",
-              textAlign: "center",
-              width: "100%",
-              color: "#999",
-            }}
-          >
-            신고된 내역이 없습니다.
-          </div>
+                <div className="content-info">
+                  <span className="main-title">
+                    {item.targetTitle
+                      ? item.targetTitle.length > 25
+                        ? item.targetTitle.substring(0, 25) + "..."
+                        : item.targetTitle
+                      : "내용 없음"}
+                  </span>
+                  <span className="sub-info">
+                    ID #{item.targetNo} · {item.targetType}
+                  </span>
+                </div>
+              </S.Col>
+              <S.Col flex={2} style={{ fontWeight: "500" }}>
+                {item.reason}
+              </S.Col>
+              <S.Col flex={1.2} style={{ fontSize: "13px", color: "#64748b" }}>
+                {item.reportDate}
+              </S.Col>
+              <S.Col flex={1.2}>
+                <div className="user-info">
+                  <span className="target-user">{item.reportedUserName}</span>
+                  <span className="reporter">from: {item.reporterName}</span>
+                </div>
+              </S.Col>
+              <S.Col flex={1}>
+                <S.ActionGroup>
+                  <S.DeleteBtn onClick={() => handleDelete(item.reportNo)}>
+                    삭제
+                  </S.DeleteBtn>
+                  <S.RejectBtn
+                    onClick={() => handleReject(item.reportNo)}
+                    title="반려"
+                  >
+                    <FaTimes />
+                  </S.RejectBtn>
+                </S.ActionGroup>
+              </S.Col>
+            </S.Row>
+          ))
+        ) : (
+          <S.EmptyState>신고된 댓글이 없습니다.</S.EmptyState>
         )}
       </S.ListCard>
     </S.Container>
